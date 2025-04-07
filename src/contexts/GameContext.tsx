@@ -1,112 +1,23 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from "sonner";
+import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { forestEnemies, desertEnemies } from '@/data/enemies';
+import { playerSkills } from '@/data/skills';
+import { initialUpgrades } from '@/data/upgrades';
+import { calculatePlayerStats, handleEnemyDrops } from '@/utils/battle';
+import { 
+  GameContextType, 
+  BattleState, 
+  Enemy, 
+  Item, 
+  Skill, 
+  Upgrade,
+  ActiveBuff
+} from '@/types/game';
 
-// Define our enemy types with enhanced stats
-type Enemy = {
-  name: string;
-  power: number;
-  image: string;
-  hp: number;
-  maxHp: number;
-  damage: number;
-  ki: number;
-  maxKi: number;
-};
-
-// Define our item types
-type ItemType = 'weapon' | 'weight' | 'consumable';
-
-type Item = {
-  id: string;
-  name: string;
-  description: string;
-  type: ItemType;
-  slot?: string;
-  effect?: {
-    type: string;
-    value: number;
-    duration?: number;
-  };
-};
-
-// Define our battle types
-type BattleState = {
-  inProgress: boolean;
-  playerStats: CombatStats;
-  enemy: Enemy | null;
-  log: string[];
-  playerTurn: boolean;
-};
-
-type CombatStats = {
-  hp: number;
-  maxHp: number;
-  damage: number;
-  ki: number;
-  maxKi: number;
-};
-
-type SkillType = 'basic' | 'special' | 'ultimate';
-
-type Skill = {
-  name: string;
-  type: SkillType;
-  damageMultiplier: number;
-  kiCost: number;
-  description: string;
-};
-
-// Define our upgrade types
-type Upgrade = {
-  id: string;
-  name: string;
-  description: string;
-  powerBonus: number;
-  cost: number;
-  purchased: boolean;
-};
-
-// Define the context type
-type GameContextType = {
-  clicks: number;
-  powerLevel: number;
-  increaseClicks: () => void;
-  upgrades: Upgrade[];
-  equippedUpgrade: string | null;
-  purchaseUpgrade: (id: string) => void;
-  equipUpgrade: (id: string) => void;
-  forest: Enemy[];
-  desert: Enemy[];
-  fightEnemy: (zone: string) => void;
-  fightResult: { enemy: Enemy | null; won: boolean | null } | null;
-  clearFightResult: () => void;
-  battleState: BattleState;
-  skills: Skill[];
-  startBattle: (enemy: Enemy) => void;
-  useSkill: (skill: Skill) => void;
-  fleeFromBattle: () => void;
-  endBattle: (victory: boolean) => void;
-  inventory: Item[];
-  equippedItems: Item[];
-  equipItem: (itemId: string | null, slotType: string) => void;
-  useItem: (itemId: string) => void;
-  resetProgress: () => void;
-};
-
-// Create the context
+// Define the context
 const GameContext = createContext<GameContextType | undefined>(undefined);
-
-// Define our skills
-const playerSkills: Skill[] = [
-  {
-    name: "Basic Combo",
-    type: "basic",
-    damageMultiplier: 1,
-    kiCost: 0,
-    description: "A simple combination of punches and kicks"
-  }
-];
 
 // Define the initial battle state
 const initialBattleState: BattleState = {
@@ -123,115 +34,6 @@ const initialBattleState: BattleState = {
   playerTurn: false
 };
 
-// Define our enemies
-const forestEnemies = [
-  { 
-    name: 'Wolf', 
-    power: 5, 
-    image: '/wolf.png',
-    hp: 50,
-    maxHp: 50,
-    damage: 5,
-    ki: 10,
-    maxKi: 10
-  },
-  { 
-    name: 'Bandit', 
-    power: 10, 
-    image: '/bandit.png',
-    hp: 80,
-    maxHp: 80,
-    damage: 8,
-    ki: 20,
-    maxKi: 20
-  },
-  { 
-    name: 'Bear', 
-    power: 20, 
-    image: '/bear.png',
-    hp: 150,
-    maxHp: 150,
-    damage: 15,
-    ki: 20,
-    maxKi: 20
-  },
-];
-
-// Define desert enemies
-const desertEnemies = [
-  { 
-    name: 'Yamcha', 
-    power: 50, 
-    image: '/yamcha.png',
-    hp: 300,
-    maxHp: 300,
-    damage: 25,
-    ki: 50,
-    maxKi: 50
-  },
-  { 
-    name: 'T-Rex', 
-    power: 250, 
-    image: '/t-rex.png',
-    hp: 1000,
-    maxHp: 1000,
-    damage: 75,
-    ki: 100,
-    maxKi: 100
-  },
-];
-
-// Define our upgrades
-const initialUpgrades = [
-  { 
-    id: 'pushups', 
-    name: 'Push Ups', 
-    description: 'Basic training that increases your power gain.', 
-    powerBonus: 1, 
-    cost: 10, 
-    purchased: false 
-  },
-  { 
-    id: 'pullups', 
-    name: 'Pull Ups', 
-    description: 'Advanced training that significantly boosts your power gain.', 
-    powerBonus: 2, 
-    cost: 25, 
-    purchased: false 
-  },
-  { 
-    id: 'onehand', 
-    name: 'One-Handed Push Ups', 
-    description: 'Master level training for substantial power gain boosts.', 
-    powerBonus: 3, 
-    cost: 50, 
-    purchased: false 
-  },
-];
-
-// Helper function to calculate player stats based on power level
-const calculatePlayerStats = (powerLevel: number, equippedItems: Item[]): CombatStats => {
-  // Start with base stats
-  let stats = {
-    hp: powerLevel * 10,
-    maxHp: powerLevel * 10,
-    damage: Math.max(1, Math.floor(powerLevel * 0.8)),
-    ki: powerLevel * 5,
-    maxKi: powerLevel * 5,
-  };
-  
-  // Apply equipment bonuses
-  equippedItems.forEach(item => {
-    if (item.effect) {
-      if (item.effect.type === 'damage_multiplier') {
-        stats.damage = Math.floor(stats.damage * item.effect.value);
-      }
-    }
-  });
-  
-  return stats;
-};
-
 // Define initial state values
 const initialState = {
   clicks: 0,
@@ -240,38 +42,23 @@ const initialState = {
   equippedUpgrade: null as string | null,
   inventory: [] as Item[],
   equippedItems: [] as Item[],
-  activeBuffs: [] as {id: string, endTime: number}[]
+  activeBuffs: [] as ActiveBuff[]
 };
 
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Load state from localStorage if available
-  const loadLocalStorage = <T,>(key: string, defaultValue: T): T => {
-    if (typeof window === 'undefined') return defaultValue;
-    const saved = localStorage.getItem(key);
-    return saved ? JSON.parse(saved) : defaultValue;
-  };
+  // Use our custom hook for localStorage
+  const [clicks, setClicks] = useLocalStorage('dbClicks', initialState.clicks);
+  const [powerLevel, setPowerLevel] = useLocalStorage('dbPowerLevel', initialState.powerLevel);
+  const [upgrades, setUpgrades] = useLocalStorage('dbUpgrades', initialState.upgrades);
+  const [equippedUpgrade, setEquippedUpgrade] = useLocalStorage('dbEquippedUpgrade', initialState.equippedUpgrade);
+  const [inventory, setInventory] = useLocalStorage('dbInventory', initialState.inventory);
+  const [equippedItems, setEquippedItems] = useLocalStorage('dbEquippedItems', initialState.equippedItems);
+  const [activeBuffs, setActiveBuffs] = useLocalStorage('dbActiveBuffs', initialState.activeBuffs);
 
-  const [clicks, setClicks] = useState<number>(() => loadLocalStorage('dbClicks', initialState.clicks));
-  const [powerLevel, setPowerLevel] = useState<number>(() => loadLocalStorage('dbPowerLevel', initialState.powerLevel));
-  const [upgrades, setUpgrades] = useState<Upgrade[]>(() => loadLocalStorage('dbUpgrades', initialState.upgrades));
-  const [equippedUpgrade, setEquippedUpgrade] = useState<string | null>(() => loadLocalStorage('dbEquippedUpgrade', initialState.equippedUpgrade));
+  // State not stored in localStorage
   const [fightResult, setFightResult] = useState<{ enemy: Enemy | null; won: boolean | null } | null>(null);
   const [battleState, setBattleState] = useState<BattleState>(initialBattleState);
   const [skills, setSkills] = useState<Skill[]>(playerSkills);
-  const [inventory, setInventory] = useState<Item[]>(() => loadLocalStorage('dbInventory', initialState.inventory));
-  const [equippedItems, setEquippedItems] = useState<Item[]>(() => loadLocalStorage('dbEquippedItems', initialState.equippedItems));
-  const [activeBuffs, setActiveBuffs] = useState<{id: string, endTime: number}[]>(() => loadLocalStorage('dbActiveBuffs', initialState.activeBuffs));
-
-  // Update localStorage when state changes
-  useEffect(() => {
-    localStorage.setItem('dbClicks', JSON.stringify(clicks));
-    localStorage.setItem('dbPowerLevel', JSON.stringify(powerLevel));
-    localStorage.setItem('dbUpgrades', JSON.stringify(upgrades));
-    localStorage.setItem('dbEquippedUpgrade', JSON.stringify(equippedUpgrade));
-    localStorage.setItem('dbInventory', JSON.stringify(inventory));
-    localStorage.setItem('dbEquippedItems', JSON.stringify(equippedItems));
-    localStorage.setItem('dbActiveBuffs', JSON.stringify(activeBuffs));
-  }, [clicks, powerLevel, upgrades, equippedUpgrade, inventory, equippedItems, activeBuffs]);
 
   // Check active buffs
   useEffect(() => {
@@ -583,7 +370,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       
       // Check for item drops
-      handleEnemyDrops(battleState.enemy);
+      handleEnemyDrops(battleState.enemy, setInventory);
       
       // End battle with victory
       setTimeout(() => endBattle(true), 1500);
@@ -603,57 +390,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setTimeout(() => {
       enemyAttack();
     }, 1000);
-  };
-
-  // Handle enemy drops after defeating them
-  const handleEnemyDrops = (enemy: Enemy) => {
-    if (enemy.name === 'Yamcha') {
-      // 10% chance to drop Yamcha's Sword
-      if (Math.random() < 0.1) {
-        const sword: Item = {
-          id: `sword-${Date.now()}`,
-          name: "Yamcha's Sword",
-          description: "Increases your damage output by 25%",
-          type: 'weapon',
-          slot: 'weapon',
-          effect: {
-            type: 'damage_multiplier',
-            value: 1.25
-          }
-        };
-        
-        setInventory(prev => [...prev, sword]);
-        
-        setTimeout(() => {
-          toast.success(`You found Yamcha's Sword!`, {
-            description: "Check your inventory to equip it."
-          });
-        }, 1000);
-      }
-    }
-    
-    if (enemy.name === 'T-Rex') {
-      // Always drop Dino Meat
-      const dinoMeat: Item = {
-        id: `dino-meat-${Date.now()}`,
-        name: "Dino Meat",
-        description: "Temporarily increases your power gain by 25% for 20 seconds",
-        type: 'consumable',
-        effect: {
-          type: 'power_gain_percent',
-          value: 0.25,
-          duration: 20
-        }
-      };
-      
-      setInventory(prev => [...prev, dinoMeat]);
-      
-      setTimeout(() => {
-        toast.success(`You found Dino Meat!`, {
-          description: "Check your inventory to use it."
-        });
-      }, 1000);
-    }
   };
 
   // Flee from battle
