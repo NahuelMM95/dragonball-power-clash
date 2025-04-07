@@ -97,7 +97,7 @@ const BattleZone = () => {
                     <span>{battleState.enemy.name}</span>
                     <span>{battleState.enemy.hp}/{battleState.enemy.maxHp} HP</span>
                   </div>
-                  <Progress value={(battleState.enemy.hp / battleState.enemy.maxHp) * 100} className="h-2 bg-red-200" indicatorClassName="bg-red-500" />
+                  <Progress value={(battleState.enemy.hp / battleState.enemy.maxHp) * 100} className="h-2 bg-red-200" />
                 </div>
               </div>
               
@@ -114,13 +114,13 @@ const BattleZone = () => {
                   <span>You</span>
                   <span>{battleState.playerStats.hp}/{battleState.playerStats.maxHp} HP</span>
                 </div>
-                <Progress value={(battleState.playerStats.hp / battleState.playerStats.maxHp) * 100} className="h-2 bg-green-200" indicatorClassName="bg-green-500" />
+                <Progress value={(battleState.playerStats.hp / battleState.playerStats.maxHp) * 100} className="h-2 bg-green-200" />
                 
                 <div className="flex justify-between text-sm mt-2 mb-1">
                   <span>Ki</span>
                   <span>{battleState.playerStats.ki}/{battleState.playerStats.maxKi} Ki</span>
                 </div>
-                <Progress value={(battleState.playerStats.ki / battleState.playerStats.maxKi) * 100} className="h-2 bg-blue-200" indicatorClassName="bg-blue-500" />
+                <Progress value={(battleState.playerStats.ki / battleState.playerStats.maxKi) * 100} className="h-2 bg-blue-200" />
               </div>
               
               {/* Battle Actions */}
