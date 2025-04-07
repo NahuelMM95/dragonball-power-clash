@@ -1,11 +1,15 @@
 
+import { useState } from "react";
 import { GameProvider } from "@/contexts/GameContext";
 import DragonBall from "@/components/DragonBall";
 import PowerLevel from "@/components/PowerLevel";
 import TrainingUpgrades from "@/components/TrainingUpgrades";
 import BattleZone from "@/components/BattleZone";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 const Index = () => {
+  const [activeTab, setActiveTab] = useState("main");
+
   return (
     <GameProvider>
       <div className="min-h-screen py-8 px-4 sm:px-6 md:py-12">
@@ -17,27 +21,34 @@ const Index = () => {
         </header>
         
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Left column - Training */}
-            <div className="md:col-span-1">
-              <TrainingUpgrades />
-            </div>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid grid-cols-3 mb-8 mx-auto max-w-md">
+              <TabsTrigger value="main" className="text-lg">Main</TabsTrigger>
+              <TabsTrigger value="training" className="text-lg">Training Room</TabsTrigger>
+              <TabsTrigger value="battle" className="text-lg">Battle Zone</TabsTrigger>
+            </TabsList>
             
-            {/* Middle column - Dragon Ball Clicker */}
-            <div className="md:col-span-1">
+            <TabsContent value="main" className="mt-6">
               <div className="flex flex-col items-center">
                 <DragonBall />
-                <div className="mt-6 w-full">
+                <div className="mt-6 w-full max-w-md mx-auto">
                   <PowerLevel />
                 </div>
               </div>
-            </div>
+            </TabsContent>
             
-            {/* Right column - Battle Zone */}
-            <div className="md:col-span-1">
-              <BattleZone />
-            </div>
-          </div>
+            <TabsContent value="training" className="mt-6">
+              <div className="max-w-md mx-auto">
+                <TrainingUpgrades />
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="battle" className="mt-6">
+              <div className="max-w-md mx-auto">
+                <BattleZone />
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
         
         <footer className="text-center mt-12 text-sm text-gray-600">

@@ -4,10 +4,13 @@ import { useGame } from '@/contexts/GameContext';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Progress } from "@/components/ui/progress";
+import { Sword, Shield, X } from "lucide-react";
 
 const BattleZone = () => {
-  const { powerLevel, forest, fightEnemy, fightResult, clearFightResult } = useGame();
+  const { powerLevel, forest, fightEnemy, fightResult, clearFightResult, battleState, skills, useSkill, fleeFromBattle } = useGame();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [showSkills, setShowSkills] = useState(false);
   
   const handleFight = () => {
     fightEnemy();
@@ -17,6 +20,19 @@ const BattleZone = () => {
   const handleCloseDialog = () => {
     clearFightResult();
     setDialogOpen(false);
+  };
+
+  const handleAttackClick = () => {
+    setShowSkills(true);
+  };
+
+  const handleSkillClick = (skill: any) => {
+    useSkill(skill);
+    setShowSkills(false);
+  };
+
+  const handleFleeClick = () => {
+    fleeFromBattle();
   };
 
   return (
@@ -52,40 +68,152 @@ const BattleZone = () => {
       <p className="text-sm text-center text-gray-600">Your current power level: {powerLevel}</p>
 
       {/* Battle Result Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <Dialog open={dialogOpen} onOpenChange={(open) => {
+        if (!open) handleCloseDialog();
+        setDialogOpen(open);
+      }}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {fightResult?.won ? 'Victory!' : 'Defeat!'} 
+              {!battleState.inProgress ? (fightResult?.won === true ? 'Victory!' : fightResult?.won === false ? 'Defeat!' : 'Battle') : 'Battle'}
             </DialogTitle>
             <DialogDescription>
-              You encountered a {fightResult?.enemy?.name}!
+              {battleState.inProgress ? 
+                `Fighting against ${battleState.enemy?.name}!` : 
+                fightResult?.enemy ? `You encountered a ${fightResult.enemy.name}!` : ''}
             </DialogDescription>
           </DialogHeader>
-          <div className="flex flex-col items-center p-4">
-            <div className="bg-gray-100 p-4 rounded-full mb-4 w-24 h-24 flex items-center justify-center">
-              {/* Would display enemy image if available */}
-              <span className="text-3xl">{fightResult?.enemy?.name === 'Wolf' ? '🐺' : fightResult?.enemy?.name === 'Bandit' ? '👤' : '🐻'}</span>
+          
+          {/* Battle Interface */}
+          {battleState.inProgress && battleState.enemy ? (
+            <div className="flex flex-col space-y-4">
+              {/* Enemy Info */}
+              <div className="flex flex-col items-center p-2">
+                <div className="bg-gray-100 p-4 rounded-full mb-2 w-16 h-16 flex items-center justify-center">
+                  <span className="text-2xl">{battleState.enemy.name === 'Wolf' ? '🐺' : battleState.enemy.name === 'Bandit' ? '👤' : '🐻'}</span>
+                </div>
+                <div className="w-full">
+                  <div className="flex justify-between text-sm mb-1">
+                    <span>{battleState.enemy.name}</span>
+                    <span>{battleState.enemy.hp}/{battleState.enemy.maxHp} HP</span>
+                  </div>
+                  <Progress value={(battleState.enemy.hp / battleState.enemy.maxHp) * 100} className="h-2 bg-red-200" indicatorClassName="bg-red-500" />
+                </div>
+              </div>
+              
+              {/* Battle Log */}
+              <div className="bg-gray-100 p-2 rounded-md h-28 overflow-y-auto text-sm">
+                {battleState.log.map((entry, i) => (
+                  <p key={i} className={i === battleState.log.length - 1 ? "font-bold" : ""}>{entry}</p>
+                ))}
+              </div>
+              
+              {/* Player Info */}
+              <div className="w-full">
+                <div className="flex justify-between text-sm mb-1">
+                  <span>You</span>
+                  <span>{battleState.playerStats.hp}/{battleState.playerStats.maxHp} HP</span>
+                </div>
+                <Progress value={(battleState.playerStats.hp / battleState.playerStats.maxHp) * 100} className="h-2 bg-green-200" indicatorClassName="bg-green-500" />
+                
+                <div className="flex justify-between text-sm mt-2 mb-1">
+                  <span>Ki</span>
+                  <span>{battleState.playerStats.ki}/{battleState.playerStats.maxKi} Ki</span>
+                </div>
+                <Progress value={(battleState.playerStats.ki / battleState.playerStats.maxKi) * 100} className="h-2 bg-blue-200" indicatorClassName="bg-blue-500" />
+              </div>
+              
+              {/* Battle Actions */}
+              {battleState.playerTurn ? (
+                <div className="flex flex-col space-y-2">
+                  {!showSkills ? (
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button 
+                        variant="default" 
+                        onClick={handleAttackClick}
+                        className="bg-dbRed hover:bg-dbRed/80"
+                      >
+                        <Sword className="mr-1 h-4 w-4" /> Attack
+                      </Button>
+                      <Button 
+                        variant="default" 
+                        onClick={handleFleeClick} 
+                        className="bg-dbBlue hover:bg-dbBlue/80"
+                      >
+                        <X className="mr-1 h-4 w-4" /> Flee
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <h3 className="font-bold">Skills</h3>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => setShowSkills(false)}
+                        >
+                          Back
+                        </Button>
+                      </div>
+                      
+                      {skills.map((skill) => (
+                        <Button 
+                          key={skill.name}
+                          variant="default"
+                          className="w-full justify-between bg-dbRed hover:bg-dbRed/80"
+                          onClick={() => handleSkillClick(skill)}
+                          disabled={skill.kiCost > battleState.playerStats.ki}
+                        >
+                          <span>{skill.name}</span>
+                          {skill.kiCost > 0 && <span className="text-xs bg-blue-500 px-2 py-0.5 rounded-full">{skill.kiCost} Ki</span>}
+                        </Button>
+                      ))}
+                    </div>
+                  )}
+                  
+                  <div className="text-center text-sm text-gray-600">
+                    {battleState.playerTurn ? "Your turn" : `${battleState.enemy.name}'s turn`}
+                  </div>
+                </div>
+              ) : (
+                <div className="flex justify-center">
+                  <div className="text-center text-sm text-gray-600 animate-pulse">
+                    {`${battleState.enemy.name}'s turn...`}
+                  </div>
+                </div>
+              )}
             </div>
-            <div className="text-center mb-4">
-              <p className="font-bold text-lg">{fightResult?.enemy?.name}</p>
-              <p>Power Level: {fightResult?.enemy?.power}</p>
+          ) : (
+            <div className="flex flex-col items-center p-4">
+              <div className="bg-gray-100 p-4 rounded-full mb-4 w-24 h-24 flex items-center justify-center">
+                <span className="text-3xl">{fightResult?.enemy?.name === 'Wolf' ? '🐺' : fightResult?.enemy?.name === 'Bandit' ? '👤' : '🐻'}</span>
+              </div>
+              <div className="text-center mb-4">
+                <p className="font-bold text-lg">{fightResult?.enemy?.name}</p>
+                <p>Power Level: {fightResult?.enemy?.power}</p>
+              </div>
+              {fightResult?.won !== null && (
+                <div className={`text-center p-2 rounded-md ${fightResult?.won ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'} w-full`}>
+                  {fightResult?.won 
+                    ? `Victory! You defeated the ${fightResult?.enemy?.name}!` 
+                    : `Defeat! The ${fightResult?.enemy?.name} was too strong!`
+                  }
+                </div>
+              )}
             </div>
-            <div className={`text-center p-2 rounded-md ${fightResult?.won ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'} w-full`}>
-              {fightResult?.won 
-                ? `Your power level (${powerLevel}) was greater than the enemy's!` 
-                : `Your power level (${powerLevel}) was not enough to defeat this enemy!`
-              }
+          )}
+          
+          {/* Continue Button (only shown when battle is not in progress) */}
+          {!battleState.inProgress && (
+            <div className="flex justify-center">
+              <Button 
+                variant="default" 
+                onClick={handleCloseDialog}
+              >
+                Continue
+              </Button>
             </div>
-          </div>
-          <div className="flex justify-center">
-            <Button 
-              variant="default" 
-              onClick={handleCloseDialog}
-            >
-              Continue
-            </Button>
-          </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>

@@ -2,11 +2,43 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from "sonner";
 
-// Define our enemy types
+// Define our enemy types with enhanced stats
 type Enemy = {
   name: string;
   power: number;
   image: string;
+  hp: number;
+  maxHp: number;
+  damage: number;
+  ki: number;
+  maxKi: number;
+};
+
+// Define our battle types
+type BattleState = {
+  inProgress: boolean;
+  playerStats: CombatStats;
+  enemy: Enemy | null;
+  log: string[];
+  playerTurn: boolean;
+};
+
+type CombatStats = {
+  hp: number;
+  maxHp: number;
+  damage: number;
+  ki: number;
+  maxKi: number;
+};
+
+type SkillType = 'basic' | 'special' | 'ultimate';
+
+type Skill = {
+  name: string;
+  type: SkillType;
+  damageMultiplier: number;
+  kiCost: number;
+  description: string;
 };
 
 // Define our upgrade types
@@ -32,16 +64,75 @@ type GameContextType = {
   fightEnemy: () => void;
   fightResult: { enemy: Enemy | null; won: boolean | null } | null;
   clearFightResult: () => void;
+  battleState: BattleState;
+  skills: Skill[];
+  startBattle: (enemy: Enemy) => void;
+  useSkill: (skill: Skill) => void;
+  fleeFromBattle: () => void;
+  endBattle: (victory: boolean) => void;
 };
 
 // Create the context
 const GameContext = createContext<GameContextType | undefined>(undefined);
 
+// Define our skills
+const playerSkills: Skill[] = [
+  {
+    name: "Basic Combo",
+    type: "basic",
+    damageMultiplier: 1,
+    kiCost: 0,
+    description: "A simple combination of punches and kicks"
+  }
+];
+
+// Define the initial battle state
+const initialBattleState: BattleState = {
+  inProgress: false,
+  playerStats: {
+    hp: 0,
+    maxHp: 0,
+    damage: 0,
+    ki: 0,
+    maxKi: 0
+  },
+  enemy: null,
+  log: [],
+  playerTurn: false
+};
+
 // Define our enemies
 const forestEnemies = [
-  { name: 'Wolf', power: 5, image: '/wolf.png' },
-  { name: 'Bandit', power: 10, image: '/bandit.png' },
-  { name: 'Bear', power: 20, image: '/bear.png' },
+  { 
+    name: 'Wolf', 
+    power: 5, 
+    image: '/wolf.png',
+    hp: 50,
+    maxHp: 50,
+    damage: 5,
+    ki: 10,
+    maxKi: 10
+  },
+  { 
+    name: 'Bandit', 
+    power: 10, 
+    image: '/bandit.png',
+    hp: 80,
+    maxHp: 80,
+    damage: 8,
+    ki: 20,
+    maxKi: 20
+  },
+  { 
+    name: 'Bear', 
+    power: 20, 
+    image: '/bear.png',
+    hp: 150,
+    maxHp: 150,
+    damage: 15,
+    ki: 20,
+    maxKi: 20
+  },
 ];
 
 // Define our upgrades
@@ -72,6 +163,17 @@ const initialUpgrades = [
   },
 ];
 
+// Helper function to calculate player stats based on power level
+const calculatePlayerStats = (powerLevel: number): CombatStats => {
+  return {
+    hp: powerLevel * 10,
+    maxHp: powerLevel * 10,
+    damage: Math.max(1, Math.floor(powerLevel * 0.8)),
+    ki: powerLevel * 5,
+    maxKi: powerLevel * 5,
+  };
+};
+
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Load state from localStorage if available
   const loadLocalStorage = <T,>(key: string, defaultValue: T): T => {
@@ -85,6 +187,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [upgrades, setUpgrades] = useState<Upgrade[]>(() => loadLocalStorage('dbUpgrades', initialUpgrades));
   const [equippedUpgrade, setEquippedUpgrade] = useState<string | null>(() => loadLocalStorage('dbEquippedUpgrade', null));
   const [fightResult, setFightResult] = useState<{ enemy: Enemy | null; won: boolean | null } | null>(null);
+  const [battleState, setBattleState] = useState<BattleState>(initialBattleState);
+  const [skills, setSkills] = useState<Skill[]>(playerSkills);
 
   // Update localStorage when state changes
   useEffect(() => {
@@ -154,36 +258,202 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     let selectedEnemy: Enemy;
     
     if (rand < 0.5) { // 50% chance for wolf
-      selectedEnemy = forestEnemies[0]; // Wolf
+      selectedEnemy = { ...forestEnemies[0] }; // Wolf (clone to avoid reference issues)
     } else if (rand < 0.8) { // 30% chance for bandit
-      selectedEnemy = forestEnemies[1]; // Bandit
+      selectedEnemy = { ...forestEnemies[1] }; // Bandit
     } else { // 20% chance for bear
-      selectedEnemy = forestEnemies[2]; // Bear
+      selectedEnemy = { ...forestEnemies[2] }; // Bear
     }
     
-    // Determine if won
-    const won = powerLevel >= selectedEnemy.power;
-    
-    // Set result
-    setFightResult({ enemy: selectedEnemy, won });
-    
-    // Show toast
-    if (won) {
-      toast(`Victory against ${selectedEnemy.name}!`, {
-        description: `Your power level of ${powerLevel} was greater than the enemy's ${selectedEnemy.power}.`,
-        duration: 3000,
-      });
-    } else {
-      toast(`Defeated by ${selectedEnemy.name}!`, {
-        description: `Your power level of ${powerLevel} was less than the enemy's ${selectedEnemy.power}. Train harder!`,
-        duration: 3000,
-      });
-    }
+    // Set result and start battle
+    setFightResult({ enemy: selectedEnemy, won: null });
+    startBattle(selectedEnemy);
   };
 
   // Clear fight result
   const clearFightResult = () => {
     setFightResult(null);
+  };
+
+  // Start a battle with an enemy
+  const startBattle = (enemy: Enemy) => {
+    // Calculate player stats based on power level
+    const playerStats = calculatePlayerStats(powerLevel);
+    
+    // Determine who goes first based on power level
+    const playerFirst = powerLevel >= enemy.power;
+    
+    // Set battle state
+    setBattleState({
+      inProgress: true,
+      playerStats,
+      enemy: { ...enemy }, // Clone to avoid reference issues
+      log: [`Battle started against ${enemy.name}!`, 
+            `${playerFirst ? 'You attack first!' : `${enemy.name} attacks first!`}`],
+      playerTurn: playerFirst
+    });
+
+    // If enemy goes first, execute their turn
+    if (!playerFirst) {
+      setTimeout(() => {
+        enemyAttack();
+      }, 1000);
+    }
+  };
+
+  // Enemy attack function
+  const enemyAttack = () => {
+    if (!battleState.enemy) return;
+    
+    // Calculate damage
+    const damage = battleState.enemy.damage;
+    
+    // Update player HP
+    const newPlayerStats = {
+      ...battleState.playerStats,
+      hp: Math.max(0, battleState.playerStats.hp - damage)
+    };
+    
+    // Check if player is defeated
+    if (newPlayerStats.hp <= 0) {
+      // Player is defeated
+      setBattleState(prev => ({
+        ...prev,
+        playerStats: newPlayerStats,
+        log: [...prev.log, `${prev.enemy?.name} attacks for ${damage} damage!`, 'You were defeated!'],
+        inProgress: false
+      }));
+      
+      // End battle with defeat
+      setTimeout(() => endBattle(false), 1500);
+      return;
+    }
+    
+    // Update battle state
+    setBattleState(prev => ({
+      ...prev,
+      playerStats: newPlayerStats,
+      log: [...prev.log, `${prev.enemy?.name} attacks for ${damage} damage!`],
+      playerTurn: true
+    }));
+  };
+
+  // Use a skill during battle
+  const useSkill = (skill: Skill) => {
+    if (!battleState.inProgress || !battleState.playerTurn || !battleState.enemy) return;
+    
+    // Check if we have enough ki
+    if (battleState.playerStats.ki < skill.kiCost) {
+      setBattleState(prev => ({
+        ...prev,
+        log: [...prev.log, `Not enough Ki to use ${skill.name}!`]
+      }));
+      return;
+    }
+    
+    // Calculate damage
+    const damage = Math.floor(battleState.playerStats.damage * skill.damageMultiplier);
+    
+    // Update enemy HP and player Ki
+    const newEnemyHp = Math.max(0, battleState.enemy.hp - damage);
+    const newEnemy = {
+      ...battleState.enemy,
+      hp: newEnemyHp
+    };
+    
+    const newPlayerStats = {
+      ...battleState.playerStats,
+      ki: battleState.playerStats.ki - skill.kiCost
+    };
+    
+    // Check if enemy is defeated
+    if (newEnemyHp <= 0) {
+      // Enemy is defeated
+      setBattleState(prev => ({
+        ...prev,
+        enemy: newEnemy,
+        playerStats: newPlayerStats,
+        log: [...prev.log, `You use ${skill.name} for ${damage} damage!`, `${prev.enemy?.name} was defeated!`],
+        inProgress: false
+      }));
+      
+      // Calculate power gain (1/5 of enemy power without decimals)
+      const powerGain = Math.floor(battleState.enemy.power / 5);
+      
+      // Update power level
+      if (powerGain > 0) {
+        setPowerLevel(prev => prev + powerGain);
+        
+        setTimeout(() => {
+          toast(`You gained ${powerGain} Power Level from defeating ${battleState.enemy?.name}!`, {
+            description: `Your Power Level is now ${powerLevel + powerGain}!`,
+            duration: 3000
+          });
+        }, 500);
+      }
+      
+      // End battle with victory
+      setTimeout(() => endBattle(true), 1500);
+      return;
+    }
+    
+    // Update battle state
+    setBattleState(prev => ({
+      ...prev,
+      enemy: newEnemy,
+      playerStats: newPlayerStats,
+      log: [...prev.log, `You use ${skill.name} for ${damage} damage!`],
+      playerTurn: false
+    }));
+    
+    // Enemy's turn
+    setTimeout(() => {
+      enemyAttack();
+    }, 1000);
+  };
+
+  // Flee from battle
+  const fleeFromBattle = () => {
+    if (!battleState.inProgress) return;
+    
+    // 50% chance to successfully flee
+    const fleeSuccessful = Math.random() > 0.5;
+    
+    if (fleeSuccessful) {
+      setBattleState(prev => ({
+        ...prev,
+        log: [...prev.log, 'You successfully fled from battle!'],
+        inProgress: false
+      }));
+      
+      // End battle (neither victory nor defeat)
+      setTimeout(() => {
+        setBattleState(initialBattleState);
+        setFightResult(null);
+      }, 1500);
+      
+      toast('You fled from battle!', {
+        description: 'You escaped safely.',
+        duration: 3000
+      });
+    } else {
+      setBattleState(prev => ({
+        ...prev,
+        log: [...prev.log, 'Failed to escape! Enemy attacks!'],
+        playerTurn: false
+      }));
+      
+      // Enemy gets a free attack
+      setTimeout(() => {
+        enemyAttack();
+      }, 1000);
+    }
+  };
+
+  // End battle
+  const endBattle = (victory: boolean) => {
+    // Update fight result
+    setFightResult(prev => prev ? { ...prev, won: victory } : null);
   };
 
   return (
@@ -199,7 +469,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         forest: forestEnemies,
         fightEnemy,
         fightResult,
-        clearFightResult
+        clearFightResult,
+        battleState,
+        skills,
+        startBattle,
+        useSkill,
+        fleeFromBattle,
+        endBattle
       }}
     >
       {children}

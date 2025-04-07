@@ -20,7 +20,7 @@ const DragonBall = () => {
       >
         <div className="relative">
           <div className="dragon-ball w-40 h-40 rounded-full bg-dragonYellow animate-pulse-glow flex items-center justify-center">
-            <span className="text-black text-4xl font-bold">★</span>
+            <span className="text-black text-4xl font-bold pointer-events-none">★</span>
           </div>
         </div>
       </div>
