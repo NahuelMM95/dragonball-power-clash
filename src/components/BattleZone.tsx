@@ -5,15 +5,19 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
-import { Sword, Shield, X } from "lucide-react";
+import { Sword, Shield, X, Eye, EyeOff } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 const BattleZone = () => {
-  const { powerLevel, forest, fightEnemy, fightResult, clearFightResult, battleState, skills, useSkill, fleeFromBattle } = useGame();
+  const { powerLevel, forest, desert, fightEnemy, fightResult, clearFightResult, battleState, skills, useSkill, fleeFromBattle } = useGame();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [showSkills, setShowSkills] = useState(false);
+  const [showForestEnemies, setShowForestEnemies] = useState(false);
+  const [showDesertEnemies, setShowDesertEnemies] = useState(false);
+  const [activeZone, setActiveZone] = useState('forest');
   
-  const handleFight = () => {
-    fightEnemy();
+  const handleFight = (zone: string) => {
+    fightEnemy(zone);
     setDialogOpen(true);
   };
 
@@ -35,35 +39,105 @@ const BattleZone = () => {
     fleeFromBattle();
   };
 
+  const toggleEnemies = (zone: string) => {
+    if (zone === 'forest') {
+      setShowForestEnemies(!showForestEnemies);
+    } else if (zone === 'desert') {
+      setShowDesertEnemies(!showDesertEnemies);
+    }
+  };
+
   return (
     <div className="bg-white/90 p-4 rounded-lg shadow-md backdrop-blur-sm border-2 border-forestGreen">
       <h2 className="text-xl font-bold text-forestGreen mb-4">Battle Zone</h2>
       
-      <Card className="border-2 border-forestGreen mb-4">
-        <CardHeader className="pb-2 bg-forestGreen/20">
-          <CardTitle className="text-lg">Forest</CardTitle>
-          <CardDescription>Battle wild creatures in the forest to test your power.</CardDescription>
-        </CardHeader>
-        <CardContent className="pb-2 pt-4">
-          <div className="text-sm">
-            <p className="mb-1">Possible Enemies:</p>
-            <ul className="list-disc pl-5">
-              <li>Wolf (Power Level: 5)</li>
-              <li>Bandit (Power Level: 10)</li>
-              <li>Bear (Power Level: 20)</li>
-            </ul>
-          </div>
-        </CardContent>
-        <CardFooter className="pt-4 border-t">
-          <Button 
-            variant="default" 
-            className="w-full bg-forestGreen hover:bg-forestGreen/80"
-            onClick={handleFight}
-          >
-            Find an Enemy
-          </Button>
-        </CardFooter>
-      </Card>
+      <Tabs value={activeZone} onValueChange={setActiveZone} className="w-full">
+        <TabsList className="grid grid-cols-2 mb-4">
+          <TabsTrigger value="forest">Forest</TabsTrigger>
+          <TabsTrigger value="desert">Desert</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="forest">
+          <Card className="border-2 border-forestGreen mb-4">
+            <CardHeader className="pb-2 bg-forestGreen/20">
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle className="text-lg">Forest</CardTitle>
+                  <CardDescription>Battle wild creatures in the forest to test your power.</CardDescription>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => toggleEnemies('forest')}
+                >
+                  {showForestEnemies ? <EyeOff size={18} /> : <Eye size={18} />}
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="pb-2 pt-4">
+              {showForestEnemies && (
+                <div className="text-sm">
+                  <p className="mb-1">Possible Enemies:</p>
+                  <ul className="list-disc pl-5">
+                    <li>Wolf (Power Level: 5)</li>
+                    <li>Bandit (Power Level: 10)</li>
+                    <li>Bear (Power Level: 20)</li>
+                  </ul>
+                </div>
+              )}
+            </CardContent>
+            <CardFooter className="pt-4 border-t">
+              <Button 
+                variant="default" 
+                className="w-full bg-forestGreen hover:bg-forestGreen/80"
+                onClick={() => handleFight('forest')}
+              >
+                Find an Enemy
+              </Button>
+            </CardFooter>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="desert">
+          <Card className="border-2 border-dbRed mb-4">
+            <CardHeader className="pb-2 bg-dbRed/20">
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle className="text-lg">Desert</CardTitle>
+                  <CardDescription>Challenge powerful creatures in the scorching desert.</CardDescription>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => toggleEnemies('desert')}
+                >
+                  {showDesertEnemies ? <EyeOff size={18} /> : <Eye size={18} />}
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="pb-2 pt-4">
+              {showDesertEnemies && (
+                <div className="text-sm">
+                  <p className="mb-1">Possible Enemies:</p>
+                  <ul className="list-disc pl-5">
+                    <li>Yamcha (Power Level: 50) - Rare, might drop Yamcha's Sword</li>
+                    <li>T-Rex (Power Level: 250) - May drop Dino Meat</li>
+                  </ul>
+                </div>
+              )}
+            </CardContent>
+            <CardFooter className="pt-4 border-t">
+              <Button 
+                variant="default" 
+                className="w-full bg-dbRed hover:bg-dbRed/80"
+                onClick={() => handleFight('desert')}
+              >
+                Find an Enemy
+              </Button>
+            </CardFooter>
+          </Card>
+        </TabsContent>
+      </Tabs>
       
       <p className="text-sm text-center text-gray-600">Your current power level: {powerLevel}</p>
 
@@ -90,7 +164,13 @@ const BattleZone = () => {
               {/* Enemy Info */}
               <div className="flex flex-col items-center p-2">
                 <div className="bg-gray-100 p-4 rounded-full mb-2 w-16 h-16 flex items-center justify-center">
-                  <span className="text-2xl">{battleState.enemy.name === 'Wolf' ? '🐺' : battleState.enemy.name === 'Bandit' ? '👤' : '🐻'}</span>
+                  <span className="text-2xl">
+                    {battleState.enemy.name === 'Wolf' ? '🐺' : 
+                     battleState.enemy.name === 'Bandit' ? '👤' : 
+                     battleState.enemy.name === 'Bear' ? '🐻' :
+                     battleState.enemy.name === 'Yamcha' ? '👨' :
+                     battleState.enemy.name === 'T-Rex' ? '🦖' : '❓'}
+                  </span>
                 </div>
                 <div className="w-full">
                   <div className="flex justify-between text-sm mb-1">
@@ -186,7 +266,13 @@ const BattleZone = () => {
           ) : (
             <div className="flex flex-col items-center p-4">
               <div className="bg-gray-100 p-4 rounded-full mb-4 w-24 h-24 flex items-center justify-center">
-                <span className="text-3xl">{fightResult?.enemy?.name === 'Wolf' ? '🐺' : fightResult?.enemy?.name === 'Bandit' ? '👤' : '🐻'}</span>
+                <span className="text-3xl">
+                  {fightResult?.enemy?.name === 'Wolf' ? '🐺' : 
+                   fightResult?.enemy?.name === 'Bandit' ? '👤' : 
+                   fightResult?.enemy?.name === 'Bear' ? '🐻' :
+                   fightResult?.enemy?.name === 'Yamcha' ? '👨' :
+                   fightResult?.enemy?.name === 'T-Rex' ? '🦖' : '❓'}
+                </span>
               </div>
               <div className="text-center mb-4">
                 <p className="font-bold text-lg">{fightResult?.enemy?.name}</p>

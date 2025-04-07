@@ -1,6 +1,7 @@
 
 import { useState } from 'react';
 import { useGame } from '@/contexts/GameContext';
+import { Dumbbell } from 'lucide-react';
 
 const DragonBall = () => {
   const { increaseClicks, clicks } = useGame();
@@ -19,8 +20,8 @@ const DragonBall = () => {
         onClick={handleClick}
       >
         <div className="relative">
-          <div className="dragon-ball w-40 h-40 rounded-full bg-dragonYellow animate-pulse-glow flex items-center justify-center">
-            <span className="text-black text-4xl font-bold pointer-events-none">★</span>
+          <div className="dumbbell-item w-40 h-40 rounded-full bg-dbBlue animate-pulse-glow flex items-center justify-center">
+            <Dumbbell className="text-white w-24 h-24 pointer-events-none" />
           </div>
         </div>
       </div>

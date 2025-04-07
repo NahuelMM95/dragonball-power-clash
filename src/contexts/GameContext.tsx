@@ -14,6 +14,22 @@ type Enemy = {
   maxKi: number;
 };
 
+// Define our item types
+type ItemType = 'weapon' | 'weight' | 'consumable';
+
+type Item = {
+  id: string;
+  name: string;
+  description: string;
+  type: ItemType;
+  slot?: string;
+  effect?: {
+    type: string;
+    value: number;
+    duration?: number;
+  };
+};
+
 // Define our battle types
 type BattleState = {
   inProgress: boolean;
@@ -61,7 +77,8 @@ type GameContextType = {
   purchaseUpgrade: (id: string) => void;
   equipUpgrade: (id: string) => void;
   forest: Enemy[];
-  fightEnemy: () => void;
+  desert: Enemy[];
+  fightEnemy: (zone: string) => void;
   fightResult: { enemy: Enemy | null; won: boolean | null } | null;
   clearFightResult: () => void;
   battleState: BattleState;
@@ -70,6 +87,11 @@ type GameContextType = {
   useSkill: (skill: Skill) => void;
   fleeFromBattle: () => void;
   endBattle: (victory: boolean) => void;
+  inventory: Item[];
+  equippedItems: Item[];
+  equipItem: (itemId: string | null, slotType: string) => void;
+  useItem: (itemId: string) => void;
+  resetProgress: () => void;
 };
 
 // Create the context
@@ -135,6 +157,30 @@ const forestEnemies = [
   },
 ];
 
+// Define desert enemies
+const desertEnemies = [
+  { 
+    name: 'Yamcha', 
+    power: 50, 
+    image: '/yamcha.png',
+    hp: 300,
+    maxHp: 300,
+    damage: 25,
+    ki: 50,
+    maxKi: 50
+  },
+  { 
+    name: 'T-Rex', 
+    power: 250, 
+    image: '/t-rex.png',
+    hp: 1000,
+    maxHp: 1000,
+    damage: 75,
+    ki: 100,
+    maxKi: 100
+  },
+];
+
 // Define our upgrades
 const initialUpgrades = [
   { 
@@ -164,14 +210,37 @@ const initialUpgrades = [
 ];
 
 // Helper function to calculate player stats based on power level
-const calculatePlayerStats = (powerLevel: number): CombatStats => {
-  return {
+const calculatePlayerStats = (powerLevel: number, equippedItems: Item[]): CombatStats => {
+  // Start with base stats
+  let stats = {
     hp: powerLevel * 10,
     maxHp: powerLevel * 10,
     damage: Math.max(1, Math.floor(powerLevel * 0.8)),
     ki: powerLevel * 5,
     maxKi: powerLevel * 5,
   };
+  
+  // Apply equipment bonuses
+  equippedItems.forEach(item => {
+    if (item.effect) {
+      if (item.effect.type === 'damage_multiplier') {
+        stats.damage = Math.floor(stats.damage * item.effect.value);
+      }
+    }
+  });
+  
+  return stats;
+};
+
+// Define initial state values
+const initialState = {
+  clicks: 0,
+  powerLevel: 1,
+  upgrades: initialUpgrades,
+  equippedUpgrade: null as string | null,
+  inventory: [] as Item[],
+  equippedItems: [] as Item[],
+  activeBuffs: [] as {id: string, endTime: number}[]
 };
 
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -182,13 +251,16 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return saved ? JSON.parse(saved) : defaultValue;
   };
 
-  const [clicks, setClicks] = useState<number>(() => loadLocalStorage('dbClicks', 0));
-  const [powerLevel, setPowerLevel] = useState<number>(() => loadLocalStorage('dbPowerLevel', 0));
-  const [upgrades, setUpgrades] = useState<Upgrade[]>(() => loadLocalStorage('dbUpgrades', initialUpgrades));
-  const [equippedUpgrade, setEquippedUpgrade] = useState<string | null>(() => loadLocalStorage('dbEquippedUpgrade', null));
+  const [clicks, setClicks] = useState<number>(() => loadLocalStorage('dbClicks', initialState.clicks));
+  const [powerLevel, setPowerLevel] = useState<number>(() => loadLocalStorage('dbPowerLevel', initialState.powerLevel));
+  const [upgrades, setUpgrades] = useState<Upgrade[]>(() => loadLocalStorage('dbUpgrades', initialState.upgrades));
+  const [equippedUpgrade, setEquippedUpgrade] = useState<string | null>(() => loadLocalStorage('dbEquippedUpgrade', initialState.equippedUpgrade));
   const [fightResult, setFightResult] = useState<{ enemy: Enemy | null; won: boolean | null } | null>(null);
   const [battleState, setBattleState] = useState<BattleState>(initialBattleState);
   const [skills, setSkills] = useState<Skill[]>(playerSkills);
+  const [inventory, setInventory] = useState<Item[]>(() => loadLocalStorage('dbInventory', initialState.inventory));
+  const [equippedItems, setEquippedItems] = useState<Item[]>(() => loadLocalStorage('dbEquippedItems', initialState.equippedItems));
+  const [activeBuffs, setActiveBuffs] = useState<{id: string, endTime: number}[]>(() => loadLocalStorage('dbActiveBuffs', initialState.activeBuffs));
 
   // Update localStorage when state changes
   useEffect(() => {
@@ -196,14 +268,63 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('dbPowerLevel', JSON.stringify(powerLevel));
     localStorage.setItem('dbUpgrades', JSON.stringify(upgrades));
     localStorage.setItem('dbEquippedUpgrade', JSON.stringify(equippedUpgrade));
-  }, [clicks, powerLevel, upgrades, equippedUpgrade]);
+    localStorage.setItem('dbInventory', JSON.stringify(inventory));
+    localStorage.setItem('dbEquippedItems', JSON.stringify(equippedItems));
+    localStorage.setItem('dbActiveBuffs', JSON.stringify(activeBuffs));
+  }, [clicks, powerLevel, upgrades, equippedUpgrade, inventory, equippedItems, activeBuffs]);
 
-  // Calculate power gain based on the equipped upgrade
-  const calculatePowerGain = (): number => {
-    if (!equippedUpgrade) return 1;
+  // Check active buffs
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = Date.now();
+      const expiredBuffs = activeBuffs.filter(buff => buff.endTime <= now);
+      
+      if (expiredBuffs.length > 0) {
+        // Remove expired buffs
+        setActiveBuffs(prevBuffs => prevBuffs.filter(buff => buff.endTime > now));
+        
+        // Notify user
+        expiredBuffs.forEach(buff => {
+          const item = inventory.find(i => i.id === buff.id);
+          if (item) {
+            toast(`${item.name} effect has worn off`, {
+              description: "Your temporary buff has expired.",
+              duration: 3000
+            });
+          }
+        });
+      }
+    }, 1000);
     
-    const upgrade = upgrades.find(u => u.id === equippedUpgrade);
-    return upgrade ? 1 + upgrade.powerBonus : 1;
+    return () => clearInterval(interval);
+  }, [activeBuffs, inventory]);
+
+  // Calculate power gain based on the equipped upgrade and active buffs
+  const calculatePowerGain = (): number => {
+    let baseGain = 1;
+    
+    // Apply upgrade bonus
+    if (equippedUpgrade) {
+      const upgrade = upgrades.find(u => u.id === equippedUpgrade);
+      if (upgrade) baseGain += upgrade.powerBonus;
+    }
+    
+    // Apply active buffs
+    if (activeBuffs.length > 0) {
+      const now = Date.now();
+      const activeBuffsItems = activeBuffs
+        .filter(buff => buff.endTime > now)
+        .map(buff => inventory.find(i => i.id === buff.id))
+        .filter(Boolean) as Item[];
+      
+      for (const item of activeBuffsItems) {
+        if (item.effect && item.effect.type === 'power_gain_percent') {
+          baseGain = baseGain * (1 + item.effect.value);
+        }
+      }
+    }
+    
+    return baseGain;
   };
 
   // Increment clicks and update power level
@@ -251,18 +372,88 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  // Fight random enemy in the forest
-  const fightEnemy = () => {
-    // Determine random enemy (with rarity weighting)
-    const rand = Math.random();
+  // Equip an item
+  const equipItem = (itemId: string | null, slotType: string) => {
+    if (itemId === null) {
+      // Unequip the current item in this slot
+      setEquippedItems(prevItems => prevItems.filter(item => item.slot !== slotType));
+      return;
+    }
+    
+    const item = inventory.find(i => i.id === itemId);
+    if (!item) return;
+    
+    // Remove any item already in this slot
+    setEquippedItems(prevItems => {
+      const newItems = prevItems.filter(i => i.slot !== slotType);
+      return [...newItems, item];
+    });
+    
+    toast(`You've equipped ${item.name}!`, {
+      description: item.description,
+      duration: 3000,
+    });
+  };
+
+  // Use a consumable item
+  const useItem = (itemId: string) => {
+    const item = inventory.find(i => i.id === itemId);
+    if (!item || item.type !== 'consumable') return;
+    
+    // For consumable items that provide buffs
+    if (item.effect && item.effect.duration) {
+      // Check if there's already an active buff of this type
+      const hasActiveBuff = activeBuffs.some(buff => {
+        const buffItem = inventory.find(i => i.id === buff.id);
+        return buffItem?.effect?.type === item.effect?.type;
+      });
+      
+      if (hasActiveBuff) {
+        toast.error("Cannot use this item", {
+          description: "You already have an active buff of this type.",
+          duration: 3000,
+        });
+        return;
+      }
+      
+      // Apply the buff
+      const endTime = Date.now() + (item.effect.duration * 1000);
+      setActiveBuffs(prev => [...prev, { id: item.id, endTime }]);
+      
+      // Use up the item
+      setInventory(prev => prev.filter(i => i.id !== itemId));
+      
+      toast(`You used ${item.name}!`, {
+        description: `Effect active for ${item.effect.duration} seconds.`,
+        duration: 3000,
+      });
+    }
+  };
+
+  // Fight random enemy in the specified zone
+  const fightEnemy = (zone: string) => {
+    // Determine which enemy pool to use
+    const enemyPool = zone === 'desert' ? desertEnemies : forestEnemies;
     let selectedEnemy: Enemy;
     
-    if (rand < 0.5) { // 50% chance for wolf
-      selectedEnemy = { ...forestEnemies[0] }; // Wolf (clone to avoid reference issues)
-    } else if (rand < 0.8) { // 30% chance for bandit
-      selectedEnemy = { ...forestEnemies[1] }; // Bandit
-    } else { // 20% chance for bear
-      selectedEnemy = { ...forestEnemies[2] }; // Bear
+    if (zone === 'forest') {
+      // Forest enemy selection logic
+      const rand = Math.random();
+      if (rand < 0.5) { // 50% chance for wolf
+        selectedEnemy = { ...forestEnemies[0] }; // Wolf (clone to avoid reference issues)
+      } else if (rand < 0.8) { // 30% chance for bandit
+        selectedEnemy = { ...forestEnemies[1] }; // Bandit
+      } else { // 20% chance for bear
+        selectedEnemy = { ...forestEnemies[2] }; // Bear
+      }
+    } else {
+      // Desert enemy selection logic
+      const rand = Math.random();
+      if (rand < 0.1) { // 10% chance for Yamcha
+        selectedEnemy = { ...desertEnemies[0] }; // Yamcha
+      } else { // 90% chance for T-Rex
+        selectedEnemy = { ...desertEnemies[1] }; // T-Rex
+      }
     }
     
     // Set result and start battle
@@ -278,7 +469,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Start a battle with an enemy
   const startBattle = (enemy: Enemy) => {
     // Calculate player stats based on power level
-    const playerStats = calculatePlayerStats(powerLevel);
+    const playerStats = calculatePlayerStats(powerLevel, equippedItems);
     
     // Determine who goes first based on power level
     const playerFirst = powerLevel >= enemy.power;
@@ -385,12 +576,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setPowerLevel(prev => prev + powerGain);
         
         setTimeout(() => {
-          toast(`You gained ${powerGain} Power Level from defeating ${battleState.enemy?.name}!`, {
+          toast.success(`You gained ${powerGain} Power Level from defeating ${battleState.enemy?.name}!`, {
             description: `Your Power Level is now ${powerLevel + powerGain}!`,
-            duration: 3000
           });
         }, 500);
       }
+      
+      // Check for item drops
+      handleEnemyDrops(battleState.enemy);
       
       // End battle with victory
       setTimeout(() => endBattle(true), 1500);
@@ -410,6 +603,57 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setTimeout(() => {
       enemyAttack();
     }, 1000);
+  };
+
+  // Handle enemy drops after defeating them
+  const handleEnemyDrops = (enemy: Enemy) => {
+    if (enemy.name === 'Yamcha') {
+      // 10% chance to drop Yamcha's Sword
+      if (Math.random() < 0.1) {
+        const sword: Item = {
+          id: `sword-${Date.now()}`,
+          name: "Yamcha's Sword",
+          description: "Increases your damage output by 25%",
+          type: 'weapon',
+          slot: 'weapon',
+          effect: {
+            type: 'damage_multiplier',
+            value: 1.25
+          }
+        };
+        
+        setInventory(prev => [...prev, sword]);
+        
+        setTimeout(() => {
+          toast.success(`You found Yamcha's Sword!`, {
+            description: "Check your inventory to equip it."
+          });
+        }, 1000);
+      }
+    }
+    
+    if (enemy.name === 'T-Rex') {
+      // Always drop Dino Meat
+      const dinoMeat: Item = {
+        id: `dino-meat-${Date.now()}`,
+        name: "Dino Meat",
+        description: "Temporarily increases your power gain by 25% for 20 seconds",
+        type: 'consumable',
+        effect: {
+          type: 'power_gain_percent',
+          value: 0.25,
+          duration: 20
+        }
+      };
+      
+      setInventory(prev => [...prev, dinoMeat]);
+      
+      setTimeout(() => {
+        toast.success(`You found Dino Meat!`, {
+          description: "Check your inventory to use it."
+        });
+      }, 1000);
+    }
   };
 
   // Flee from battle
@@ -456,6 +700,19 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setFightResult(prev => prev ? { ...prev, won: victory } : null);
   };
 
+  // Reset progress (for settings menu)
+  const resetProgress = () => {
+    setClicks(initialState.clicks);
+    setPowerLevel(initialState.powerLevel);
+    setUpgrades(initialState.upgrades);
+    setEquippedUpgrade(initialState.equippedUpgrade);
+    setInventory(initialState.inventory);
+    setEquippedItems(initialState.equippedItems);
+    setActiveBuffs(initialState.activeBuffs);
+    setBattleState(initialBattleState);
+    setFightResult(null);
+  };
+
   return (
     <GameContext.Provider 
       value={{ 
@@ -467,6 +724,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         purchaseUpgrade, 
         equipUpgrade,
         forest: forestEnemies,
+        desert: desertEnemies,
         fightEnemy,
         fightResult,
         clearFightResult,
@@ -475,7 +733,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         startBattle,
         useSkill,
         fleeFromBattle,
-        endBattle
+        endBattle,
+        inventory,
+        equippedItems,
+        equipItem,
+        useItem,
+        resetProgress
       }}
     >
       {children}
