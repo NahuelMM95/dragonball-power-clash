@@ -1,11 +1,10 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from "sonner";
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { forestEnemies, desertEnemies } from '@/data/enemies';
 import { playerSkills } from '@/data/skills';
 import { initialUpgrades } from '@/data/upgrades';
-import { calculatePlayerStats, handleEnemyDrops } from '@/utils/battle';
+import { calculatePlayerStats } from '@/utils/battle';
 import { 
   GameContextType, 
   BattleState, 
@@ -62,7 +61,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [battleState, setBattleState] = useState<BattleState>(initialBattleState);
   const [skills, setSkills] = useLocalStorage('dbSkills', playerSkills);
 
-  // Check active buffs
+  // Check active buffs and display them
   useEffect(() => {
     const interval = setInterval(() => {
       const now = Date.now();
@@ -200,10 +199,58 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       };
       
       setZeni(zeni - 100);
-      setInventory(prev => [...prev, senzuBean]);
       
-      toast.success("Purchased Senzu Bean!", {
-        description: "Check your inventory to use it during battle.",
+      // Check if senzu already exists in inventory to stack
+      const existingSenzu = inventory.find(i => 
+        i.name === "Senzu Bean" && 
+        i.type === 'consumable' && 
+        i.effect?.type === 'heal'
+      );
+      
+      if (existingSenzu) {
+        // Just keep the existing senzu, no need for a duplicate
+        toast.success("Purchased Senzu Bean!", {
+          description: "Added to your existing stack.",
+          duration: 3000,
+        });
+      } else {
+        // Add new senzu to inventory
+        setInventory(prev => [...prev, senzuBean]);
+        toast.success("Purchased Senzu Bean!", {
+          description: "Check your inventory to use it during battle.",
+          duration: 3000,
+        });
+      }
+    }
+    
+    // Handle training weights
+    if (itemType === 'weights') {
+      if (zeni < 200) {
+        toast.error("Not enough Zeni!", {
+          description: "You need 200 Zeni to buy Training Weights.",
+          duration: 3000,
+        });
+        return;
+      }
+      
+      // Create Training Weights item
+      const weights: Item = {
+        id: `weights-${Date.now()}`,
+        name: "Training Weights",
+        description: "Increases power gain by 15% when equipped",
+        type: 'weight',
+        slot: 'weight',
+        effect: {
+          type: 'power_gain_percent',
+          value: 0.15
+        }
+      };
+      
+      setZeni(zeni - 200);
+      setInventory(prev => [...prev, weights]);
+      
+      toast.success("Purchased Training Weights!", {
+        description: "Check your inventory to equip them.",
         duration: 3000,
       });
     }
@@ -303,7 +350,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Fight random enemy in the specified zone
   const fightEnemy = (zone: string) => {
     // Determine which enemy pool to use
-    const enemyPool = zone === 'desert' ? desertEnemies : forestEnemies;
     let selectedEnemy: Enemy;
     
     if (zone === 'forest') {
@@ -317,11 +363,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         selectedEnemy = { ...forestEnemies[2] }; // Bear
       }
     } else {
-      // Desert enemy selection logic
+      // Desert enemy selection logic - updated to give Yamcha a recurring chance
       const rand = Math.random();
-      if (rand < 0.1) { // 10% chance for Yamcha
+      if (rand < 0.2) { // 20% chance for Yamcha (increased from 10%)
         selectedEnemy = { ...desertEnemies[0] }; // Yamcha
-      } else { // 90% chance for T-Rex
+      } else { // 80% chance for T-Rex
         selectedEnemy = { ...desertEnemies[1] }; // T-Rex
       }
     }
@@ -438,23 +484,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         inProgress: false
       }));
       
-      // Calculate power gain (1/5 of enemy power without decimals)
-      const powerGain = Math.floor(battleState.enemy.power / 5);
-      
-      // Update power level
-      if (powerGain > 0) {
-        setPowerLevel(prev => prev + powerGain);
-        
-        setTimeout(() => {
-          toast.success(`You gained ${powerGain} Power Level from defeating ${battleState.enemy?.name}!`, {
-            description: `Your Power Level is now ${powerLevel + powerGain}!`,
-          });
-        }, 500);
-      }
-      
-      // Check for item drops and award zeni
-      handleEnemyDrops(battleState.enemy, setInventory, setZeni);
-      
       // End battle with victory
       setTimeout(() => endBattle(true), 1500);
       return;
@@ -513,10 +542,107 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Handle enemy drops after defeating them with improved dino meat functionality
+  const handleEnemyDrops = (enemy: Enemy) => {
+    // Add zeni reward if available
+    if (enemy.zeniReward) {
+      setZeni(prev => prev + enemy.zeniReward);
+      
+      toast.success(`+ ${enemy.zeniReward} Zeni`, {
+        description: "Added to your wallet",
+        duration: 3000
+      });
+    }
+    
+    if (enemy.name === 'Yamcha') {
+      // 10% chance to drop Yamcha's Sword
+      if (Math.random() < 0.1) {
+        const sword: Item = {
+          id: `sword-${Date.now()}`,
+          name: "Yamcha's Sword",
+          description: "Increases your damage output by 25%",
+          type: 'weapon',
+          slot: 'weapon',
+          effect: {
+            type: 'damage_multiplier',
+            value: 1.25
+          }
+        };
+        
+        setInventory(prev => [...prev, sword]);
+        
+        setTimeout(() => {
+          toast.success(`You found Yamcha's Sword!`, {
+            description: "Check your inventory to equip it."
+          });
+        }, 1000);
+      }
+    }
+    
+    if (enemy.name === 'T-Rex') {
+      // Always drop Dino Meat
+      const dinoMeat: Item = {
+        id: `dino-meat-${Date.now()}`,
+        name: "Dino Meat",
+        description: "Temporarily increases your power gain by 25% for 20 seconds",
+        type: 'consumable',
+        effect: {
+          type: 'power_gain_percent',
+          value: 0.25,
+          duration: 20
+        }
+      };
+      
+      // Check if dino meat already exists in inventory
+      const existingDinoMeat = inventory.find(i => 
+        i.name === "Dino Meat" && 
+        i.type === 'consumable' && 
+        i.effect?.type === 'power_gain_percent'
+      );
+      
+      if (existingDinoMeat) {
+        // Just keep the existing dino meat, no need for a duplicate
+        toast.success(`You found Dino Meat!`, {
+          description: "Added to your existing stack.",
+          duration: 3000,
+        });
+      } else {
+        // Add new dino meat to inventory
+        setInventory(prev => [...prev, dinoMeat]);
+        
+        setTimeout(() => {
+          toast.success(`You found Dino Meat!`, {
+            description: "Check your inventory to use it."
+          });
+        }, 1000);
+      }
+    }
+  };
+
   // End battle
   const endBattle = (victory: boolean) => {
     // Update fight result
     setFightResult(prev => prev ? { ...prev, won: victory } : null);
+    
+    // If victorious, handle enemy drops and power gain
+    if (victory && battleState.enemy) {
+      // Calculate power gain (1/5 of enemy power without decimals)
+      const powerGain = Math.floor(battleState.enemy.power / 5);
+      
+      // Update power level
+      if (powerGain > 0) {
+        setPowerLevel(prev => prev + powerGain);
+        
+        setTimeout(() => {
+          toast.success(`You gained ${powerGain} Power Level from defeating ${battleState.enemy?.name}!`, {
+            description: `Your Power Level is now ${powerLevel + powerGain}!`,
+          });
+        }, 500);
+      }
+      
+      // Check for item drops and award zeni
+      handleEnemyDrops(battleState.enemy);
+    }
   };
 
   // Reset progress (for settings menu)
@@ -563,7 +689,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         useItem,
         useItemInBattle,
         purchaseItem,
-        resetProgress
+        resetProgress,
+        activeBuffs
       }}
     >
       {children}

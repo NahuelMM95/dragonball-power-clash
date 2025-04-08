@@ -97,4 +97,5 @@ export type GameContextType = {
   useItemInBattle: (itemId: string) => void;
   purchaseItem: (itemType: string) => void;
   resetProgress: () => void;
+  activeBuffs: ActiveBuff[];
 };

@@ -44,11 +44,16 @@ const BattleZone = () => {
       
       <p className="text-sm text-center text-gray-600">Your current power level: {powerLevel}</p>
 
-      {/* Battle Result Dialog */}
-      <Dialog open={dialogOpen || battleState.inProgress} onOpenChange={(open) => {
-        if (!open) handleCloseDialog();
-        setDialogOpen(open);
-      }}>
+      {/* Battle Result Dialog - No close button "X" */}
+      <Dialog 
+        open={dialogOpen || battleState.inProgress} 
+        onOpenChange={(open) => {
+          // Only allow closing through the buttons we provide
+          if (battleState.inProgress) return;
+          if (!open) handleCloseDialog();
+          setDialogOpen(open);
+        }}
+      >
         <BattleDialogContent 
           battleState={battleState} 
           fightResult={fightResult} 

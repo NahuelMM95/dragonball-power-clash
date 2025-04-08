@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Zap, Pill } from "lucide-react";
+import { Zap, Pill, Dumbbell } from "lucide-react";
 
 const TrainingUpgrades = () => {
   const { 
@@ -164,6 +164,30 @@ const TrainingUpgrades = () => {
                   className="w-full bg-green-600 hover:bg-green-700"
                   disabled={zeni < 100}
                   onClick={() => purchaseItem('senzu')}
+                >
+                  Purchase
+                </Button>
+              </CardFooter>
+            </Card>
+            
+            <Card className="border-2 border-blue-200">
+              <CardHeader className="pb-2">
+                <div className="flex items-center">
+                  <Dumbbell className="mr-2 h-5 w-5 text-blue-500" />
+                  <CardTitle className="text-lg">Training Weights</CardTitle>
+                </div>
+                <CardDescription>These heavy weights increase power gain when equipped.</CardDescription>
+              </CardHeader>
+              <CardContent className="pb-2">
+                <p className="text-sm">Effect: <span className="font-semibold text-blue-600">+15% Power Gain</span></p>
+                <p className="text-sm mt-1">Cost: <span className="font-semibold text-yellow-600">200 Zeni</span></p>
+              </CardContent>
+              <CardFooter className="pt-0">
+                <Button 
+                  variant="default" 
+                  className="w-full bg-blue-600 hover:bg-blue-700"
+                  disabled={zeni < 200}
+                  onClick={() => purchaseItem('weights')}
                 >
                   Purchase
                 </Button>

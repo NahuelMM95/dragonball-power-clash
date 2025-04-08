@@ -4,7 +4,7 @@ import { useGame } from '@/contexts/GameContext';
 import { Button } from "@/components/ui/button";
 import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
-import { Sword, Shield, X, Pill } from "lucide-react";
+import { Sword, Shield, Pill } from "lucide-react";
 import { BattleState, Enemy, Item, Skill } from '@/types/game';
 
 type BattleDialogContentProps = {
@@ -135,7 +135,7 @@ const BattleDialogContent = ({ battleState, fightResult, handleCloseDialog }: Ba
                     onClick={handleFleeClick} 
                     className="bg-dbBlue hover:bg-dbBlue/80"
                   >
-                    <X className="mr-1 h-4 w-4" /> Flee
+                    Shield <Shield className="ml-1 h-4 w-4" /> Flee
                   </Button>
                 </div>
               ) : showSkills ? (
