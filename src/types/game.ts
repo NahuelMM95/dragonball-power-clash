@@ -62,6 +62,7 @@ export type Upgrade = {
   powerBonus: number;
   cost: number;
   purchased: boolean;
+  itemType?: string; // New field to identify upgrades that should be treated as items
 };
 
 export type ActiveBuff = {

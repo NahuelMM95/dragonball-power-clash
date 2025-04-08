@@ -15,10 +15,8 @@ import {
   ActiveBuff
 } from '@/types/game';
 
-// Define the context
 const GameContext = createContext<GameContextType | undefined>(undefined);
 
-// Define the initial battle state
 const initialBattleState: BattleState = {
   inProgress: false,
   playerStats: {
@@ -33,7 +31,6 @@ const initialBattleState: BattleState = {
   playerTurn: false
 };
 
-// Define initial state values
 const initialState = {
   clicks: 0,
   powerLevel: 1,
@@ -46,7 +43,6 @@ const initialState = {
 };
 
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Use our custom hook for localStorage
   const [clicks, setClicks] = useLocalStorage('dbClicks', initialState.clicks);
   const [powerLevel, setPowerLevel] = useLocalStorage('dbPowerLevel', initialState.powerLevel);
   const [zeni, setZeni] = useLocalStorage('dbZeni', initialState.zeni);
@@ -56,22 +52,18 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [equippedItems, setEquippedItems] = useLocalStorage('dbEquippedItems', initialState.equippedItems);
   const [activeBuffs, setActiveBuffs] = useLocalStorage('dbActiveBuffs', initialState.activeBuffs);
 
-  // State not stored in localStorage
   const [fightResult, setFightResult] = useState<{ enemy: Enemy | null; won: boolean | null } | null>(null);
   const [battleState, setBattleState] = useState<BattleState>(initialBattleState);
   const [skills, setSkills] = useLocalStorage('dbSkills', playerSkills);
 
-  // Check active buffs and display them
   useEffect(() => {
     const interval = setInterval(() => {
       const now = Date.now();
       const expiredBuffs = activeBuffs.filter(buff => buff.endTime <= now);
       
       if (expiredBuffs.length > 0) {
-        // Remove expired buffs
         setActiveBuffs(prevBuffs => prevBuffs.filter(buff => buff.endTime > now));
         
-        // Notify user
         expiredBuffs.forEach(buff => {
           const item = inventory.find(i => i.id === buff.id);
           if (item) {
@@ -87,17 +79,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => clearInterval(interval);
   }, [activeBuffs, inventory]);
 
-  // Calculate power gain based on the equipped upgrade and active buffs
   const calculatePowerGain = (): number => {
     let baseGain = 1;
     
-    // Apply upgrade bonus
     if (equippedUpgrade) {
       const upgrade = upgrades.find(u => u.id === equippedUpgrade);
       if (upgrade) baseGain += upgrade.powerBonus;
     }
     
-    // Apply active buffs
     if (activeBuffs.length > 0) {
       const now = Date.now();
       const activeBuffsItems = activeBuffs
@@ -115,12 +104,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return baseGain;
   };
 
-  // Increment clicks and update power level
   const increaseClicks = () => {
     const newClicks = clicks + 1;
     setClicks(newClicks);
     
-    // Every 100 clicks, increase power level by the power gain
     if (newClicks % 100 === 0) {
       const powerGain = calculatePowerGain();
       const newPowerLevel = powerLevel + powerGain;
@@ -133,10 +120,32 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Purchase an upgrade
   const purchaseUpgrade = (id: string) => {
     const upgrade = upgrades.find(u => u.id === id);
     if (!upgrade || upgrade.purchased || powerLevel < upgrade.cost) return;
+
+    if (upgrade.id === 'weights') {
+      const weights: Item = {
+        id: `weights-${Date.now()}`,
+        name: "Training Weights",
+        description: "Increases power gain by 15% when equipped",
+        type: 'weight',
+        slot: 'weight',
+        effect: {
+          type: 'power_gain_percent',
+          value: 0.15
+        }
+      };
+      
+      setPowerLevel(powerLevel - upgrade.cost);
+      setInventory(prev => [...prev, weights]);
+      
+      toast(`You've purchased ${upgrade.name}!`, {
+        description: "Check your inventory to equip it.",
+        duration: 3000,
+      });
+      return;
+    }
 
     setPowerLevel(powerLevel - upgrade.cost);
     setUpgrades(upgrades.map(u => (u.id === id ? { ...u, purchased: true } : u)));
@@ -147,7 +156,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  // Equip an upgrade
   const equipUpgrade = (id: string) => {
     const upgrade = upgrades.find(u => u.id === id);
     if (!upgrade || !upgrade.purchased) return;
@@ -160,7 +168,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  // Purchase a skill
   const purchaseSkill = (skillName: string) => {
     const skill = skills.find(s => s.name === skillName);
     if (!skill || skill.purchased || !skill.cost || zeni < skill.cost) return;
@@ -174,7 +181,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  // Purchase an item
   const purchaseItem = (itemType: string) => {
     if (itemType === 'senzu') {
       if (zeni < 100) {
@@ -185,7 +191,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
       
-      // Create Senzu Bean item
       const senzuBean: Item = {
         id: `senzu-${Date.now()}`,
         name: "Senzu Bean",
@@ -193,14 +198,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         type: 'consumable',
         effect: {
           type: 'heal',
-          value: 1 // Full heal
+          value: 1
         },
         usableInBattle: true
       };
       
       setZeni(zeni - 100);
       
-      // Check if senzu already exists in inventory to stack
       const existingSenzu = inventory.find(i => 
         i.name === "Senzu Bean" && 
         i.type === 'consumable' && 
@@ -208,13 +212,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       );
       
       if (existingSenzu) {
-        // Just keep the existing senzu, no need for a duplicate
         toast.success("Purchased Senzu Bean!", {
           description: "Added to your existing stack.",
           duration: 3000,
         });
       } else {
-        // Add new senzu to inventory
         setInventory(prev => [...prev, senzuBean]);
         toast.success("Purchased Senzu Bean!", {
           description: "Check your inventory to use it during battle.",
@@ -222,44 +224,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
       }
     }
-    
-    // Handle training weights
-    if (itemType === 'weights') {
-      if (zeni < 200) {
-        toast.error("Not enough Zeni!", {
-          description: "You need 200 Zeni to buy Training Weights.",
-          duration: 3000,
-        });
-        return;
-      }
-      
-      // Create Training Weights item
-      const weights: Item = {
-        id: `weights-${Date.now()}`,
-        name: "Training Weights",
-        description: "Increases power gain by 15% when equipped",
-        type: 'weight',
-        slot: 'weight',
-        effect: {
-          type: 'power_gain_percent',
-          value: 0.15
-        }
-      };
-      
-      setZeni(zeni - 200);
-      setInventory(prev => [...prev, weights]);
-      
-      toast.success("Purchased Training Weights!", {
-        description: "Check your inventory to equip them.",
-        duration: 3000,
-      });
-    }
   };
 
-  // Equip an item
   const equipItem = (itemId: string | null, slotType: string) => {
     if (itemId === null) {
-      // Unequip the current item in this slot
       setEquippedItems(prevItems => prevItems.filter(item => item.slot !== slotType));
       return;
     }
@@ -267,7 +235,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const item = inventory.find(i => i.id === itemId);
     if (!item) return;
     
-    // Remove any item already in this slot
     setEquippedItems(prevItems => {
       const newItems = prevItems.filter(i => i.slot !== slotType);
       return [...newItems, item];
@@ -279,14 +246,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  // Use a consumable item
   const useItem = (itemId: string) => {
     const item = inventory.find(i => i.id === itemId);
     if (!item || item.type !== 'consumable') return;
     
-    // For consumable items that provide buffs
     if (item.effect && item.effect.duration) {
-      // Check if there's already an active buff of this type
       const hasActiveBuff = activeBuffs.some(buff => {
         const buffItem = inventory.find(i => i.id === buff.id);
         return buffItem?.effect?.type === item.effect?.type;
@@ -300,11 +264,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
       
-      // Apply the buff
       const endTime = Date.now() + (item.effect.duration * 1000);
       setActiveBuffs(prev => [...prev, { id: item.id, endTime }]);
       
-      // Use up the item
       setInventory(prev => prev.filter(i => i.id !== itemId));
       
       toast(`You used ${item.name}!`, {
@@ -314,22 +276,18 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Use an item in battle
   const useItemInBattle = (itemId: string) => {
     if (!battleState.inProgress || !battleState.playerTurn) return;
     
     const item = inventory.find(i => i.id === itemId);
     if (!item || !item.usableInBattle) return;
     
-    // Handle different item effects in battle
     if (item.effect?.type === 'heal') {
-      // Healing item
       const newPlayerStats = {
         ...battleState.playerStats,
-        hp: battleState.playerStats.maxHp // Full heal
+        hp: battleState.playerStats.maxHp
       };
       
-      // Update battle state with healing
       setBattleState(prev => ({
         ...prev,
         playerStats: newPlayerStats,
@@ -337,70 +295,56 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         playerTurn: false
       }));
       
-      // Use up the item
       setInventory(prev => prev.filter(i => i.id !== itemId));
       
-      // Enemy's turn after using item
       setTimeout(() => {
         enemyAttack();
       }, 1000);
     }
   };
 
-  // Fight random enemy in the specified zone
   const fightEnemy = (zone: string) => {
-    // Determine which enemy pool to use
     let selectedEnemy: Enemy;
     
     if (zone === 'forest') {
-      // Forest enemy selection logic
       const rand = Math.random();
-      if (rand < 0.5) { // 50% chance for wolf
-        selectedEnemy = { ...forestEnemies[0] }; // Wolf (clone to avoid reference issues)
-      } else if (rand < 0.8) { // 30% chance for bandit
-        selectedEnemy = { ...forestEnemies[1] }; // Bandit
-      } else { // 20% chance for bear
-        selectedEnemy = { ...forestEnemies[2] }; // Bear
+      if (rand < 0.5) {
+        selectedEnemy = { ...forestEnemies[0] };
+      } else if (rand < 0.8) {
+        selectedEnemy = { ...forestEnemies[1] };
+      } else {
+        selectedEnemy = { ...forestEnemies[2] };
       }
     } else {
-      // Desert enemy selection logic - updated to give Yamcha a recurring chance
       const rand = Math.random();
-      if (rand < 0.2) { // 20% chance for Yamcha (increased from 10%)
-        selectedEnemy = { ...desertEnemies[0] }; // Yamcha
-      } else { // 80% chance for T-Rex
-        selectedEnemy = { ...desertEnemies[1] }; // T-Rex
+      if (rand < 0.2) {
+        selectedEnemy = { ...desertEnemies[0] };
+      } else {
+        selectedEnemy = { ...desertEnemies[1] };
       }
     }
     
-    // Set result and start battle
     setFightResult({ enemy: selectedEnemy, won: null });
     startBattle(selectedEnemy);
   };
 
-  // Clear fight result
   const clearFightResult = () => {
     setFightResult(null);
   };
 
-  // Start a battle with an enemy
   const startBattle = (enemy: Enemy) => {
-    // Calculate player stats based on power level
     const playerStats = calculatePlayerStats(powerLevel, equippedItems);
-    
-    // Determine who goes first based on power level
     const playerFirst = powerLevel >= enemy.power;
     
-    // Set battle state
     setBattleState({
       inProgress: true,
       playerStats,
-      enemy: { ...enemy }, // Clone to avoid reference issues
+      enemy: { ...enemy },
       log: [`Battle started against ${enemy.name}!`, 
             `${playerFirst ? 'You attack first!' : `${enemy.name} attacks first!`}`],
       playerTurn: playerFirst
     });
 
-    // If enemy goes first, execute their turn
     if (!playerFirst) {
       setTimeout(() => {
         enemyAttack();
@@ -408,22 +352,17 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Enemy attack function
   const enemyAttack = () => {
     if (!battleState.enemy) return;
     
-    // Calculate damage
     const damage = battleState.enemy.damage;
     
-    // Update player HP
     const newPlayerStats = {
       ...battleState.playerStats,
       hp: Math.max(0, battleState.playerStats.hp - damage)
     };
     
-    // Check if player is defeated
     if (newPlayerStats.hp <= 0) {
-      // Player is defeated
       setBattleState(prev => ({
         ...prev,
         playerStats: newPlayerStats,
@@ -431,12 +370,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         inProgress: false
       }));
       
-      // End battle with defeat
       setTimeout(() => endBattle(false), 1500);
       return;
     }
     
-    // Update battle state
     setBattleState(prev => ({
       ...prev,
       playerStats: newPlayerStats,
@@ -445,11 +382,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }));
   };
 
-  // Use a skill during battle
   const useSkill = (skill: Skill) => {
     if (!battleState.inProgress || !battleState.playerTurn || !battleState.enemy || !skill.purchased) return;
     
-    // Check if we have enough ki
     if (battleState.playerStats.ki < skill.kiCost) {
       setBattleState(prev => ({
         ...prev,
@@ -458,10 +393,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
     
-    // Calculate damage
     const damage = Math.floor(battleState.playerStats.damage * skill.damageMultiplier);
     
-    // Update enemy HP and player Ki
     const newEnemyHp = Math.max(0, battleState.enemy.hp - damage);
     const newEnemy = {
       ...battleState.enemy,
@@ -473,9 +406,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ki: battleState.playerStats.ki - skill.kiCost
     };
     
-    // Check if enemy is defeated
     if (newEnemyHp <= 0) {
-      // Enemy is defeated
       setBattleState(prev => ({
         ...prev,
         enemy: newEnemy,
@@ -484,12 +415,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         inProgress: false
       }));
       
-      // End battle with victory
       setTimeout(() => endBattle(true), 1500);
       return;
     }
     
-    // Update battle state
     setBattleState(prev => ({
       ...prev,
       enemy: newEnemy,
@@ -498,17 +427,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       playerTurn: false
     }));
     
-    // Enemy's turn
     setTimeout(() => {
       enemyAttack();
     }, 1000);
   };
 
-  // Flee from battle
   const fleeFromBattle = () => {
     if (!battleState.inProgress) return;
     
-    // 50% chance to successfully flee
     const fleeSuccessful = Math.random() > 0.5;
     
     if (fleeSuccessful) {
@@ -518,7 +444,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         inProgress: false
       }));
       
-      // End battle (neither victory nor defeat)
       setTimeout(() => {
         setBattleState(initialBattleState);
         setFightResult(null);
@@ -535,16 +460,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         playerTurn: false
       }));
       
-      // Enemy gets a free attack
       setTimeout(() => {
         enemyAttack();
       }, 1000);
     }
   };
 
-  // Handle enemy drops after defeating them with improved dino meat functionality
   const handleEnemyDrops = (enemy: Enemy) => {
-    // Add zeni reward if available
     if (enemy.zeniReward) {
       setZeni(prev => prev + enemy.zeniReward);
       
@@ -555,7 +477,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     
     if (enemy.name === 'Yamcha') {
-      // 10% chance to drop Yamcha's Sword
       if (Math.random() < 0.1) {
         const sword: Item = {
           id: `sword-${Date.now()}`,
@@ -580,7 +501,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     
     if (enemy.name === 'T-Rex') {
-      // Always drop Dino Meat
       const dinoMeat: Item = {
         id: `dino-meat-${Date.now()}`,
         name: "Dino Meat",
@@ -593,7 +513,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       };
       
-      // Check if dino meat already exists in inventory
       const existingDinoMeat = inventory.find(i => 
         i.name === "Dino Meat" && 
         i.type === 'consumable' && 
@@ -601,13 +520,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       );
       
       if (existingDinoMeat) {
-        // Just keep the existing dino meat, no need for a duplicate
         toast.success(`You found Dino Meat!`, {
           description: "Added to your existing stack.",
           duration: 3000,
         });
       } else {
-        // Add new dino meat to inventory
         setInventory(prev => [...prev, dinoMeat]);
         
         setTimeout(() => {
@@ -619,17 +536,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // End battle
   const endBattle = (victory: boolean) => {
-    // Update fight result
     setFightResult(prev => prev ? { ...prev, won: victory } : null);
     
-    // If victorious, handle enemy drops and power gain
     if (victory && battleState.enemy) {
-      // Calculate power gain (1/5 of enemy power without decimals)
       const powerGain = Math.floor(battleState.enemy.power / 5);
       
-      // Update power level
       if (powerGain > 0) {
         setPowerLevel(prev => prev + powerGain);
         
@@ -640,12 +552,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }, 500);
       }
       
-      // Check for item drops and award zeni
       handleEnemyDrops(battleState.enemy);
     }
   };
 
-  // Reset progress (for settings menu)
   const resetProgress = () => {
     setClicks(initialState.clicks);
     setPowerLevel(initialState.powerLevel);
