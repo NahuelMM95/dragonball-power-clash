@@ -5,13 +5,28 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
-import { Sword, Shield, X, Eye, EyeOff } from "lucide-react";
+import { Sword, Shield, X, Eye, EyeOff, Pill } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 const BattleZone = () => {
-  const { powerLevel, forest, desert, fightEnemy, fightResult, clearFightResult, battleState, skills, useSkill, fleeFromBattle } = useGame();
+  const { 
+    powerLevel, 
+    forest, 
+    desert, 
+    fightEnemy, 
+    fightResult, 
+    clearFightResult, 
+    battleState, 
+    skills, 
+    useSkill, 
+    fleeFromBattle,
+    inventory,
+    useItemInBattle
+  } = useGame();
+  
   const [dialogOpen, setDialogOpen] = useState(false);
   const [showSkills, setShowSkills] = useState(false);
+  const [showItems, setShowItems] = useState(false);
   const [showForestEnemies, setShowForestEnemies] = useState(false);
   const [showDesertEnemies, setShowDesertEnemies] = useState(false);
   const [activeZone, setActiveZone] = useState('forest');
@@ -28,24 +43,38 @@ const BattleZone = () => {
 
   const handleAttackClick = () => {
     setShowSkills(true);
+    setShowItems(false);
   };
 
-  const handleSkillClick = (skill: any) => {
+  const handleItemsClick = () => {
+    setShowItems(true);
+    setShowSkills(false);
+  };
+
+  const handleSkillClick = (skill) => {
     useSkill(skill);
     setShowSkills(false);
+  };
+
+  const handleItemClick = (itemId) => {
+    useItemInBattle(itemId);
+    setShowItems(false);
   };
 
   const handleFleeClick = () => {
     fleeFromBattle();
   };
 
-  const toggleEnemies = (zone: string) => {
+  const toggleEnemies = (zone) => {
     if (zone === 'forest') {
       setShowForestEnemies(!showForestEnemies);
     } else if (zone === 'desert') {
       setShowDesertEnemies(!showDesertEnemies);
     }
   };
+
+  const usableItems = inventory.filter(item => item.usableInBattle);
+  const availableSkills = skills.filter(skill => skill.purchased);
 
   return (
     <div className="bg-white/90 p-4 rounded-lg shadow-md backdrop-blur-sm border-2 border-forestGreen">
@@ -79,9 +108,9 @@ const BattleZone = () => {
                 <div className="text-sm">
                   <p className="mb-1">Possible Enemies:</p>
                   <ul className="list-disc pl-5">
-                    <li>Wolf (Power Level: 5)</li>
-                    <li>Bandit (Power Level: 10)</li>
-                    <li>Bear (Power Level: 20)</li>
+                    <li>Wolf (Power Level: 5) - 10 Zeni reward</li>
+                    <li>Bandit (Power Level: 10) - 25 Zeni reward</li>
+                    <li>Bear (Power Level: 20) - 50 Zeni reward</li>
                   </ul>
                 </div>
               )}
@@ -120,8 +149,8 @@ const BattleZone = () => {
                 <div className="text-sm">
                   <p className="mb-1">Possible Enemies:</p>
                   <ul className="list-disc pl-5">
-                    <li>Yamcha (Power Level: 50) - Rare, might drop Yamcha's Sword</li>
-                    <li>T-Rex (Power Level: 250) - May drop Dino Meat</li>
+                    <li>Yamcha (Power Level: 50) - 200 Zeni, might drop Yamcha's Sword</li>
+                    <li>T-Rex (Power Level: 250) - 500 Zeni, drops Dino Meat</li>
                   </ul>
                 </div>
               )}
@@ -206,8 +235,8 @@ const BattleZone = () => {
               {/* Battle Actions */}
               {battleState.playerTurn ? (
                 <div className="flex flex-col space-y-2">
-                  {!showSkills ? (
-                    <div className="grid grid-cols-2 gap-2">
+                  {!showSkills && !showItems ? (
+                    <div className="grid grid-cols-3 gap-2">
                       <Button 
                         variant="default" 
                         onClick={handleAttackClick}
@@ -217,13 +246,21 @@ const BattleZone = () => {
                       </Button>
                       <Button 
                         variant="default" 
+                        onClick={handleItemsClick}
+                        className="bg-green-600 hover:bg-green-700"
+                        disabled={usableItems.length === 0}
+                      >
+                        <Pill className="mr-1 h-4 w-4" /> Items
+                      </Button>
+                      <Button 
+                        variant="default" 
                         onClick={handleFleeClick} 
                         className="bg-dbBlue hover:bg-dbBlue/80"
                       >
                         <X className="mr-1 h-4 w-4" /> Flee
                       </Button>
                     </div>
-                  ) : (
+                  ) : showSkills ? (
                     <div className="space-y-2">
                       <div className="flex justify-between items-center">
                         <h3 className="font-bold">Skills</h3>
@@ -236,7 +273,7 @@ const BattleZone = () => {
                         </Button>
                       </div>
                       
-                      {skills.map((skill) => (
+                      {availableSkills.map((skill) => (
                         <Button 
                           key={skill.name}
                           variant="default"
@@ -249,7 +286,35 @@ const BattleZone = () => {
                         </Button>
                       ))}
                     </div>
-                  )}
+                  ) : showItems ? (
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <h3 className="font-bold">Items</h3>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => setShowItems(false)}
+                        >
+                          Back
+                        </Button>
+                      </div>
+                      
+                      {usableItems.map((item) => (
+                        <Button 
+                          key={item.id}
+                          variant="default"
+                          className="w-full justify-between bg-green-600 hover:bg-green-700"
+                          onClick={() => handleItemClick(item.id)}
+                        >
+                          <div className="flex items-center">
+                            <Pill className="mr-2 h-4 w-4" />
+                            <span>{item.name}</span>
+                          </div>
+                          <span className="text-xs bg-green-500 px-2 py-0.5 rounded-full">Use</span>
+                        </Button>
+                      ))}
+                    </div>
+                  ) : null}
                   
                   <div className="text-center text-sm text-gray-600">
                     {battleState.playerTurn ? "Your turn" : `${battleState.enemy.name}'s turn`}

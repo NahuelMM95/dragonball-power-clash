@@ -28,7 +28,7 @@ const Index = () => {
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid grid-cols-4 mb-8 mx-auto max-w-md">
               <TabsTrigger value="main" className="text-lg">Main</TabsTrigger>
-              <TabsTrigger value="training" className="text-lg">Training Room</TabsTrigger>
+              <TabsTrigger value="training" className="text-lg">Shop</TabsTrigger>
               <TabsTrigger value="battle" className="text-lg">Battle Zone</TabsTrigger>
               <TabsTrigger value="inventory" className="text-lg">Inventory</TabsTrigger>
             </TabsList>

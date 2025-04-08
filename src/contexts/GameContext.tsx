@@ -38,6 +38,7 @@ const initialBattleState: BattleState = {
 const initialState = {
   clicks: 0,
   powerLevel: 1,
+  zeni: 0,
   upgrades: initialUpgrades,
   equippedUpgrade: null as string | null,
   inventory: [] as Item[],
@@ -49,6 +50,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Use our custom hook for localStorage
   const [clicks, setClicks] = useLocalStorage('dbClicks', initialState.clicks);
   const [powerLevel, setPowerLevel] = useLocalStorage('dbPowerLevel', initialState.powerLevel);
+  const [zeni, setZeni] = useLocalStorage('dbZeni', initialState.zeni);
   const [upgrades, setUpgrades] = useLocalStorage('dbUpgrades', initialState.upgrades);
   const [equippedUpgrade, setEquippedUpgrade] = useLocalStorage('dbEquippedUpgrade', initialState.equippedUpgrade);
   const [inventory, setInventory] = useLocalStorage('dbInventory', initialState.inventory);
@@ -58,7 +60,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // State not stored in localStorage
   const [fightResult, setFightResult] = useState<{ enemy: Enemy | null; won: boolean | null } | null>(null);
   const [battleState, setBattleState] = useState<BattleState>(initialBattleState);
-  const [skills, setSkills] = useState<Skill[]>(playerSkills);
+  const [skills, setSkills] = useLocalStorage('dbSkills', playerSkills);
 
   // Check active buffs
   useEffect(() => {
@@ -159,6 +161,54 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
+  // Purchase a skill
+  const purchaseSkill = (skillName: string) => {
+    const skill = skills.find(s => s.name === skillName);
+    if (!skill || skill.purchased || !skill.cost || zeni < skill.cost) return;
+
+    setZeni(zeni - skill.cost);
+    setSkills(skills.map(s => (s.name === skillName ? { ...s, purchased: true } : s)));
+    
+    toast(`You've learned ${skill.name}!`, {
+      description: "You can now use this skill in battle.",
+      duration: 3000,
+    });
+  };
+
+  // Purchase an item
+  const purchaseItem = (itemType: string) => {
+    if (itemType === 'senzu') {
+      if (zeni < 100) {
+        toast.error("Not enough Zeni!", {
+          description: "You need 100 Zeni to buy a Senzu Bean.",
+          duration: 3000,
+        });
+        return;
+      }
+      
+      // Create Senzu Bean item
+      const senzuBean: Item = {
+        id: `senzu-${Date.now()}`,
+        name: "Senzu Bean",
+        description: "Completely restore HP during battle",
+        type: 'consumable',
+        effect: {
+          type: 'heal',
+          value: 1 // Full heal
+        },
+        usableInBattle: true
+      };
+      
+      setZeni(zeni - 100);
+      setInventory(prev => [...prev, senzuBean]);
+      
+      toast.success("Purchased Senzu Bean!", {
+        description: "Check your inventory to use it during battle.",
+        duration: 3000,
+      });
+    }
+  };
+
   // Equip an item
   const equipItem = (itemId: string | null, slotType: string) => {
     if (itemId === null) {
@@ -214,6 +264,39 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: `Effect active for ${item.effect.duration} seconds.`,
         duration: 3000,
       });
+    }
+  };
+
+  // Use an item in battle
+  const useItemInBattle = (itemId: string) => {
+    if (!battleState.inProgress || !battleState.playerTurn) return;
+    
+    const item = inventory.find(i => i.id === itemId);
+    if (!item || !item.usableInBattle) return;
+    
+    // Handle different item effects in battle
+    if (item.effect?.type === 'heal') {
+      // Healing item
+      const newPlayerStats = {
+        ...battleState.playerStats,
+        hp: battleState.playerStats.maxHp // Full heal
+      };
+      
+      // Update battle state with healing
+      setBattleState(prev => ({
+        ...prev,
+        playerStats: newPlayerStats,
+        log: [...prev.log, `You used ${item.name} and fully recovered your HP!`],
+        playerTurn: false
+      }));
+      
+      // Use up the item
+      setInventory(prev => prev.filter(i => i.id !== itemId));
+      
+      // Enemy's turn after using item
+      setTimeout(() => {
+        enemyAttack();
+      }, 1000);
     }
   };
 
@@ -318,7 +401,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Use a skill during battle
   const useSkill = (skill: Skill) => {
-    if (!battleState.inProgress || !battleState.playerTurn || !battleState.enemy) return;
+    if (!battleState.inProgress || !battleState.playerTurn || !battleState.enemy || !skill.purchased) return;
     
     // Check if we have enough ki
     if (battleState.playerStats.ki < skill.kiCost) {
@@ -369,8 +452,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }, 500);
       }
       
-      // Check for item drops
-      handleEnemyDrops(battleState.enemy, setInventory);
+      // Check for item drops and award zeni
+      handleEnemyDrops(battleState.enemy, setInventory, setZeni);
       
       // End battle with victory
       setTimeout(() => endBattle(true), 1500);
@@ -440,11 +523,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const resetProgress = () => {
     setClicks(initialState.clicks);
     setPowerLevel(initialState.powerLevel);
+    setZeni(initialState.zeni);
     setUpgrades(initialState.upgrades);
     setEquippedUpgrade(initialState.equippedUpgrade);
     setInventory(initialState.inventory);
     setEquippedItems(initialState.equippedItems);
     setActiveBuffs(initialState.activeBuffs);
+    setSkills(playerSkills);
     setBattleState(initialBattleState);
     setFightResult(null);
   };
@@ -453,7 +538,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <GameContext.Provider 
       value={{ 
         clicks, 
-        powerLevel, 
+        powerLevel,
+        zeni,
         increaseClicks, 
         upgrades, 
         equippedUpgrade, 
@@ -466,6 +552,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         clearFightResult,
         battleState,
         skills,
+        purchaseSkill,
         startBattle,
         useSkill,
         fleeFromBattle,
@@ -474,6 +561,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         equippedItems,
         equipItem,
         useItem,
+        useItemInBattle,
+        purchaseItem,
         resetProgress
       }}
     >

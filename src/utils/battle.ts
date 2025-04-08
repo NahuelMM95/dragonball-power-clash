@@ -28,8 +28,19 @@ export const calculatePlayerStats = (powerLevel: number, equippedItems: Item[]):
 // Handle enemy drops after defeating them
 export const handleEnemyDrops = (
   enemy: Enemy, 
-  setInventory: React.Dispatch<React.SetStateAction<Item[]>>
+  setInventory: React.Dispatch<React.SetStateAction<Item[]>>,
+  setZeni: React.Dispatch<React.SetStateAction<number>>
 ) => {
+  // Add zeni reward if available
+  if (enemy.zeniReward) {
+    setZeni(prev => prev + enemy.zeniReward);
+    
+    toast.success(`+ ${enemy.zeniReward} Zeni`, {
+      description: "Added to your wallet",
+      duration: 3000
+    });
+  }
+  
   if (enemy.name === 'Yamcha') {
     // 10% chance to drop Yamcha's Sword
     if (Math.random() < 0.1) {

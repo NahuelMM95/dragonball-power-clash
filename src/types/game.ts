@@ -8,6 +8,7 @@ export type Enemy = {
   damage: number;
   ki: number;
   maxKi: number;
+  zeniReward?: number;
 };
 
 export type ItemType = 'weapon' | 'weight' | 'consumable';
@@ -23,6 +24,7 @@ export type Item = {
     value: number;
     duration?: number;
   };
+  usableInBattle?: boolean;
 };
 
 export type BattleState = {
@@ -49,6 +51,8 @@ export type Skill = {
   damageMultiplier: number;
   kiCost: number;
   description: string;
+  purchased?: boolean;
+  cost?: number;
 };
 
 export type Upgrade = {
@@ -68,6 +72,7 @@ export type ActiveBuff = {
 export type GameContextType = {
   clicks: number;
   powerLevel: number;
+  zeni: number;
   increaseClicks: () => void;
   upgrades: Upgrade[];
   equippedUpgrade: string | null;
@@ -80,6 +85,7 @@ export type GameContextType = {
   clearFightResult: () => void;
   battleState: BattleState;
   skills: Skill[];
+  purchaseSkill: (skillName: string) => void;
   startBattle: (enemy: Enemy) => void;
   useSkill: (skill: Skill) => void;
   fleeFromBattle: () => void;
@@ -88,5 +94,7 @@ export type GameContextType = {
   equippedItems: Item[];
   equipItem: (itemId: string | null, slotType: string) => void;
   useItem: (itemId: string) => void;
+  useItemInBattle: (itemId: string) => void;
+  purchaseItem: (itemType: string) => void;
   resetProgress: () => void;
 };
