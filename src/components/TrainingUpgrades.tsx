@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Zap, Pill } from "lucide-react";
+import { Zap, Pill, Weight } from "lucide-react";
 
 const TrainingUpgrades = () => {
   const { 
@@ -42,8 +42,11 @@ const TrainingUpgrades = () => {
               <Card key={upgrade.id} className={`border-2 ${equippedUpgrade === upgrade.id ? 'border-dragonOrange bg-amber-50' : 'border-gray-200'}`}>
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-center">
-                    <CardTitle className="text-lg">{upgrade.name}</CardTitle>
-                    {upgrade.purchased && upgrade.id !== 'weights' && (
+                    <div className="flex items-center">
+                      {upgrade.id === 'weights' && <Weight className="mr-2 h-5 w-5 text-gray-600" />}
+                      <CardTitle className="text-lg">{upgrade.name}</CardTitle>
+                    </div>
+                    {upgrade.purchased && !upgrade.itemType && (
                       <Badge variant={equippedUpgrade === upgrade.id ? "default" : "outline"} className="ml-2">
                         {equippedUpgrade === upgrade.id ? "Equipped" : "Purchased"}
                       </Badge>
@@ -52,7 +55,11 @@ const TrainingUpgrades = () => {
                   <CardDescription>{upgrade.description}</CardDescription>
                 </CardHeader>
                 <CardContent className="pb-2">
-                  <p className="text-sm"><span className="font-semibold text-dbBlue">+{upgrade.powerBonus}</span> Power Level gain</p>
+                  {!upgrade.itemType ? (
+                    <p className="text-sm"><span className="font-semibold text-dbBlue">+{upgrade.powerBonus}</span> Power Level gain</p>
+                  ) : (
+                    <p className="text-sm"><span className="font-semibold text-dbBlue">+15%</span> Power Level gain when equipped</p>
+                  )}
                   {!upgrade.purchased && (
                     <p className="text-sm">Cost: <span className="font-semibold text-dbRed">{upgrade.cost}</span> Power Levels</p>
                   )}
@@ -67,7 +74,7 @@ const TrainingUpgrades = () => {
                     >
                       Purchase
                     </Button>
-                  ) : upgrade.id !== 'weights' && equippedUpgrade !== upgrade.id ? (
+                  ) : !upgrade.itemType && equippedUpgrade !== upgrade.id ? (
                     <Button 
                       variant="default" 
                       className="w-full bg-dragonOrange hover:bg-dragonOrange/80"
@@ -75,7 +82,7 @@ const TrainingUpgrades = () => {
                     >
                       Equip
                     </Button>
-                  ) : upgrade.id !== 'weights' ? (
+                  ) : !upgrade.itemType ? (
                     <Button 
                       variant="outline" 
                       className="w-full"

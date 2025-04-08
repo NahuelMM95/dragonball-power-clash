@@ -26,4 +26,13 @@ export const initialUpgrades: Upgrade[] = [
     cost: 50, 
     purchased: false 
   },
+  { 
+    id: 'weights', 
+    name: '5Kg Weighted Clothes', 
+    description: 'Train with weighted clothing to increase power gain by 15%.', 
+    powerBonus: 0, 
+    cost: 75, 
+    purchased: false,
+    itemType: 'weight'
+  },
 ];
