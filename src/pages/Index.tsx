@@ -1,6 +1,9 @@
 
 import { useState } from "react";
-import { GameProvider, GameContextWrapper } from "@/contexts/GameContext";
+import { GameProvider, GameContextWrapper, useGame } from "@/contexts/GameContext";
+import { useItems } from "@/contexts/ItemContext";
+import { useBattle } from "@/contexts/BattleContext";
+import { useUpgrades } from "@/contexts/UpgradeContext";
 import DragonBall from "@/components/DragonBall";
 import PowerLevel from "@/components/PowerLevel";
 import TrainingUpgrades from "@/components/TrainingUpgrades";
@@ -8,11 +11,11 @@ import BattleZone from "@/components/BattleZone";
 import Inventory from "@/components/Inventory";
 import SettingsMenu from "@/components/SettingsMenu";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { useGame } from "@/contexts/GameContext";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const ActiveBuffsIndicator = () => {
-  const { inventory, activeBuffs } = useGame();
+  const { inventory } = useItems();
+  const { activeBuffs } = useItems();
   
   if (!activeBuffs || activeBuffs.length === 0) return null;
   

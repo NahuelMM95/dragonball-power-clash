@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState } from 'react';
 import { toast } from "sonner";
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -245,7 +244,12 @@ export const BattleProvider: React.FC<BattleProviderProps> = ({
       setItemInventory(prev => prev.filter(i => i.id !== itemId));
       
       setTimeout(() => {
-        enemyAttack(battleState, setBattleState, endBattle);
+        const currentState = {
+          ...battleState,
+          playerStats: newPlayerStats,
+          playerTurn: false
+        };
+        enemyAttack(currentState, setBattleState, endBattle);
       }, 1000);
     }
   };

@@ -1,4 +1,3 @@
-
 export type Enemy = {
   name: string;
   power: number;
@@ -62,7 +61,7 @@ export type Upgrade = {
   powerBonus: number;
   cost: number;
   purchased: boolean;
-  itemType?: string; // New field to identify upgrades that should be treated as items
+  itemType?: string;
 };
 
 export type ActiveBuff = {
@@ -111,4 +110,6 @@ export type GameContextType = {
   zeni: number;
   increaseClicks: () => void;
   resetProgress: () => void;
-} & BattleContextType & ItemContextType & UpgradeContextType;
+  setPowerLevel: React.Dispatch<React.SetStateAction<number>>;
+  setZeni: React.Dispatch<React.SetStateAction<number>>;
+};
