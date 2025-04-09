@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { GameProvider } from "@/contexts/GameContext";
+import { GameProvider, GameContextWrapper } from "@/contexts/GameContext";
 import DragonBall from "@/components/DragonBall";
 import PowerLevel from "@/components/PowerLevel";
 import TrainingUpgrades from "@/components/TrainingUpgrades";
@@ -118,7 +118,9 @@ const GameContent = () => {
 const Index = () => {
   return (
     <GameProvider>
-      <GameContent />
+      <GameContextWrapper>
+        <GameContent />
+      </GameContextWrapper>
     </GameProvider>
   );
 };

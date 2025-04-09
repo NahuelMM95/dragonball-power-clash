@@ -70,15 +70,8 @@ export type ActiveBuff = {
   endTime: number;
 };
 
-export type GameContextType = {
-  clicks: number;
-  powerLevel: number;
-  zeni: number;
-  increaseClicks: () => void;
-  upgrades: Upgrade[];
-  equippedUpgrade: string | null;
-  purchaseUpgrade: (id: string) => void;
-  equipUpgrade: (id: string) => void;
+// New interfaces for our separate contexts
+export interface BattleContextType {
   forest: Enemy[];
   desert: Enemy[];
   fightEnemy: (zone: string) => void;
@@ -86,17 +79,36 @@ export type GameContextType = {
   clearFightResult: () => void;
   battleState: BattleState;
   skills: Skill[];
-  purchaseSkill: (skillName: string) => void;
+  purchaseSkill: (skillName: string) => number | void;
   startBattle: (enemy: Enemy) => void;
   useSkill: (skill: Skill) => void;
   fleeFromBattle: () => void;
   endBattle: (victory: boolean) => void;
+  useItemInBattle: (itemId: string, inventory: Item[], setInventory: React.Dispatch<React.SetStateAction<Item[]>>) => void;
+}
+
+export interface ItemContextType {
   inventory: Item[];
+  setInventory: React.Dispatch<React.SetStateAction<Item[]>>;
   equippedItems: Item[];
   equipItem: (itemId: string | null, slotType: string) => void;
   useItem: (itemId: string) => void;
-  useItemInBattle: (itemId: string) => void;
   purchaseItem: (itemType: string) => void;
-  resetProgress: () => void;
   activeBuffs: ActiveBuff[];
-};
+}
+
+export interface UpgradeContextType {
+  upgrades: Upgrade[];
+  equippedUpgrade: string | null;
+  purchaseUpgrade: (id: string) => void;
+  equipUpgrade: (id: string) => void;
+}
+
+// Main game context that combines all the others
+export type GameContextType = {
+  clicks: number;
+  powerLevel: number;
+  zeni: number;
+  increaseClicks: () => void;
+  resetProgress: () => void;
+} & BattleContextType & ItemContextType & UpgradeContextType;
