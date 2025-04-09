@@ -1,6 +1,7 @@
 
 import { useState } from 'react';
-import { useGame } from '@/contexts/GameContext';
+import { useBattle } from '@/contexts/BattleContext';
+import { useItems } from '@/contexts/ItemContext';
 import { Button } from "@/components/ui/button";
 import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
@@ -14,7 +15,8 @@ type BattleDialogContentProps = {
 };
 
 const BattleDialogContent = ({ battleState, fightResult, handleCloseDialog }: BattleDialogContentProps) => {
-  const { useSkill, fleeFromBattle, inventory, useItemInBattle, skills } = useGame();
+  const { useSkill, fleeFromBattle, skills, useItemInBattle } = useBattle();
+  const { inventory } = useItems();
   const [showSkills, setShowSkills] = useState(false);
   const [showItems, setShowItems] = useState(false);
 
@@ -34,7 +36,7 @@ const BattleDialogContent = ({ battleState, fightResult, handleCloseDialog }: Ba
   };
 
   const handleItemClick = (itemId: string) => {
-    useItemInBattle(itemId);
+    useItemInBattle(itemId, inventory, inventory => {});
     setShowItems(false);
   };
 

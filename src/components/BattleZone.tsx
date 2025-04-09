@@ -1,6 +1,7 @@
 
 import { useState } from 'react';
 import { useGame } from '@/contexts/GameContext';
+import { useBattle } from '@/contexts/BattleContext';
 import { Dialog } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import ForestZone from './battle/ForestZone';
@@ -8,12 +9,8 @@ import DesertZone from './battle/DesertZone';
 import BattleDialogContent from './battle/BattleDialogContent';
 
 const BattleZone = () => {
-  const { 
-    powerLevel, 
-    fightResult, 
-    clearFightResult, 
-    battleState
-  } = useGame();
+  const { powerLevel } = useGame();
+  const { fightResult, clearFightResult, battleState } = useBattle();
   
   const [dialogOpen, setDialogOpen] = useState(false);
   const [activeZone, setActiveZone] = useState('forest');
@@ -44,7 +41,6 @@ const BattleZone = () => {
       
       <p className="text-sm text-center text-gray-600">Your current power level: {powerLevel}</p>
 
-      {/* Battle Result Dialog - No close button "X" */}
       <Dialog 
         open={dialogOpen || battleState.inProgress} 
         onOpenChange={(open) => {

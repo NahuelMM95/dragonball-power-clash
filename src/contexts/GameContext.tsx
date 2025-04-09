@@ -1,9 +1,9 @@
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { BattleProvider } from './BattleContext';
-import { ItemProvider } from './ItemContext'; 
-import { UpgradeProvider } from './UpgradeContext';
+import { BattleProvider, useBattle } from './BattleContext';
+import { ItemProvider, useItems } from './ItemContext'; 
+import { UpgradeProvider, useUpgrades } from './UpgradeContext';
 import { GameContextType } from '@/types/game';
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -18,7 +18,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [clicks, setClicks] = useLocalStorage('dbClicks', initialState.clicks);
   const [powerLevel, setPowerLevel] = useLocalStorage('dbPowerLevel', initialState.powerLevel);
   const [zeni, setZeni] = useLocalStorage('dbZeni', initialState.zeni);
-  const [inventory, setInventory] = useLocalStorage('dbInventory', []);
 
   const increaseClicks = () => {
     const newClicks = clicks + 1;
@@ -41,7 +40,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       powerLevel,
       zeni,
       increaseClicks,
-      resetProgress
+      resetProgress,
+      setPowerLevel,
+      setZeni
     }}>
       {children}
     </GameContext.Provider>

@@ -1,11 +1,11 @@
 
 import { useState } from 'react';
-import { useGame } from '@/contexts/GameContext';
+import { useBattle } from '@/contexts/BattleContext';
 import ZoneCard from './ZoneCard';
 
 const DesertZone = () => {
   const [showEnemies, setShowEnemies] = useState(false);
-  const { fightEnemy } = useGame();
+  const { fightEnemy } = useBattle();
 
   const desertEnemiesInfo = [
     { name: "Yamcha", power: 50, reward: "200 Zeni, might drop Yamcha's Sword" },

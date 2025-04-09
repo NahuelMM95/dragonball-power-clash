@@ -1,11 +1,11 @@
 
 import { useState } from 'react';
-import { useGame } from '@/contexts/GameContext';
+import { useBattle } from '@/contexts/BattleContext';
 import ZoneCard from './ZoneCard';
 
 const ForestZone = () => {
   const [showEnemies, setShowEnemies] = useState(false);
-  const { fightEnemy } = useGame();
+  const { fightEnemy } = useBattle();
 
   const forestEnemiesInfo = [
     { name: "Wolf", power: 5, reward: "10 Zeni reward" },

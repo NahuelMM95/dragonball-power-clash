@@ -1,12 +1,13 @@
 
 import { useGame } from '@/contexts/GameContext';
+import { useItems } from '@/contexts/ItemContext';
 import { Sword } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const Inventory = () => {
-  const { inventory, equippedItems, equipItem, useItem } = useGame();
+  const { inventory, equippedItems, equipItem, useItem } = useItems();
 
   const renderEquipmentSlot = (slotType: string, item: any | null) => {
     return (

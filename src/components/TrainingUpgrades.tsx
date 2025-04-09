@@ -1,5 +1,8 @@
 
 import { useGame } from '@/contexts/GameContext';
+import { useUpgrades } from '@/contexts/UpgradeContext';
+import { useBattle } from '@/contexts/BattleContext';
+import { useItems } from '@/contexts/ItemContext';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -7,17 +10,10 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Zap, Pill, Weight } from "lucide-react";
 
 const TrainingUpgrades = () => {
-  const { 
-    upgrades, 
-    equippedUpgrade, 
-    powerLevel, 
-    purchaseUpgrade, 
-    equipUpgrade,
-    skills,
-    purchaseSkill,
-    zeni,
-    purchaseItem
-  } = useGame();
+  const { powerLevel, zeni } = useGame();
+  const { upgrades, equippedUpgrade, purchaseUpgrade, equipUpgrade } = useUpgrades();
+  const { skills, purchaseSkill } = useBattle();
+  const { purchaseItem } = useItems();
 
   return (
     <div className="bg-white/90 p-4 rounded-lg shadow-md backdrop-blur-sm border-2 border-dbBlue">

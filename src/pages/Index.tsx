@@ -14,8 +14,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const ActiveBuffsIndicator = () => {
-  const { inventory } = useItems();
-  const { activeBuffs } = useItems();
+  const { inventory, activeBuffs } = useItems();
   
   if (!activeBuffs || activeBuffs.length === 0) return null;
   

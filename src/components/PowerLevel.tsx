@@ -1,8 +1,10 @@
 
 import { useGame } from '@/contexts/GameContext';
+import { useUpgrades } from '@/contexts/UpgradeContext';
 
 const PowerLevel = () => {
-  const { powerLevel, equippedUpgrade, upgrades } = useGame();
+  const { powerLevel } = useGame();
+  const { equippedUpgrade, upgrades } = useUpgrades();
   
   // Calculate power gain based on equipped upgrade
   const powerGain = (() => {
