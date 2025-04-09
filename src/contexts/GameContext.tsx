@@ -24,9 +24,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const newClicks = clicks + 1;
     setClicks(newClicks);
     
-    if (newClicks % 100 === 0) {
-      setPowerLevel(prev => prev + 1);
-    }
+    // We'll move the power level increase logic to UpgradeContext.tsx
+    // to handle both the base increase and any bonuses from upgrades
   };
 
   const resetProgress = () => {

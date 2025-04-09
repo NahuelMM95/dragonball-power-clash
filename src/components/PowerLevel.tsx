@@ -10,7 +10,7 @@ const PowerLevel = () => {
   const powerGain = (() => {
     if (!equippedUpgrade) return 1;
     const upgrade = upgrades.find(u => u.id === equippedUpgrade);
-    return upgrade ? 1 + upgrade.powerBonus : 1;
+    return upgrade ? upgrade.powerBonus : 1;
   })();
 
   return (

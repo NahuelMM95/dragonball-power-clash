@@ -33,12 +33,14 @@ export const UpgradeProvider: React.FC<UpgradeProviderProps> = ({
   // Apply power bonus when clicks are a multiple of 100
   useEffect(() => {
     if (clicks % 100 === 0 && clicks > 0) {
-      let bonus = 1; // Default bonus
+      // Calculate bonus based on equipped upgrade
+      let bonus = 1; // Base increase
       
       if (equippedUpgrade) {
         const upgrade = upgrades.find(u => u.id === equippedUpgrade);
         if (upgrade) {
-          bonus = 1 + upgrade.powerBonus;
+          // Only apply the bonus, not 1 + bonus, as the base 1 is already included
+          bonus = upgrade.powerBonus;
         }
       }
       
