@@ -4,7 +4,7 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { forestEnemies, desertEnemies } from '@/data/enemies';
 import { playerSkills } from '@/data/skills';
 import { initialUpgrades } from '@/data/upgrades';
-import { calculatePlayerStats } from '@/utils/battle';
+import { calculatePlayerStats, handleEnemyDrops, enemyAttack } from '@/utils/battle';
 import { 
   GameContextType, 
   BattleState, 
@@ -298,7 +298,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setInventory(prev => prev.filter(i => i.id !== itemId));
       
       setTimeout(() => {
-        enemyAttack();
+        enemyAttack(battleState, setBattleState, endBattle);
       }, 1000);
     }
   };
@@ -347,39 +347,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     if (!playerFirst) {
       setTimeout(() => {
-        enemyAttack();
+        enemyAttack(battleState, setBattleState, endBattle);
       }, 1000);
     }
-  };
-
-  const enemyAttack = () => {
-    if (!battleState.enemy) return;
-    
-    const damage = battleState.enemy.damage;
-    
-    const newPlayerStats = {
-      ...battleState.playerStats,
-      hp: Math.max(0, battleState.playerStats.hp - damage)
-    };
-    
-    if (newPlayerStats.hp <= 0) {
-      setBattleState(prev => ({
-        ...prev,
-        playerStats: newPlayerStats,
-        log: [...prev.log, `${prev.enemy?.name} attacks for ${damage} damage!`, 'You were defeated!'],
-        inProgress: false
-      }));
-      
-      setTimeout(() => endBattle(false), 1500);
-      return;
-    }
-    
-    setBattleState(prev => ({
-      ...prev,
-      playerStats: newPlayerStats,
-      log: [...prev.log, `${prev.enemy?.name} attacks for ${damage} damage!`],
-      playerTurn: true
-    }));
   };
 
   const useSkill = (skill: Skill) => {
@@ -428,7 +398,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }));
     
     setTimeout(() => {
-      enemyAttack();
+      enemyAttack(battleState, setBattleState, endBattle);
     }, 1000);
   };
 
@@ -461,78 +431,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }));
       
       setTimeout(() => {
-        enemyAttack();
+        enemyAttack(battleState, setBattleState, endBattle);
       }, 1000);
-    }
-  };
-
-  const handleEnemyDrops = (enemy: Enemy) => {
-    if (enemy.zeniReward) {
-      setZeni(prev => prev + enemy.zeniReward);
-      
-      toast.success(`+ ${enemy.zeniReward} Zeni`, {
-        description: "Added to your wallet",
-        duration: 3000
-      });
-    }
-    
-    if (enemy.name === 'Yamcha') {
-      if (Math.random() < 0.1) {
-        const sword: Item = {
-          id: `sword-${Date.now()}`,
-          name: "Yamcha's Sword",
-          description: "Increases your damage output by 25%",
-          type: 'weapon',
-          slot: 'weapon',
-          effect: {
-            type: 'damage_multiplier',
-            value: 1.25
-          }
-        };
-        
-        setInventory(prev => [...prev, sword]);
-        
-        setTimeout(() => {
-          toast.success(`You found Yamcha's Sword!`, {
-            description: "Check your inventory to equip it."
-          });
-        }, 1000);
-      }
-    }
-    
-    if (enemy.name === 'T-Rex') {
-      const dinoMeat: Item = {
-        id: `dino-meat-${Date.now()}`,
-        name: "Dino Meat",
-        description: "Temporarily increases your power gain by 25% for 20 seconds",
-        type: 'consumable',
-        effect: {
-          type: 'power_gain_percent',
-          value: 0.25,
-          duration: 20
-        }
-      };
-      
-      const existingDinoMeat = inventory.find(i => 
-        i.name === "Dino Meat" && 
-        i.type === 'consumable' && 
-        i.effect?.type === 'power_gain_percent'
-      );
-      
-      if (existingDinoMeat) {
-        toast.success(`You found Dino Meat!`, {
-          description: "Added to your existing stack.",
-          duration: 3000,
-        });
-      } else {
-        setInventory(prev => [...prev, dinoMeat]);
-        
-        setTimeout(() => {
-          toast.success(`You found Dino Meat!`, {
-            description: "Check your inventory to use it."
-          });
-        }, 1000);
-      }
     }
   };
 
@@ -552,8 +452,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }, 500);
       }
       
-      handleEnemyDrops(battleState.enemy);
+      handleEnemyDrops(battleState.enemy, setInventory, setZeni);
     }
+    
+    setTimeout(() => {
+      setBattleState(initialBattleState);
+    }, 1500);
   };
 
   const resetProgress = () => {

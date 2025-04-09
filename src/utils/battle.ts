@@ -25,6 +25,41 @@ export const calculatePlayerStats = (powerLevel: number, equippedItems: Item[]):
   return stats;
 };
 
+// Helper function to make enemy attack
+export const enemyAttack = (
+  battleState: any,
+  setBattleState: any,
+  endBattle: (victory: boolean) => void
+) => {
+  if (!battleState.enemy) return;
+  
+  const damage = battleState.enemy.damage;
+  
+  const newPlayerStats = {
+    ...battleState.playerStats,
+    hp: Math.max(0, battleState.playerStats.hp - damage)
+  };
+  
+  if (newPlayerStats.hp <= 0) {
+    setBattleState(prev => ({
+      ...prev,
+      playerStats: newPlayerStats,
+      log: [...prev.log, `${prev.enemy?.name} attacks for ${damage} damage!`, 'You were defeated!'],
+      inProgress: false
+    }));
+    
+    setTimeout(() => endBattle(false), 1500);
+    return;
+  }
+  
+  setBattleState(prev => ({
+    ...prev,
+    playerStats: newPlayerStats,
+    log: [...prev.log, `${prev.enemy?.name} attacks for ${damage} damage!`],
+    playerTurn: true
+  }));
+};
+
 // Handle enemy drops after defeating them
 export const handleEnemyDrops = (
   enemy: Enemy, 
