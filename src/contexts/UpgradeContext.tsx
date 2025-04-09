@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
 import { toast } from "sonner";
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { initialUpgrades } from '@/data/upgrades';
@@ -15,16 +15,36 @@ interface UpgradeProviderProps {
   powerLevel: number;
   setPowerLevel: React.Dispatch<React.SetStateAction<number>>;
   setInventory: React.Dispatch<React.SetStateAction<any[]>>;
+  clicks: number;
+  originalIncreaseClicks: () => void;
 }
 
 export const UpgradeProvider: React.FC<UpgradeProviderProps> = ({ 
   children, 
   powerLevel, 
   setPowerLevel, 
-  setInventory 
+  setInventory,
+  clicks,
+  originalIncreaseClicks
 }) => {
   const [upgrades, setUpgrades] = useLocalStorage<Upgrade[]>('dbUpgrades', initialUpgrades);
   const [equippedUpgrade, setEquippedUpgrade] = useLocalStorage<string | null>('dbEquippedUpgrade', null);
+
+  // Apply power bonus when clicks are a multiple of 100
+  useEffect(() => {
+    if (clicks % 100 === 0 && clicks > 0) {
+      let bonus = 1; // Default bonus
+      
+      if (equippedUpgrade) {
+        const upgrade = upgrades.find(u => u.id === equippedUpgrade);
+        if (upgrade) {
+          bonus = 1 + upgrade.powerBonus;
+        }
+      }
+      
+      setPowerLevel(prev => prev + bonus);
+    }
+  }, [clicks, equippedUpgrade, upgrades, setPowerLevel]);
 
   const purchaseUpgrade = (id: string) => {
     const upgrade = upgrades.find(u => u.id === id);

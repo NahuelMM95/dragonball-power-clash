@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { BattleProvider, useBattle } from './BattleContext';
@@ -18,6 +17,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [clicks, setClicks] = useLocalStorage('dbClicks', initialState.clicks);
   const [powerLevel, setPowerLevel] = useLocalStorage('dbPowerLevel', initialState.powerLevel);
   const [zeni, setZeni] = useLocalStorage('dbZeni', initialState.zeni);
+  const [inventory, setInventory] = useLocalStorage('dbInventory', []);
+  const [equippedItems, setEquippedItems] = useLocalStorage('dbEquippedItems', []);
 
   const increaseClicks = () => {
     const newClicks = clicks + 1;
@@ -50,9 +51,29 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 };
 
 export const GameContextWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { powerLevel, setPowerLevel, zeni, setZeni } = useGame();
+  const { powerLevel, setPowerLevel, zeni, setZeni, clicks, increaseClicks: originalIncreaseClicks } = useGame();
   const [inventory, setInventory] = useLocalStorage('dbInventory', []);
   const [equippedItems, setEquippedItems] = useLocalStorage('dbEquippedItems', []);
+  
+  const gameContextEnhanced = {
+    clicks,
+    powerLevel,
+    zeni,
+    increaseClicks: () => {
+      originalIncreaseClicks();
+      
+      // Calculate power gain based on equipped upgrade from UpgradeContext
+      // We'll handle this from the UpgradeProvider since it has access to the
+      // equipped upgrade and upgrade details
+    },
+    resetProgress: () => {
+      // Keep the original implementation
+      const context = useGame();
+      context.resetProgress();
+    },
+    setPowerLevel,
+    setZeni
+  };
   
   return (
     <ItemProvider zeni={zeni} setZeni={setZeni}>
@@ -60,6 +81,8 @@ export const GameContextWrapper: React.FC<{ children: React.ReactNode }> = ({ ch
         powerLevel={powerLevel}
         setPowerLevel={setPowerLevel}
         setInventory={setInventory}
+        clicks={clicks}
+        originalIncreaseClicks={originalIncreaseClicks}
       >
         <BattleProvider
           powerLevel={powerLevel}
