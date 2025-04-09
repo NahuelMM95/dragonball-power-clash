@@ -23,9 +23,27 @@ const ZoneCard = ({
   onFindEnemy,
   accentColor
 }: ZoneCardProps) => {
+  // Define color mapping for dynamic styling
+  const colorStyles: Record<string, { border: string, bg: string, hover: string }> = {
+    forestGreen: { 
+      border: "border-forestGreen", 
+      bg: "bg-forestGreen", 
+      hover: "hover:bg-forestGreen/80"
+    },
+    // Add other colors as needed
+    desert: {
+      border: "border-dragonOrange",
+      bg: "bg-dragonOrange",
+      hover: "hover:bg-dragonOrange/80"
+    }
+  };
+  
+  // Get the style for the current accentColor or default to forestGreen
+  const style = colorStyles[accentColor] || colorStyles.forestGreen;
+  
   return (
-    <Card className={`border-2 border-${accentColor} mb-4`}>
-      <CardHeader className={`pb-2 bg-${accentColor}/20`}>
+    <Card className={`border-2 ${style.border} mb-4`}>
+      <CardHeader className={`pb-2 ${style.bg}/20`}>
         <div className="flex justify-between items-center">
           <div>
             <CardTitle className="text-lg">{zoneName}</CardTitle>
@@ -58,7 +76,7 @@ const ZoneCard = ({
       <CardFooter className="pt-4 border-t">
         <Button 
           variant="default" 
-          className={`w-full bg-${accentColor} hover:bg-${accentColor}/80`}
+          className={`w-full ${style.bg} ${style.hover}`}
           onClick={onFindEnemy}
         >
           Find an Enemy
