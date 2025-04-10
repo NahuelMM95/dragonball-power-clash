@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect } from 'react';
 import { toast } from "sonner";
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -143,7 +144,7 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children, zeni, setZ
           type: 'heal',
           value: 1
         },
-        usableInBattle: true
+        usableInBattle: true  // Make sure this is set to true
       };
       
       setZeni(zeni - 100);

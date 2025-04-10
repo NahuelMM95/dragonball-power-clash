@@ -11,6 +11,7 @@ export const calculatePlayerStats = (powerLevel: number, equippedItems: Item[]):
     damage: Math.max(1, Math.floor(powerLevel * 0.8)),
     ki: powerLevel * 5,
     maxKi: powerLevel * 5,
+    damageMultiplier: 1, // Default multiplier
   };
   
   // Apply equipment bonuses
@@ -85,7 +86,7 @@ export const handleEnemyDrops = (
         description: "Increases your damage output by 25%",
         type: 'weapon',
         slot: 'weapon',
-        quantity: 1,  // Added required quantity property
+        quantity: 1,
         effect: {
           type: 'damage_multiplier',
           value: 1.25
@@ -109,7 +110,7 @@ export const handleEnemyDrops = (
       name: "Dino Meat",
       description: "Temporarily increases your power gain by 25% for 20 seconds",
       type: 'consumable',
-      quantity: 1,  // Added required quantity property
+      quantity: 1,
       effect: {
         type: 'power_gain_percent',
         value: 0.25,

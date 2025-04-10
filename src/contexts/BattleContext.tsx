@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState } from 'react';
 import { toast } from "sonner";
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -200,6 +201,7 @@ export const BattleProvider: React.FC<BattleProviderProps> = ({
         }, 500);
       }
       
+      // Call handleEnemyDrops to process any potential item drops
       handleEnemyDrops(battleState.enemy, setInventory, setZeni);
     }
     
@@ -232,22 +234,25 @@ export const BattleProvider: React.FC<BattleProviderProps> = ({
     
     if (item.type === 'consumable' && item.effect) {
       if (item.effect.type === 'heal') {
-        setBattleState(prev => {
-          const newHp = Math.min(
-            prev.playerStats.maxHp, 
-            prev.playerStats.hp + Math.floor(prev.playerStats.maxHp * item.effect!.value)
-          );
-          
-          return {
-            ...prev,
-            playerStats: {
-              ...prev.playerStats,
-              hp: newHp
-            },
-            log: [...prev.log, `You used ${item.name} and restored your health!`]
-          };
-        });
+        // Calculate healing amount based on the item's effect value (percentage of max HP)
+        const healAmount = Math.floor(battleState.playerStats.maxHp * item.effect.value);
+        const newHp = Math.min(
+          battleState.playerStats.maxHp, 
+          battleState.playerStats.hp + healAmount
+        );
         
+        // Update battle state with healing
+        setBattleState(prev => ({
+          ...prev,
+          playerStats: {
+            ...prev.playerStats,
+            hp: newHp
+          },
+          log: [...prev.log, `You used ${item.name} and restored ${healAmount} HP!`],
+          playerTurn: false
+        }));
+        
+        // Update inventory to remove used item or decrease quantity
         setInventory(prev => {
           if (item.quantity > 1) {
             return prev.map(i => 
@@ -258,14 +263,10 @@ export const BattleProvider: React.FC<BattleProviderProps> = ({
           }
         });
         
-        setBattleState(prev => ({
-          ...prev,
-          playerTurn: false
-        }));
-        
-        setTimeout(handleEnemyTurn, 1000);
-        
-        return;
+        // After using item, the enemy gets to attack
+        setTimeout(() => {
+          enemyAttack(battleState, setBattleState, endBattle);
+        }, 1000);
       }
     }
   };
