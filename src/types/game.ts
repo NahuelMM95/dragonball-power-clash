@@ -1,4 +1,3 @@
-
 export type Enemy = {
   name: string;
   power: number;
@@ -42,6 +41,7 @@ export type CombatStats = {
   damage: number;
   ki: number;
   maxKi: number;
+  damageMultiplier?: number;
 };
 
 export type SkillType = 'basic' | 'special' | 'ultimate';

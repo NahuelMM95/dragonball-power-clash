@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect } from 'react';
 import { toast } from "sonner";
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -44,16 +43,13 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children, zeni, setZ
     return () => clearInterval(interval);
   }, [activeBuffs, inventory]);
 
-  // Updated to handle stacking
   const addItemToInventory = (newItem: Item) => {
     setInventory(prevInventory => {
-      // Check if item already exists in inventory
       const existingItemIndex = prevInventory.findIndex(
         item => item.name === newItem.name && item.type === newItem.type
       );
       
       if (existingItemIndex >= 0) {
-        // Item exists, increase quantity
         const updatedInventory = [...prevInventory];
         updatedInventory[existingItemIndex] = {
           ...updatedInventory[existingItemIndex],
@@ -61,7 +57,6 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children, zeni, setZ
         };
         return updatedInventory;
       } else {
-        // Item doesn't exist, add it with quantity
         return [...prevInventory, { ...newItem, quantity: newItem.quantity || 1 }];
       }
     });
@@ -78,7 +73,7 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children, zeni, setZ
     
     setEquippedItems(prevItems => {
       const newItems = prevItems.filter(i => i.slot !== slotType);
-      return [...newItems, { ...item, quantity: 1 }]; // Only equip one of the item
+      return [...newItems, { ...item, quantity: 1 }];
     });
     
     toast(`You've equipped ${item.name}!`, {
@@ -111,15 +106,12 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children, zeni, setZ
       const endTime = Date.now() + (item.effect.duration * 1000);
       setActiveBuffs(prev => [...prev, { id: item.id, endTime }]);
       
-      // Update quantity or remove item
       setInventory(prev => {
         if (item.quantity > 1) {
-          // Decrease quantity
           return prev.map(i => 
             i.id === itemId ? { ...i, quantity: i.quantity - 1 } : i
           );
         } else {
-          // Remove item
           return prev.filter(i => i.id !== itemId);
         }
       });
@@ -156,7 +148,6 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children, zeni, setZ
       
       setZeni(zeni - 100);
       
-      // Add to inventory with stacking
       addItemToInventory(senzuBean);
       
       toast.success("Purchased Senzu Bean!", {
@@ -169,13 +160,7 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children, zeni, setZ
   return (
     <ItemContext.Provider value={{
       inventory,
-      setInventory: (newInventory) => {
-        // When setting inventory directly, make sure items have quantity
-        setInventory(newInventory.map(item => ({
-          ...item,
-          quantity: item.quantity || 1
-        })));
-      },
+      setInventory,
       equippedItems,
       equipItem,
       useItem,

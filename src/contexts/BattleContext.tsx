@@ -273,7 +273,7 @@ export const BattleProvider: React.FC<BattleProviderProps> = ({
   const handleEnemyTurn = () => {
     if (!battleState.inProgress || !battleState.enemy) return;
     
-    const damage = Math.floor(battleState.enemy.damage * battleState.playerStats.damageMultiplier);
+    const damage = battleState.enemy.damage;
     
     const newPlayerStats = {
       ...battleState.playerStats,
