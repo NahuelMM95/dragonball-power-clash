@@ -222,38 +222,76 @@ export const BattleProvider: React.FC<BattleProviderProps> = ({
     return skill.cost;
   };
 
-  const useItemInBattle = (itemId: string, inventory: Item[], setItemInventory: React.Dispatch<React.SetStateAction<Item[]>>) => {
-    if (!battleState.inProgress || !battleState.playerTurn) return;
+  const useItemInBattle = (itemId: string, inventory: Item[], setInventoryCallback: React.Dispatch<React.SetStateAction<Item[]>>) => {
+    if (!battleState.inProgress) return;
     
-    const item = inventory.find(i => i.id === itemId);
-    if (!item || !item.usableInBattle) return;
+    const itemIndex = inventory.findIndex(i => i.id === itemId);
+    if (itemIndex === -1) return;
     
-    if (item.effect?.type === 'heal') {
-      const newPlayerStats = {
-        ...battleState.playerStats,
-        hp: battleState.playerStats.maxHp
-      };
-      
-      setBattleState(prev => ({
-        ...prev,
-        playerStats: newPlayerStats,
-        log: [...prev.log, `You used ${item.name} and fully recovered your HP!`],
-        playerTurn: false
-      }));
-      
-      setItemInventory(prev => prev.filter(i => i.id !== itemId));
-      
-      setTimeout(() => {
-        const currentState = {
-          ...battleState,
-          playerStats: newPlayerStats,
+    const item = inventory[itemIndex];
+    
+    if (item.type === 'consumable' && item.effect) {
+      if (item.effect.type === 'heal') {
+        setBattleState(prev => {
+          const newHp = Math.min(
+            prev.playerStats.maxHp, 
+            prev.playerStats.hp + Math.floor(prev.playerStats.maxHp * item.effect!.value)
+          );
+          
+          return {
+            ...prev,
+            playerStats: {
+              ...prev.playerStats,
+              hp: newHp
+            },
+            log: [...prev.log, `You used ${item.name} and restored your health!`]
+          };
+        });
+        
+        setInventory(prev => {
+          if (item.quantity > 1) {
+            return prev.map(i => 
+              i.id === itemId ? { ...i, quantity: i.quantity - 1 } : i
+            );
+          } else {
+            return prev.filter(i => i.id !== itemId);
+          }
+        });
+        
+        setBattleState(prev => ({
+          ...prev,
           playerTurn: false
-        };
-        enemyAttack(currentState, setBattleState, endBattle);
-      }, 1000);
+        }));
+        
+        setTimeout(handleEnemyTurn, 1000);
+        
+        return;
+      }
     }
   };
-  
+
+  const handleEnemyTurn = () => {
+    if (!battleState.inProgress || !battleState.enemy) return;
+    
+    const damage = Math.floor(battleState.enemy.damage * battleState.playerStats.damageMultiplier);
+    
+    const newPlayerStats = {
+      ...battleState.playerStats,
+      hp: Math.max(0, battleState.playerStats.hp - damage)
+    };
+    
+    setBattleState(prev => ({
+      ...prev,
+      playerStats: newPlayerStats,
+      log: [...prev.log, `${battleState.enemy.name} attacks for ${damage} damage!`],
+      playerTurn: true
+    }));
+    
+    if (newPlayerStats.hp <= 0) {
+      endBattle(false);
+    }
+  };
+
   return (
     <BattleContext.Provider value={{
       fightEnemy,

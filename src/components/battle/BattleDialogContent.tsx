@@ -7,6 +7,7 @@ import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/c
 import { Progress } from "@/components/ui/progress";
 import { Sword, Shield, Pill } from "lucide-react";
 import { BattleState, Enemy, Item, Skill } from '@/types/game';
+import { Badge } from "@/components/ui/badge";
 
 type BattleDialogContentProps = {
   battleState: BattleState;
@@ -16,7 +17,7 @@ type BattleDialogContentProps = {
 
 const BattleDialogContent = ({ battleState, fightResult, handleCloseDialog }: BattleDialogContentProps) => {
   const { useSkill, fleeFromBattle, skills, useItemInBattle } = useBattle();
-  const { inventory } = useItems();
+  const { inventory, setInventory } = useItems();
   const [showSkills, setShowSkills] = useState(false);
   const [showItems, setShowItems] = useState(false);
 
@@ -36,7 +37,7 @@ const BattleDialogContent = ({ battleState, fightResult, handleCloseDialog }: Ba
   };
 
   const handleItemClick = (itemId: string) => {
-    useItemInBattle(itemId, inventory, inventory => {});
+    useItemInBattle(itemId, inventory, setInventory);
     setShowItems(false);
   };
 
@@ -190,7 +191,14 @@ const BattleDialogContent = ({ battleState, fightResult, handleCloseDialog }: Ba
                         <Pill className="mr-2 h-4 w-4" />
                         <span>{item.name}</span>
                       </div>
-                      <span className="text-xs bg-green-500 px-2 py-0.5 rounded-full">Use</span>
+                      <div className="flex items-center">
+                        {item.quantity > 1 && (
+                          <Badge variant="outline" className="mr-2">
+                            x{item.quantity}
+                          </Badge>
+                        )}
+                        <span className="text-xs bg-green-500 px-2 py-0.5 rounded-full">Use</span>
+                      </div>
                     </Button>
                   ))}
                 </div>

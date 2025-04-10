@@ -5,6 +5,7 @@ import { Sword } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Badge } from "@/components/ui/badge";
 
 const Inventory = () => {
   const { inventory, equippedItems, equipItem, useItem } = useItems();
@@ -78,7 +79,7 @@ const Inventory = () => {
                 inventory.map((item, index) => (
                   <Popover key={index}>
                     <PopoverTrigger asChild>
-                      <Button variant="ghost" className="h-16 w-16 p-0">
+                      <Button variant="ghost" className="h-16 w-16 p-0 relative">
                         <div className="flex flex-col items-center justify-center">
                           <div className="text-xl mb-1">
                             {item.type === 'weapon' ? '🗡️' : 
@@ -86,12 +87,24 @@ const Inventory = () => {
                              item.type === 'consumable' ? '🍖' : '❓'}
                           </div>
                           <span className="text-xs">{item.name}</span>
+                          
+                          {/* Quantity Badge */}
+                          {item.quantity > 1 && (
+                            <Badge variant="secondary" className="absolute top-1 right-1">
+                              {item.quantity}
+                            </Badge>
+                          )}
                         </div>
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-64">
                       <div className="space-y-2">
-                        <h4 className="font-medium">{item.name}</h4>
+                        <div className="flex justify-between items-center">
+                          <h4 className="font-medium">{item.name}</h4>
+                          {item.quantity > 1 && (
+                            <Badge variant="outline">x{item.quantity}</Badge>
+                          )}
+                        </div>
                         <p className="text-sm">{item.description}</p>
                         {item.type === 'consumable' ? (
                           <Button 

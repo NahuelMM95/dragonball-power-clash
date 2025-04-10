@@ -44,6 +44,29 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children, zeni, setZ
     return () => clearInterval(interval);
   }, [activeBuffs, inventory]);
 
+  // Updated to handle stacking
+  const addItemToInventory = (newItem: Item) => {
+    setInventory(prevInventory => {
+      // Check if item already exists in inventory
+      const existingItemIndex = prevInventory.findIndex(
+        item => item.name === newItem.name && item.type === newItem.type
+      );
+      
+      if (existingItemIndex >= 0) {
+        // Item exists, increase quantity
+        const updatedInventory = [...prevInventory];
+        updatedInventory[existingItemIndex] = {
+          ...updatedInventory[existingItemIndex],
+          quantity: updatedInventory[existingItemIndex].quantity + (newItem.quantity || 1)
+        };
+        return updatedInventory;
+      } else {
+        // Item doesn't exist, add it with quantity
+        return [...prevInventory, { ...newItem, quantity: newItem.quantity || 1 }];
+      }
+    });
+  };
+
   const equipItem = (itemId: string | null, slotType: string) => {
     if (itemId === null) {
       setEquippedItems(prevItems => prevItems.filter(item => item.slot !== slotType));
@@ -55,7 +78,7 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children, zeni, setZ
     
     setEquippedItems(prevItems => {
       const newItems = prevItems.filter(i => i.slot !== slotType);
-      return [...newItems, item];
+      return [...newItems, { ...item, quantity: 1 }]; // Only equip one of the item
     });
     
     toast(`You've equipped ${item.name}!`, {
@@ -65,8 +88,11 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children, zeni, setZ
   };
 
   const useItem = (itemId: string) => {
-    const item = inventory.find(i => i.id === itemId);
-    if (!item || item.type !== 'consumable') return;
+    const itemIndex = inventory.findIndex(i => i.id === itemId);
+    if (itemIndex === -1) return;
+    
+    const item = inventory[itemIndex];
+    if (item.type !== 'consumable') return;
     
     if (item.effect && item.effect.duration) {
       const hasActiveBuff = activeBuffs.some(buff => {
@@ -85,7 +111,18 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children, zeni, setZ
       const endTime = Date.now() + (item.effect.duration * 1000);
       setActiveBuffs(prev => [...prev, { id: item.id, endTime }]);
       
-      setInventory(prev => prev.filter(i => i.id !== itemId));
+      // Update quantity or remove item
+      setInventory(prev => {
+        if (item.quantity > 1) {
+          // Decrease quantity
+          return prev.map(i => 
+            i.id === itemId ? { ...i, quantity: i.quantity - 1 } : i
+          );
+        } else {
+          // Remove item
+          return prev.filter(i => i.id !== itemId);
+        }
+      });
       
       toast(`You used ${item.name}!`, {
         description: `Effect active for ${item.effect.duration} seconds.`,
@@ -109,6 +146,7 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children, zeni, setZ
         name: "Senzu Bean",
         description: "Completely restore HP during battle",
         type: 'consumable',
+        quantity: 1,
         effect: {
           type: 'heal',
           value: 1
@@ -118,31 +156,26 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children, zeni, setZ
       
       setZeni(zeni - 100);
       
-      const existingSenzu = inventory.find(i => 
-        i.name === "Senzu Bean" && 
-        i.type === 'consumable' && 
-        i.effect?.type === 'heal'
-      );
+      // Add to inventory with stacking
+      addItemToInventory(senzuBean);
       
-      if (existingSenzu) {
-        toast.success("Purchased Senzu Bean!", {
-          description: "Added to your existing stack.",
-          duration: 3000,
-        });
-      } else {
-        setInventory(prev => [...prev, senzuBean]);
-        toast.success("Purchased Senzu Bean!", {
-          description: "Check your inventory to use it during battle.",
-          duration: 3000,
-        });
-      }
+      toast.success("Purchased Senzu Bean!", {
+        description: "Added to your inventory.",
+        duration: 3000,
+      });
     }
   };
   
   return (
     <ItemContext.Provider value={{
       inventory,
-      setInventory,
+      setInventory: (newInventory) => {
+        // When setting inventory directly, make sure items have quantity
+        setInventory(newInventory.map(item => ({
+          ...item,
+          quantity: item.quantity || 1
+        })));
+      },
       equippedItems,
       equipItem,
       useItem,

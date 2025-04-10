@@ -1,3 +1,4 @@
+
 export type Enemy = {
   name: string;
   power: number;
@@ -18,6 +19,7 @@ export type Item = {
   description: string;
   type: ItemType;
   slot?: string;
+  quantity: number;
   effect?: {
     type: string;
     value: number;
