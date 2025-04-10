@@ -22,7 +22,8 @@ const initialBattleState: BattleState = {
     maxHp: 0,
     damage: 0,
     ki: 0,
-    maxKi: 0
+    maxKi: 0,
+    damageMultiplier: 1
   },
   enemy: null,
   log: [],
@@ -241,14 +242,17 @@ export const BattleProvider: React.FC<BattleProviderProps> = ({
           battleState.playerStats.hp + healAmount
         );
         
+        // Create a new playerStats object to ensure it's properly updated
+        const newPlayerStats = {
+          ...battleState.playerStats,
+          hp: newHp
+        };
+        
         // Update battle state with healing
-        setBattleState(prev => ({
-          ...prev,
-          playerStats: {
-            ...prev.playerStats,
-            hp: newHp
-          },
-          log: [...prev.log, `You used ${item.name} and restored ${healAmount} HP!`],
+        setBattleState(prevState => ({
+          ...prevState,
+          playerStats: newPlayerStats,
+          log: [...prevState.log, `You used ${item.name} and restored ${healAmount} HP!`],
           playerTurn: false
         }));
         
@@ -265,7 +269,12 @@ export const BattleProvider: React.FC<BattleProviderProps> = ({
         
         // After using item, the enemy gets to attack
         setTimeout(() => {
-          enemyAttack(battleState, setBattleState, endBattle);
+          // Pass the updated battle state with new player stats to enemyAttack
+          const updatedBattleState = {
+            ...battleState,
+            playerStats: newPlayerStats
+          };
+          enemyAttack(updatedBattleState, setBattleState, endBattle);
         }, 1000);
       }
     }

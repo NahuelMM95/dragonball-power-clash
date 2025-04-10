@@ -18,7 +18,8 @@ export const calculatePlayerStats = (powerLevel: number, equippedItems: Item[]):
   equippedItems.forEach(item => {
     if (item.effect) {
       if (item.effect.type === 'damage_multiplier') {
-        stats.damage = Math.floor(stats.damage * item.effect.value);
+        stats.damageMultiplier = item.effect.value; // Set the multiplier directly
+        stats.damage = Math.floor(stats.damage * item.effect.value); // Apply to base damage
       }
     }
   });
@@ -93,7 +94,23 @@ export const handleEnemyDrops = (
         }
       };
       
-      setInventory(prev => [...prev, sword]);
+      // Use the addItemToInventory-style logic here directly
+      setInventory(prevInventory => {
+        const existingItemIndex = prevInventory.findIndex(
+          item => item.name === sword.name && item.type === sword.type
+        );
+        
+        if (existingItemIndex >= 0) {
+          const updatedInventory = [...prevInventory];
+          updatedInventory[existingItemIndex] = {
+            ...updatedInventory[existingItemIndex],
+            quantity: updatedInventory[existingItemIndex].quantity + 1
+          };
+          return updatedInventory;
+        } else {
+          return [...prevInventory, sword];
+        }
+      });
       
       setTimeout(() => {
         toast.success(`You found Yamcha's Sword!`, {
@@ -118,7 +135,23 @@ export const handleEnemyDrops = (
       }
     };
     
-    setInventory(prev => [...prev, dinoMeat]);
+    // Use the addItemToInventory-style logic here directly
+    setInventory(prevInventory => {
+      const existingItemIndex = prevInventory.findIndex(
+        item => item.name === dinoMeat.name && item.type === dinoMeat.type
+      );
+      
+      if (existingItemIndex >= 0) {
+        const updatedInventory = [...prevInventory];
+        updatedInventory[existingItemIndex] = {
+          ...updatedInventory[existingItemIndex],
+          quantity: updatedInventory[existingItemIndex].quantity + 1
+        };
+        return updatedInventory;
+      } else {
+        return [...prevInventory, dinoMeat];
+      }
+    });
     
     setTimeout(() => {
       toast.success(`You found Dino Meat!`, {
