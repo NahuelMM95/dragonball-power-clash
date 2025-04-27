@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { GameProvider, GameContextWrapper, useGame } from "@/contexts/GameContext";
 import { useItems } from "@/contexts/ItemContext";
@@ -59,10 +60,11 @@ const ActiveBuffsIndicator = () => {
 
 const GameContent = () => {
   const [activeTab, setActiveTab] = useState("main");
+  const [cheatsVisible, setCheatsVisible] = useState(false);
   
   return (
     <div className="min-h-screen py-8 px-4 sm:px-6 md:py-12">
-      <SettingsMenu />
+      <SettingsMenu onCheatsUnlocked={() => setCheatsVisible(true)} />
       
       <header className="text-center mb-8">
         <h1 className="text-4xl font-extrabold text-dragonOrange drop-shadow-md">
@@ -86,7 +88,7 @@ const GameContent = () => {
               <ActiveBuffsIndicator />
               <div className="mt-6 w-full max-w-md mx-auto">
                 <PowerLevel />
-                <CheatButtons />
+                <CheatButtons visible={cheatsVisible} />
               </div>
             </div>
           </TabsContent>

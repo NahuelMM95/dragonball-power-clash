@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,11 @@ import { useGame } from '@/contexts/GameContext';
 import { useItems } from '@/contexts/ItemContext';
 import { toast } from "sonner";
 
-const SettingsMenu = () => {
+interface SettingsMenuProps {
+  onCheatsUnlocked?: () => void;
+}
+
+const SettingsMenu = ({ onCheatsUnlocked }: SettingsMenuProps) => {
   const { resetProgress } = useGame();
   const { setInventory } = useItems();
   const [deleteText, setDeleteText] = useState('');
@@ -35,6 +40,9 @@ const SettingsMenu = () => {
   const handleCheats = () => {
     if (cheatText === 'Cacahuete') {
       setCheatsUnlocked(true);
+      if (onCheatsUnlocked) {
+        onCheatsUnlocked();
+      }
       setCheatText('');
       toast.success("Cheats unlocked!", {
         description: "Power boost buttons are now available on the main screen."
