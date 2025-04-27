@@ -1,4 +1,3 @@
-
 import { CombatStats, Enemy, Item } from '../types/game';
 import { toast } from "sonner";
 
@@ -120,43 +119,48 @@ export const handleEnemyDrops = (
     }
   }
   
-  if (enemy.name === 'T-Rex') {
-    // Always drop Dino Meat
-    const dinoMeat: Item = {
-      id: `dino-meat-${Date.now()}`,
-      name: "Dino Meat",
-      description: "Temporarily increases your power gain by 25% for 20 seconds",
-      type: 'consumable',
-      quantity: 1,
-      effect: {
-        type: 'power_gain_percent',
-        value: 0.25,
-        duration: 20
-      }
-    };
+  // Handle Dino Meat drops
+  if (enemy.name === 'T-Rex' || enemy.name === 'Pterodactyl') {
+    // Define drop chance based on enemy
+    const dropChance = enemy.name === 'T-Rex' ? 1 : 0.65; // 100% for T-Rex, 65% for Pterodactyl
     
-    // Use the addItemToInventory-style logic here directly
-    setInventory(prevInventory => {
-      const existingItemIndex = prevInventory.findIndex(
-        item => item.name === dinoMeat.name && item.type === dinoMeat.type
-      );
+    if (Math.random() < dropChance) {
+      const dinoMeat: Item = {
+        id: `dino-meat-${Date.now()}`,
+        name: "Dino Meat",
+        description: "Temporarily increases your power gain by 25% for 20 seconds",
+        type: 'consumable',
+        quantity: 1,
+        effect: {
+          type: 'power_gain_percent',
+          value: 0.25,
+          duration: 20
+        }
+      };
       
-      if (existingItemIndex >= 0) {
-        const updatedInventory = [...prevInventory];
-        updatedInventory[existingItemIndex] = {
-          ...updatedInventory[existingItemIndex],
-          quantity: updatedInventory[existingItemIndex].quantity + 1
-        };
-        return updatedInventory;
-      } else {
-        return [...prevInventory, dinoMeat];
-      }
-    });
-    
-    setTimeout(() => {
-      toast.success(`You found Dino Meat!`, {
-        description: "Check your inventory to use it."
+      // Use the addItemToInventory-style logic here directly
+      setInventory(prevInventory => {
+        const existingItemIndex = prevInventory.findIndex(
+          item => item.name === dinoMeat.name && item.type === dinoMeat.type
+        );
+        
+        if (existingItemIndex >= 0) {
+          const updatedInventory = [...prevInventory];
+          updatedInventory[existingItemIndex] = {
+            ...updatedInventory[existingItemIndex],
+            quantity: updatedInventory[existingItemIndex].quantity + 1
+          };
+          return updatedInventory;
+        } else {
+          return [...prevInventory, dinoMeat];
+        }
       });
-    }, 1000);
+      
+      setTimeout(() => {
+        toast.success(`You found Dino Meat!`, {
+          description: "Check your inventory to use it."
+        });
+      }, 1000);
+    }
   }
 };

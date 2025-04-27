@@ -1,5 +1,5 @@
 
-import { getForestEnemies, getDesertEnemies } from '@/data/enemies';
+import { getForestEnemies, getDesertEnemies, getWastelandEnemies } from '@/data/enemies';
 import { Enemy } from '@/types/game';
 
 export const useBattleZones = () => {
@@ -7,6 +7,7 @@ export const useBattleZones = () => {
     let selectedEnemy: Enemy;
     const forestEnemies = getForestEnemies(playerPowerLevel);
     const desertEnemies = getDesertEnemies(playerPowerLevel);
+    const wastelandEnemies = getWastelandEnemies(playerPowerLevel);
     
     if (zone === 'forest') {
       const rand = Math.random();
@@ -17,13 +18,17 @@ export const useBattleZones = () => {
       } else {
         selectedEnemy = { ...forestEnemies[2] };
       }
-    } else {
+    } else if (zone === 'desert') {
       const rand = Math.random();
       if (rand < 0.2) {
         selectedEnemy = { ...desertEnemies[0] };
-      } else {
+      } else if (rand < 0.6) {
         selectedEnemy = { ...desertEnemies[1] };
+      } else {
+        selectedEnemy = { ...desertEnemies[2] };
       }
+    } else {
+      selectedEnemy = { ...wastelandEnemies[0] };
     }
     
     return selectedEnemy;
@@ -32,6 +37,7 @@ export const useBattleZones = () => {
   return {
     forest: getForestEnemies(),
     desert: getDesertEnemies(),
+    wasteland: getWastelandEnemies(),
     getFightEnemy
   };
 };

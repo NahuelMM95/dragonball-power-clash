@@ -56,9 +56,29 @@ export const getDesertEnemies = (playerPowerLevel: number = 1): Enemy[] => [
     maxKi: 0,
     zeniReward: 500,
     ...calculateEnemyStats(250, playerPowerLevel)
+  },
+  {
+    name: 'Pterodactyl',
+    image: 'pterodactyl.png',
+    ki: 0,
+    maxKi: 0,
+    zeniReward: 300,
+    ...calculateEnemyStats(150, playerPowerLevel)
+  }
+];
+
+export const getWastelandEnemies = (playerPowerLevel: number = 1): Enemy[] => [
+  {
+    name: 'Saibaman',
+    image: 'saibaman.png',
+    ki: 500,
+    maxKi: 500,
+    zeniReward: 1000,
+    ...calculateEnemyStats(1500, playerPowerLevel)
   }
 ];
 
 // Export static versions for reference
 export const forestEnemies = getForestEnemies();
 export const desertEnemies = getDesertEnemies();
+export const wastelandEnemies = getWastelandEnemies();
