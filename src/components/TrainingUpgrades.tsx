@@ -1,4 +1,3 @@
-
 import { useGame } from '@/contexts/GameContext';
 import { useUpgrades } from '@/contexts/UpgradeContext';
 import { useBattle } from '@/contexts/BattleContext';
@@ -33,7 +32,7 @@ const TrainingUpgrades = () => {
         
         <TabsContent value="training" className="mt-1">
           <h3 className="text-lg font-semibold text-dbBlue mb-3">Training Shop</h3>
-          <div className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             {upgrades.map((upgrade) => (
               <Card key={upgrade.id} className={`border-2 ${equippedUpgrade === upgrade.id ? 'border-dragonOrange bg-amber-50' : 'border-gray-200'}`}>
                 <CardHeader className="pb-2">
@@ -103,7 +102,7 @@ const TrainingUpgrades = () => {
         
         <TabsContent value="skills" className="mt-1">
           <h3 className="text-lg font-semibold text-purple-700 mb-3">Combat Skills</h3>
-          <div className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             {skills.map((skill) => (
               <Card key={skill.name} className={`border-2 ${skill.purchased ? 'border-purple-300 bg-purple-50' : 'border-gray-200'}`}>
                 <CardHeader className="pb-2">
@@ -156,7 +155,7 @@ const TrainingUpgrades = () => {
         
         <TabsContent value="items" className="mt-1">
           <h3 className="text-lg font-semibold text-green-700 mb-3">Battle Items</h3>
-          <div className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <Card className="border-2 border-green-200">
               <CardHeader className="pb-2">
                 <div className="flex items-center">

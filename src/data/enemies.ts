@@ -1,63 +1,64 @@
 
 import { Enemy } from '../types/game';
 
-export const forestEnemies: Enemy[] = [
+const calculateEnemyStats = (basePower: number, playerPowerLevel: number = 1) => {
+  // Scale enemy stats based on player's power level, but maintain relative strength
+  const scaleFactor = Math.max(1, playerPowerLevel / 100);
+  
+  return {
+    power: Math.floor(basePower * scaleFactor),
+    hp: Math.floor((basePower * 10) * scaleFactor),
+    maxHp: Math.floor((basePower * 10) * scaleFactor),
+    damage: Math.floor((basePower * 0.3) * scaleFactor)
+  };
+};
+
+export const getForestEnemies = (playerPowerLevel: number = 1): Enemy[] => [
   {
     name: 'Wolf',
-    power: 5,
     image: 'wolf.png',
-    hp: 50,
-    maxHp: 50,
-    damage: 3,
     ki: 0,
     maxKi: 0,
-    zeniReward: 10
+    zeniReward: 10,
+    ...calculateEnemyStats(5, playerPowerLevel)
   },
   {
     name: 'Bandit',
-    power: 10,
     image: 'bandit.png',
-    hp: 80,
-    maxHp: 80,
-    damage: 5,
     ki: 10,
     maxKi: 10,
-    zeniReward: 25
+    zeniReward: 25,
+    ...calculateEnemyStats(10, playerPowerLevel)
   },
   {
     name: 'Bear',
-    power: 20,
     image: 'bear.png',
-    hp: 150,
-    maxHp: 150,
-    damage: 8,
     ki: 0,
     maxKi: 0,
-    zeniReward: 50
+    zeniReward: 50,
+    ...calculateEnemyStats(20, playerPowerLevel)
   }
 ];
 
-export const desertEnemies: Enemy[] = [
+export const getDesertEnemies = (playerPowerLevel: number = 1): Enemy[] => [
   {
     name: 'Yamcha',
-    power: 50,
     image: 'yamcha.png',
-    hp: 300,
-    maxHp: 300,
-    damage: 15,
     ki: 100,
     maxKi: 100,
-    zeniReward: 200
+    zeniReward: 200,
+    ...calculateEnemyStats(50, playerPowerLevel)
   },
   {
     name: 'T-Rex',
-    power: 250,
     image: 't-rex.png',
-    hp: 1000,
-    maxHp: 1000,
-    damage: 35,
     ki: 0,
     maxKi: 0,
-    zeniReward: 500
+    zeniReward: 500,
+    ...calculateEnemyStats(250, playerPowerLevel)
   }
 ];
+
+// Export static versions for reference
+export const forestEnemies = getForestEnemies();
+export const desertEnemies = getDesertEnemies();
