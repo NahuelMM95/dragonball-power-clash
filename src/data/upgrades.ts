@@ -1,4 +1,3 @@
-
 import { Upgrade } from '../types/game';
 
 export const initialUpgrades: Upgrade[] = [
@@ -8,7 +7,7 @@ export const initialUpgrades: Upgrade[] = [
     description: 'Increases your power gain by +1 per click.', 
     powerBonus: 1, 
     cost: 10, 
-    purchased: false 
+    purchased: true 
   },
   { 
     id: 'pullups', 

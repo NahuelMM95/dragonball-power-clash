@@ -4,14 +4,16 @@ import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescri
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Settings, Trash2 } from "lucide-react";
+import { Settings, Trash2, Wand2 } from "lucide-react";
 import { useGame } from '@/contexts/GameContext';
 import { toast } from "sonner";
 
 const SettingsMenu = () => {
   const { resetProgress } = useGame();
   const [deleteText, setDeleteText] = useState('');
+  const [cheatText, setCheatText] = useState('');
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [cheatsUnlocked, setCheatsUnlocked] = useState(false);
 
   const handleReset = () => {
     if (deleteText === 'DELETE') {
@@ -24,6 +26,20 @@ const SettingsMenu = () => {
     } else {
       toast.error("Incorrect confirmation", {
         description: "You must type DELETE correctly to reset your progress."
+      });
+    }
+  };
+
+  const handleCheats = () => {
+    if (cheatText === 'Cacahuete') {
+      setCheatsUnlocked(true);
+      setCheatText('');
+      toast.success("Cheats unlocked!", {
+        description: "Power boost buttons are now available on the main screen."
+      });
+    } else {
+      toast.error("Incorrect password", {
+        description: "The cheat code was incorrect."
       });
     }
   };
@@ -70,6 +86,35 @@ const SettingsMenu = () => {
               >
                 <Trash2 className="mr-2 h-4 w-4" />
                 Reset All Progress
+              </Button>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium">Cheats</h3>
+            <p className="text-sm text-muted-foreground">
+              Enter the secret password to unlock power boosts.
+            </p>
+            
+            <div className="space-y-2">
+              <Label htmlFor="cheat-confirm">
+                Enter cheat password:
+              </Label>
+              <Input 
+                id="cheat-confirm"
+                value={cheatText}
+                onChange={(e) => setCheatText(e.target.value)}
+                placeholder="Enter password"
+                type="password"
+              />
+              
+              <Button 
+                variant="secondary" 
+                onClick={handleCheats}
+                className="w-full"
+              >
+                <Wand2 className="mr-2 h-4 w-4" />
+                Unlock Cheats
               </Button>
             </div>
           </div>

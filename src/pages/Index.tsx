@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { GameProvider, GameContextWrapper, useGame } from "@/contexts/GameContext";
 import { useItems } from "@/contexts/ItemContext";
@@ -12,6 +11,7 @@ import Inventory from "@/components/Inventory";
 import SettingsMenu from "@/components/SettingsMenu";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import CheatButtons from "@/components/CheatButtons";
 
 const ActiveBuffsIndicator = () => {
   const { inventory, activeBuffs } = useItems();
@@ -86,6 +86,7 @@ const GameContent = () => {
               <ActiveBuffsIndicator />
               <div className="mt-6 w-full max-w-md mx-auto">
                 <PowerLevel />
+                <CheatButtons />
               </div>
             </div>
           </TabsContent>
