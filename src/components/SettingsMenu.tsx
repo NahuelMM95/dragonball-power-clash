@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -6,10 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Settings, Trash2, Wand2 } from "lucide-react";
 import { useGame } from '@/contexts/GameContext';
+import { useItems } from '@/contexts/ItemContext';
 import { toast } from "sonner";
 
 const SettingsMenu = () => {
   const { resetProgress } = useGame();
+  const { setInventory } = useItems();
   const [deleteText, setDeleteText] = useState('');
   const [cheatText, setCheatText] = useState('');
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -18,6 +19,7 @@ const SettingsMenu = () => {
   const handleReset = () => {
     if (deleteText === 'DELETE') {
       resetProgress();
+      setInventory([]); // Clear inventory
       setDeleteText('');
       setIsSheetOpen(false);
       toast.success("Progress deleted successfully", {

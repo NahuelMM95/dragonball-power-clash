@@ -2,8 +2,14 @@
 import { Button } from "@/components/ui/button";
 import { useGame } from '@/contexts/GameContext';
 
-const CheatButtons = () => {
+interface CheatButtonsProps {
+  visible: boolean;
+}
+
+const CheatButtons = ({ visible }: CheatButtonsProps) => {
   const { powerLevel, setPowerLevel } = useGame();
+
+  if (!visible) return null;
 
   const addPower = (amount: number) => {
     setPowerLevel(powerLevel + amount);
