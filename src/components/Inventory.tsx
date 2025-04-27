@@ -1,7 +1,7 @@
 
 import { useGame } from '@/contexts/GameContext';
 import { useItems } from '@/contexts/ItemContext';
-import { Sword } from "lucide-react";
+import { Sword, Weight } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -13,29 +13,31 @@ const Inventory = () => {
   const renderEquipmentSlot = (slotType: string, item: any | null) => {
     return (
       <div className="flex flex-col items-center gap-1">
-        <p className="text-xs text-muted-foreground">{slotType}</p>
-        <div className="w-16 h-16 border-2 border-dashed border-gray-300 rounded-md flex items-center justify-center bg-gray-100">
+        <p className="text-xs text-muted-foreground uppercase tracking-wider">{slotType}</p>
+        <div className="w-16 h-16 border-2 border-forestGreen/30 rounded-lg flex items-center justify-center bg-background/50 hover:bg-accent/20 transition-colors">
           {item ? (
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="ghost" className="w-full h-full p-0 m-0">
+                <Button variant="ghost" className="w-full h-full p-0 m-0 group">
                   <div className="flex flex-col items-center justify-center">
-                    <div className="text-xl mb-1">
+                    <div className="text-2xl mb-1 group-hover:scale-110 transition-transform">
                       {item.type === 'weapon' ? '🗡️' : '🏋️'}
                     </div>
-                    <span className="text-xs">{item.name}</span>
+                    <span className="text-xs text-foreground/80 group-hover:text-foreground transition-colors">
+                      {item.name}
+                    </span>
                   </div>
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-64">
                 <div className="space-y-2">
-                  <h4 className="font-medium">{item.name}</h4>
-                  <p className="text-sm">{item.description}</p>
+                  <h4 className="font-semibold text-lg">{item.name}</h4>
+                  <p className="text-sm text-muted-foreground">{item.description}</p>
                   <Button 
                     variant="outline" 
                     size="sm" 
                     onClick={() => equipItem(null, slotType)}
-                    className="w-full"
+                    className="w-full mt-2"
                   >
                     Remove
                   </Button>
@@ -43,7 +45,7 @@ const Inventory = () => {
               </PopoverContent>
             </Popover>
           ) : (
-            <span className="text-gray-400">Empty</span>
+            <span className="text-muted-foreground text-sm">Empty</span>
           )}
         </div>
       </div>
@@ -51,11 +53,11 @@ const Inventory = () => {
   };
 
   return (
-    <div className="bg-white/90 p-4 rounded-lg shadow-md backdrop-blur-sm border-2 border-forestGreen">
-      <h2 className="text-xl font-bold text-forestGreen mb-4">Inventory</h2>
+    <div className="bg-background/90 p-4 rounded-lg shadow-md border-2 border-forestGreen/30 backdrop-blur-sm">
+      <h2 className="text-2xl font-bold text-forestGreen mb-4 tracking-tight">Inventory</h2>
       
       <div className="grid grid-cols-2 gap-4">
-        <Card>
+        <Card className="border-forestGreen/30">
           <CardHeader className="pb-2">
             <CardTitle className="text-lg">Equipment</CardTitle>
             <CardDescription>Equip items to increase your power</CardDescription>
@@ -68,7 +70,7 @@ const Inventory = () => {
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="border-forestGreen/30">
           <CardHeader className="pb-2">
             <CardTitle className="text-lg">Items</CardTitle>
             <CardDescription>Use or equip collected items</CardDescription>
@@ -79,18 +81,26 @@ const Inventory = () => {
                 inventory.map((item, index) => (
                   <Popover key={index}>
                     <PopoverTrigger asChild>
-                      <Button variant="ghost" className="h-16 w-16 p-0 relative">
+                      <Button 
+                        variant="ghost" 
+                        className="h-16 w-16 p-0 relative group hover:bg-accent/20 transition-colors"
+                      >
                         <div className="flex flex-col items-center justify-center">
-                          <div className="text-xl mb-1">
+                          <div className="text-xl mb-1 group-hover:scale-110 transition-transform">
                             {item.type === 'weapon' ? '🗡️' : 
                              item.type === 'weight' ? '🏋️' : 
                              item.type === 'consumable' ? '🍖' : '❓'}
                           </div>
-                          <span className="text-xs">{item.name}</span>
+                          <span className="text-xs text-foreground/80 group-hover:text-foreground transition-colors">
+                            {item.name}
+                          </span>
                           
                           {/* Quantity Badge */}
                           {item.quantity > 1 && (
-                            <Badge variant="secondary" className="absolute top-1 right-1">
+                            <Badge 
+                              variant="secondary" 
+                              className="absolute top-1 right-1 bg-forestGreen/20 text-forestGreen"
+                            >
                               {item.quantity}
                             </Badge>
                           )}
@@ -100,18 +110,18 @@ const Inventory = () => {
                     <PopoverContent className="w-64">
                       <div className="space-y-2">
                         <div className="flex justify-between items-center">
-                          <h4 className="font-medium">{item.name}</h4>
+                          <h4 className="font-semibold text-lg">{item.name}</h4>
                           {item.quantity > 1 && (
                             <Badge variant="outline">x{item.quantity}</Badge>
                           )}
                         </div>
-                        <p className="text-sm">{item.description}</p>
+                        <p className="text-sm text-muted-foreground">{item.description}</p>
                         {item.type === 'consumable' ? (
                           <Button 
                             variant="default" 
                             size="sm" 
                             onClick={() => useItem(item.id)}
-                            className="w-full"
+                            className="w-full mt-2"
                           >
                             Use
                           </Button>
@@ -120,7 +130,7 @@ const Inventory = () => {
                             variant="default" 
                             size="sm" 
                             onClick={() => equipItem(item.id, item.slot)}
-                            className="w-full"
+                            className="w-full mt-2"
                           >
                             Equip
                           </Button>
@@ -130,7 +140,7 @@ const Inventory = () => {
                   </Popover>
                 ))
               ) : (
-                <div className="col-span-3 text-center py-4 text-gray-500">
+                <div className="col-span-3 text-center py-4 text-muted-foreground">
                   No items in inventory
                 </div>
               )}
