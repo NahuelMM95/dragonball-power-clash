@@ -1,10 +1,11 @@
-
 import React, { createContext, useContext } from 'react';
 import { BattleContextType, Enemy, Item } from '@/types/game';
 import { useBattleState } from '@/hooks/useBattleState';
 import { useBattleZones } from '@/hooks/useBattleZones';
 import { useSkillManagement } from '@/hooks/useSkillManagement';
-import { useSkillInBattle, fleeFromBattle, useItemInBattle, processBattleEnd } from '@/utils/battleActions';
+import { useSkillInBattle } from '@/utils/battleSkillActions';
+import { fleeFromBattle } from '@/utils/battleFleeActions';
+import { useItemInBattle, processBattleEnd } from '@/utils/battleItemActions';
 import { enemyAttack } from '@/utils/battle';
 
 const BattleContext = createContext<BattleContextType | undefined>(undefined);
