@@ -95,13 +95,20 @@ export const UpgradeProvider: React.FC<UpgradeProviderProps> = ({
       duration: 3000,
     });
   };
+
+  // Function to reset upgrades to their initial state
+  const resetUpgrades = () => {
+    setUpgrades(initialUpgrades);
+    setEquippedUpgrade(null);
+  };
   
   return (
     <UpgradeContext.Provider value={{
       upgrades,
       equippedUpgrade,
       purchaseUpgrade,
-      equipUpgrade
+      equipUpgrade,
+      resetUpgrades
     }}>
       {children}
     </UpgradeContext.Provider>

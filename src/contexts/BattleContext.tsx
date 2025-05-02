@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext } from 'react';
 import { BattleContextType, Enemy, Item } from '@/types/game';
 import { useBattleState } from '@/hooks/useBattleState';
@@ -28,7 +29,7 @@ export const BattleProvider: React.FC<BattleProviderProps> = ({
   setZeni
 }) => {
   // Use our custom hooks
-  const { skills, purchaseSkill } = useSkillManagement();
+  const { skills, purchaseSkill, setSkills } = useSkillManagement();
   const { forest, desert, getFightEnemy } = useBattleZones();
   const { 
     battleState, 
@@ -83,6 +84,14 @@ export const BattleProvider: React.FC<BattleProviderProps> = ({
   const handleUseItemInBattle = (itemId: string, inventory: Item[], setInventoryCallback: React.Dispatch<React.SetStateAction<Item[]>>) => {
     useItemInBattle(itemId, inventory, setInventoryCallback, battleState, setBattleState, endBattle);
   };
+  
+  // Function to reset skills to their initial state
+  const resetSkills = () => {
+    // Reset skills to their initial state from the playerSkills in data/skills
+    import('@/data/skills').then(({ playerSkills }) => {
+      setSkills(playerSkills);
+    });
+  };
 
   return (
     <BattleContext.Provider value={{
@@ -98,7 +107,8 @@ export const BattleProvider: React.FC<BattleProviderProps> = ({
       endBattle,
       useItemInBattle: handleUseItemInBattle,
       forest,
-      desert
+      desert,
+      resetSkills
     }}>
       {children}
     </BattleContext.Provider>
