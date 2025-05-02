@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { GameProvider, GameContextWrapper, useGame } from "@/contexts/GameContext";
 import { useItems } from "@/contexts/ItemContext";
 import { useBattle } from "@/contexts/BattleContext";
@@ -13,6 +14,8 @@ import SettingsMenu from "@/components/SettingsMenu";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import CheatButtons from "@/components/CheatButtons";
+import { Button } from "@/components/ui/button";
+import { Sword } from "lucide-react";
 
 const ActiveBuffsIndicator = () => {
   const { inventory, activeBuffs } = useItems();
@@ -71,6 +74,15 @@ const GameContent = () => {
           DRAGON BALL POWER CLASH
         </h1>
         <p className="text-lg mt-2">Click to power up and become the strongest warrior!</p>
+        
+        <div className="mt-4">
+          <Link to="/story">
+            <Button variant="outline" className="gap-2 bg-orange-100 border-orange-300 hover:bg-orange-200 text-orange-800">
+              <Sword className="h-4 w-4" />
+              Story Mode
+            </Button>
+          </Link>
+        </div>
       </header>
       
       <div className="max-w-6xl mx-auto">

@@ -76,6 +76,7 @@ export type ActiveBuff = {
 export interface BattleContextType {
   forest: Enemy[];
   desert: Enemy[];
+  wasteland: Enemy[];
   fightEnemy: (zone: string) => void;
   fightResult: { enemy: Enemy | null; won: boolean | null } | null;
   clearFightResult: () => void;

@@ -8,6 +8,7 @@ import { useSkillInBattle } from '@/utils/battleSkillActions';
 import { fleeFromBattle } from '@/utils/battleFleeActions';
 import { useItemInBattle, processBattleEnd } from '@/utils/battleItemActions';
 import { enemyAttack } from '@/utils/battle';
+import { dbzEnemies } from '@/data/storyEnemies';
 
 const BattleContext = createContext<BattleContextType | undefined>(undefined);
 
@@ -30,7 +31,7 @@ export const BattleProvider: React.FC<BattleProviderProps> = ({
 }) => {
   // Use our custom hooks
   const { skills, purchaseSkill, setSkills } = useSkillManagement();
-  const { forest, desert, getFightEnemy } = useBattleZones();
+  const { forest, desert, wasteland, getFightEnemy } = useBattleZones();
   const { 
     battleState, 
     setBattleState, 
@@ -43,7 +44,16 @@ export const BattleProvider: React.FC<BattleProviderProps> = ({
 
   // Function to start a fight with an enemy from a specific zone
   const fightEnemy = (zone: string) => {
-    const selectedEnemy = getFightEnemy(zone);
+    let selectedEnemy: Enemy;
+    
+    if (zone === 'story') {
+      // Get the current progress from localStorage
+      const dbzProgress = parseInt(localStorage.getItem("dbzStoryProgress") || "0");
+      selectedEnemy = { ...dbzEnemies[dbzProgress] };
+    } else {
+      selectedEnemy = getFightEnemy(zone, powerLevel);
+    }
+    
     setFightResult({ enemy: selectedEnemy, won: null });
     
     const newBattleState = initBattle(selectedEnemy);
@@ -108,6 +118,7 @@ export const BattleProvider: React.FC<BattleProviderProps> = ({
       useItemInBattle: handleUseItemInBattle,
       forest,
       desert,
+      wasteland,
       resetSkills
     }}>
       {children}
