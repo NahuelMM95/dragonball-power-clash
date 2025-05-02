@@ -1,12 +1,12 @@
 
 import { useState } from "react";
-import { useGame } from "@/contexts/GameContext";
+import { GameProvider, GameContextWrapper, useGame } from "@/contexts/GameContext";
 import { useBattle } from "@/contexts/BattleContext";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import DragonBallZStory from "@/components/story/DragonBallZStory";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-const Story = () => {
+const StoryContent = () => {
   const [activeSaga, setActiveSaga] = useState("dbz");
   const { powerLevel } = useGame();
   
@@ -45,6 +45,16 @@ const Story = () => {
         <p className="text-sm text-gray-600">Your current power level: {powerLevel}</p>
       </div>
     </div>
+  );
+};
+
+const Story = () => {
+  return (
+    <GameProvider>
+      <GameContextWrapper>
+        <StoryContent />
+      </GameContextWrapper>
+    </GameProvider>
   );
 };
 
