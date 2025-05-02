@@ -6,10 +6,12 @@ import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import BattleDialogContent from "@/components/battle/BattleDialogContent";
 import { dbzEnemies } from "@/data/storyEnemies";
+import { Link } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 
 const DragonBallZStory = () => {
   const { powerLevel } = useGame();
-  const { fightResult, clearFightResult, battleState } = useBattle();
+  const { fightResult, clearFightResult, battleState, startBattle } = useBattle();
   const [progress, setProgress] = useState<number>(0);
 
   // Get progress from localStorage on component mount
@@ -29,8 +31,13 @@ const DragonBallZStory = () => {
     clearFightResult();
     // If the fight was won, update progress
     if (fightResult?.won) {
-      setProgress(currentProgress => Math.max(currentProgress, currentEnemy.id));
+      setProgress(currentProgress => Math.max(currentProgress, currentEnemy.id + 1));
     }
+  };
+
+  const handleFightEnemy = (enemy) => {
+    // Directly use the startBattle function with the selected enemy
+    startBattle(enemy);
   };
 
   // Get current enemy based on progress
@@ -39,6 +46,14 @@ const DragonBallZStory = () => {
 
   return (
     <div className="space-y-6">
+      <div className="mb-4">
+        <Link to="/">
+          <Button variant="outline" size="sm" className="flex items-center gap-2">
+            <ArrowLeft size={16} /> Back to Main Screen
+          </Button>
+        </Link>
+      </div>
+
       {dbzEnemies.map((enemy, index) => {
         const isCompleted = progress > enemy.id;
         const isCurrent = progress === enemy.id;
@@ -66,10 +81,7 @@ const DragonBallZStory = () => {
               <Button 
                 variant={isCompleted ? "outline" : isCurrent ? "default" : "ghost"}
                 disabled={isLocked}
-                onClick={() => {
-                  // Use the custom startStoryBattle function from BattleContext
-                  useBattle().fightEnemy('story');
-                }}
+                onClick={() => handleFightEnemy(enemy)}
               >
                 {isCompleted ? "Fight Again" : isCurrent ? "Fight" : "Locked"}
               </Button>
