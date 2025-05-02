@@ -1,3 +1,4 @@
+
 export type Enemy = {
   name: string;
   power: number;
@@ -86,16 +87,19 @@ export interface BattleContextType {
   fleeFromBattle: () => void;
   endBattle: (victory: boolean) => void;
   useItemInBattle: (itemId: string, inventory: Item[], setInventory: React.Dispatch<React.SetStateAction<Item[]>>) => void;
+  resetSkills: () => void;
 }
 
 export interface ItemContextType {
   inventory: Item[];
   setInventory: React.Dispatch<React.SetStateAction<Item[]>>;
   equippedItems: Item[];
+  setEquippedItems: React.Dispatch<React.SetStateAction<Item[]>>;
   equipItem: (itemId: string | null, slotType: string) => void;
   useItem: (itemId: string) => void;
   purchaseItem: (itemType: string) => void;
   activeBuffs: ActiveBuff[];
+  setActiveBuffs: React.Dispatch<React.SetStateAction<ActiveBuff[]>>;
 }
 
 export interface UpgradeContextType {
@@ -103,6 +107,7 @@ export interface UpgradeContextType {
   equippedUpgrade: string | null;
   purchaseUpgrade: (id: string) => void;
   equipUpgrade: (id: string) => void;
+  resetUpgrades: () => void;
 }
 
 // Main game context that combines all the others

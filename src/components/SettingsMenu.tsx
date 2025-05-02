@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Settings, Trash2, Wand2 } from "lucide-react";
 import { useGame } from '@/contexts/GameContext';
 import { useItems } from '@/contexts/ItemContext';
+import { useBattle } from '@/contexts/BattleContext';
+import { useUpgrades } from '@/contexts/UpgradeContext';
 import { toast } from "sonner";
 
 interface SettingsMenuProps {
@@ -15,7 +17,9 @@ interface SettingsMenuProps {
 
 const SettingsMenu = ({ onCheatsUnlocked }: SettingsMenuProps) => {
   const { resetProgress } = useGame();
-  const { setInventory } = useItems();
+  const { setInventory, setEquippedItems, setActiveBuffs } = useItems();
+  const { resetSkills } = useBattle();
+  const { resetUpgrades } = useUpgrades();
   const [deleteText, setDeleteText] = useState('');
   const [cheatText, setCheatText] = useState('');
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -23,8 +27,20 @@ const SettingsMenu = ({ onCheatsUnlocked }: SettingsMenuProps) => {
 
   const handleReset = () => {
     if (deleteText === 'DELETE') {
+      // Reset all game progress
       resetProgress();
-      setInventory([]); // Clear inventory
+      
+      // Reset all inventory and equipment
+      setInventory([]);
+      setEquippedItems([]);
+      setActiveBuffs([]);
+      
+      // Reset all skills
+      resetSkills();
+      
+      // Reset all upgrades
+      resetUpgrades();
+      
       setDeleteText('');
       setIsSheetOpen(false);
       toast.success("Progress deleted successfully", {
