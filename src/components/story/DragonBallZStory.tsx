@@ -8,10 +8,11 @@ import BattleDialogContent from "@/components/battle/BattleDialogContent";
 import { dbzEnemies } from "@/data/storyEnemies";
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { enemyAttack } from "@/utils/battle";
 
 const DragonBallZStory = () => {
   const { powerLevel } = useGame();
-  const { fightResult, clearFightResult, battleState, startBattle } = useBattle();
+  const { fightResult, clearFightResult, battleState, setBattleState, startBattle, endBattle } = useBattle();
   const [progress, setProgress] = useState<number>(0);
 
   // Get progress from localStorage on component mount
@@ -37,7 +38,14 @@ const DragonBallZStory = () => {
 
   const handleFightEnemy = (enemy) => {
     // Directly use the startBattle function with the selected enemy
-    startBattle(enemy);
+    const newBattleState = startBattle(enemy);
+    
+    // If enemy attacks first, trigger their attack
+    if (!newBattleState.playerTurn) {
+      setTimeout(() => {
+        enemyAttack(newBattleState, setBattleState, endBattle);
+      }, 1000);
+    }
   };
 
   // Get current enemy based on progress
