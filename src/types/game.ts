@@ -81,9 +81,10 @@ export interface BattleContextType {
   fightResult: { enemy: Enemy | null; won: boolean | null } | null;
   clearFightResult: () => void;
   battleState: BattleState;
+  setBattleState: React.Dispatch<React.SetStateAction<BattleState>>;
   skills: Skill[];
   purchaseSkill: (skillName: string) => number | void;
-  startBattle: (enemy: Enemy) => void;
+  startBattle: (enemy: Enemy) => BattleState;
   useSkill: (skill: Skill) => void;
   fleeFromBattle: () => void;
   endBattle: (victory: boolean) => void;

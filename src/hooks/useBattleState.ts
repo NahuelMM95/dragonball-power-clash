@@ -27,7 +27,7 @@ export const useBattleState = (powerLevel: number, equippedItems: any[]) => {
     setFightResult(null);
   };
 
-  const startBattle = (enemy: Enemy) => {
+  const startBattle = (enemy: Enemy): BattleState => {
     const playerStats = calculatePlayerStats(powerLevel, equippedItems);
     const playerFirst = powerLevel >= enemy.power;
     

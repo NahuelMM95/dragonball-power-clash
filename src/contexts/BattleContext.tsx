@@ -109,6 +109,7 @@ export const BattleProvider: React.FC<BattleProviderProps> = ({
       fightResult,
       clearFightResult,
       battleState,
+      setBattleState,
       skills,
       purchaseSkill,
       startBattle: initBattle,
