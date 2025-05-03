@@ -9,23 +9,24 @@ type BattleResultProps = {
 };
 
 const BattleResult = ({ enemy, won, onContinue }: BattleResultProps) => {
-  const getEnemyEmoji = (name: string) => {
-    switch (name) {
-      case 'Wolf': return '🐺';
-      case 'Bandit': return '👤';
-      case 'Bear': return '🐻';
-      case 'Yamcha': return '👨';
-      case 'T-Rex': return '🦖';
-      default: return '❓';
-    }
-  };
-
   return (
     <div className="flex flex-col items-center p-4">
-      <div className="bg-gray-100 p-4 rounded-full mb-4 w-24 h-24 flex items-center justify-center">
-        <span className="text-3xl">
-          {enemy ? getEnemyEmoji(enemy.name) : '❓'}
-        </span>
+      <div className="bg-gray-100 p-4 rounded-full mb-4 w-24 h-24 flex items-center justify-center overflow-hidden">
+        {enemy ? (
+          <img 
+            src={`/${enemy.image}`} 
+            alt={enemy.name} 
+            className="object-contain max-w-full max-h-full"
+            onError={(e) => {
+              // Fallback if image fails to load
+              const target = e.target as HTMLImageElement;
+              target.onerror = null;
+              target.src = "/placeholder.svg";
+            }}
+          />
+        ) : (
+          <span className="text-3xl">❓</span>
+        )}
       </div>
       <div className="text-center mb-4">
         <p className="font-bold text-lg">{enemy?.name}</p>

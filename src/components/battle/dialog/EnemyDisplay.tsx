@@ -1,36 +1,37 @@
 
+import { Enemy } from '@/types/game';
 import { Progress } from "@/components/ui/progress";
-import { Enemy } from "@/types/game";
 
 type EnemyDisplayProps = {
   enemy: Enemy;
 };
 
 const EnemyDisplay = ({ enemy }: EnemyDisplayProps) => {
-  const getEnemyEmoji = (name: string) => {
-    switch (name) {
-      case 'Wolf': return '🐺';
-      case 'Bandit': return '👤';
-      case 'Bear': return '🐻';
-      case 'Yamcha': return '👨';
-      case 'T-Rex': return '🦖';
-      default: return '❓';
-    }
-  };
-
+  const healthPercentage = (enemy.hp / enemy.maxHp) * 100;
+  
   return (
-    <div className="flex flex-col items-center p-2">
-      <div className="bg-gray-100 p-4 rounded-full mb-2 w-16 h-16 flex items-center justify-center">
-        <span className="text-2xl">
-          {getEnemyEmoji(enemy.name)}
-        </span>
+    <div className="flex flex-col items-center p-4">
+      <div className="bg-gray-100 p-2 rounded-lg mb-4 w-28 h-28 flex items-center justify-center overflow-hidden">
+        <img 
+          src={`/${enemy.image}`} 
+          alt={enemy.name} 
+          className="object-contain max-w-full max-h-full"
+          onError={(e) => {
+            // Fallback to emoji if image fails to load
+            const target = e.target as HTMLImageElement;
+            target.onerror = null;
+            target.src = "/placeholder.svg";
+          }}
+        />
       </div>
-      <div className="w-full">
-        <div className="flex justify-between text-sm mb-1">
-          <span>{enemy.name}</span>
-          <span>{enemy.hp}/{enemy.maxHp} HP</span>
+      <div className="text-center w-full mb-4">
+        <p className="font-bold">{enemy.name}</p>
+        <p className="text-xs text-gray-600">Power Level: {enemy.power}</p>
+        <div className="flex justify-between text-xs text-gray-600 mt-1">
+          <span>HP:</span>
+          <span>{enemy.hp}/{enemy.maxHp}</span>
         </div>
-        <Progress value={(enemy.hp / enemy.maxHp) * 100} className="h-2 bg-red-200" />
+        <Progress value={healthPercentage} className="h-2 mt-1" />
       </div>
     </div>
   );

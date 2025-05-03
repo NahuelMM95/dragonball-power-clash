@@ -17,7 +17,7 @@ const calculateEnemyStats = (basePower: number, playerPowerLevel: number = 1) =>
 export const getForestEnemies = (playerPowerLevel: number = 1): Enemy[] => [
   {
     name: 'Wolf',
-    image: 'wolf.png',
+    image: 'wolf-dbz.png',
     ki: 0,
     maxKi: 0,
     zeniReward: 10,
@@ -33,7 +33,7 @@ export const getForestEnemies = (playerPowerLevel: number = 1): Enemy[] => [
   },
   {
     name: 'Bear',
-    image: 'bear.png',
+    image: 'bear-dbz.png',
     ki: 0,
     maxKi: 0,
     zeniReward: 50,
