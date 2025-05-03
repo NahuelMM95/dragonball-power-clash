@@ -5,7 +5,7 @@ export const dbzEnemies: (Enemy & { id: number })[] = [
   {
     id: 0,
     name: 'Raditz',
-    image: '/raditz.png',
+    image: 'raditz.png',
     power: 1500,
     hp: 15000,
     maxHp: 15000,

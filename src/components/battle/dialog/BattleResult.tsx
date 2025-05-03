@@ -1,6 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Enemy } from "@/types/game";
+import { ImageOff } from "lucide-react";
 
 type BattleResultProps = {
   enemy: Enemy | null;
@@ -21,6 +22,7 @@ const BattleResult = ({ enemy, won, onContinue }: BattleResultProps) => {
               // Fallback if image fails to load
               const target = e.target as HTMLImageElement;
               target.onerror = null;
+              console.log(`Failed to load image: ${enemy.image}`);
               target.src = "/placeholder.svg";
             }}
           />

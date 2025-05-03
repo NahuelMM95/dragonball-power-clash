@@ -1,6 +1,7 @@
 
 import { Enemy } from '@/types/game';
 import { Progress } from "@/components/ui/progress";
+import { ImageOff } from "lucide-react";
 
 type EnemyDisplayProps = {
   enemy: Enemy;
@@ -17,9 +18,10 @@ const EnemyDisplay = ({ enemy }: EnemyDisplayProps) => {
           alt={enemy.name} 
           className="object-contain max-w-full max-h-full"
           onError={(e) => {
-            // Fallback to emoji if image fails to load
+            // Fallback to placeholder if image fails to load
             const target = e.target as HTMLImageElement;
             target.onerror = null;
+            console.log(`Failed to load image: ${enemy.image}`);
             target.src = "/placeholder.svg";
           }}
         />
