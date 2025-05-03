@@ -2,6 +2,8 @@
 import { Button } from "@/components/ui/button";
 import { Enemy } from "@/types/game";
 import { ImageOff } from "lucide-react";
+import { PLACEHOLDER_IMAGE } from "@/data/assets";
+import { useState } from "react";
 
 type BattleResultProps = {
   enemy: Enemy | null;
@@ -10,10 +12,12 @@ type BattleResultProps = {
 };
 
 const BattleResult = ({ enemy, won, onContinue }: BattleResultProps) => {
+  const [imageError, setImageError] = useState(false);
+
   return (
     <div className="flex flex-col items-center p-4">
       <div className="bg-gray-100 p-4 rounded-full mb-4 w-24 h-24 flex items-center justify-center overflow-hidden">
-        {enemy ? (
+        {enemy && !imageError ? (
           <img 
             src={enemy.image} 
             alt={enemy.name} 
@@ -21,11 +25,16 @@ const BattleResult = ({ enemy, won, onContinue }: BattleResultProps) => {
             onError={(e) => {
               // Fallback if image fails to load
               const target = e.target as HTMLImageElement;
-              target.onerror = null;
+              target.onerror = null; // Prevent infinite error loop
               console.log(`Failed to load image: ${enemy.image}`);
-              target.src = "/placeholder.svg";
+              target.src = PLACEHOLDER_IMAGE;
+              setImageError(true);
             }}
           />
+        ) : enemy && imageError ? (
+          <div className="flex flex-col items-center justify-center text-gray-400">
+            <ImageOff size={24} />
+          </div>
         ) : (
           <span className="text-3xl">❓</span>
         )}

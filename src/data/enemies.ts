@@ -1,5 +1,5 @@
-
 import { Enemy } from '../types/game';
+import { ENEMY_IMAGES } from './assets';
 
 const calculateEnemyStats = (basePower: number, playerPowerLevel: number = 1) => {
   // Scale enemy stats based on player's power level, but with a more balanced approach
@@ -17,7 +17,7 @@ const calculateEnemyStats = (basePower: number, playerPowerLevel: number = 1) =>
 export const getForestEnemies = (playerPowerLevel: number = 1): Enemy[] => [
   {
     name: 'Wolf',
-    image: 'wolf-dbz.png',
+    image: ENEMY_IMAGES.WOLF,
     ki: 0,
     maxKi: 0,
     zeniReward: 10,
@@ -25,7 +25,7 @@ export const getForestEnemies = (playerPowerLevel: number = 1): Enemy[] => [
   },
   {
     name: 'Bandit',
-    image: 'bandit.png',
+    image: ENEMY_IMAGES.BANDIT,
     ki: 10,
     maxKi: 10,
     zeniReward: 25,
@@ -33,7 +33,7 @@ export const getForestEnemies = (playerPowerLevel: number = 1): Enemy[] => [
   },
   {
     name: 'Bear',
-    image: 'bear-dbz.png',
+    image: ENEMY_IMAGES.BEAR,
     ki: 0,
     maxKi: 0,
     zeniReward: 50,
@@ -44,7 +44,7 @@ export const getForestEnemies = (playerPowerLevel: number = 1): Enemy[] => [
 export const getDesertEnemies = (playerPowerLevel: number = 1): Enemy[] => [
   {
     name: 'Yamcha',
-    image: 'yamcha.png',
+    image: ENEMY_IMAGES.YAMCHA,
     ki: 100,
     maxKi: 100,
     zeniReward: 200,
@@ -52,7 +52,7 @@ export const getDesertEnemies = (playerPowerLevel: number = 1): Enemy[] => [
   },
   {
     name: 'T-Rex',
-    image: 't-rex.png',
+    image: ENEMY_IMAGES.T_REX,
     ki: 0,
     maxKi: 0,
     zeniReward: 500,
@@ -60,7 +60,7 @@ export const getDesertEnemies = (playerPowerLevel: number = 1): Enemy[] => [
   },
   {
     name: 'Pterodactyl',
-    image: 'pterodactyl.png',
+    image: ENEMY_IMAGES.PTERODACTYL,
     ki: 0,
     maxKi: 0,
     zeniReward: 300,
@@ -71,7 +71,7 @@ export const getDesertEnemies = (playerPowerLevel: number = 1): Enemy[] => [
 export const getWastelandEnemies = (playerPowerLevel: number = 1): Enemy[] => [
   {
     name: 'Saibaman',
-    image: 'saibaman.png',
+    image: ENEMY_IMAGES.SAIBAMAN,
     ki: 500,
     maxKi: 500,
     zeniReward: 1000,

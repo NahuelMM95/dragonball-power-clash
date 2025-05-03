@@ -1,11 +1,11 @@
-
 import { Enemy } from '@/types/game';
+import { ENEMY_IMAGES } from './assets';
 
 export const dbzEnemies: (Enemy & { id: number })[] = [
   {
     id: 0,
     name: 'Raditz',
-    image: 'raditz.png',
+    image: ENEMY_IMAGES.RADITZ,
     power: 1500,
     hp: 15000,
     maxHp: 15000,
@@ -17,7 +17,7 @@ export const dbzEnemies: (Enemy & { id: number })[] = [
   {
     id: 1,
     name: 'Saibaman 1',
-    image: 'saibaman.png',
+    image: ENEMY_IMAGES.SAIBAMAN,
     power: 1200,
     hp: 12000,
     maxHp: 12000,
@@ -29,7 +29,7 @@ export const dbzEnemies: (Enemy & { id: number })[] = [
   {
     id: 2,
     name: 'Saibaman 2',
-    image: 'saibaman.png',
+    image: ENEMY_IMAGES.SAIBAMAN,
     power: 1200,
     hp: 12000,
     maxHp: 12000,
@@ -41,7 +41,7 @@ export const dbzEnemies: (Enemy & { id: number })[] = [
   {
     id: 3,
     name: 'Saibaman 3',
-    image: 'saibaman.png',
+    image: ENEMY_IMAGES.SAIBAMAN,
     power: 1200,
     hp: 12000,
     maxHp: 12000,
@@ -53,7 +53,7 @@ export const dbzEnemies: (Enemy & { id: number })[] = [
   {
     id: 4,
     name: 'Saibaman 4',
-    image: 'saibaman.png',
+    image: ENEMY_IMAGES.SAIBAMAN,
     power: 1200,
     hp: 12000,
     maxHp: 12000,
@@ -65,7 +65,7 @@ export const dbzEnemies: (Enemy & { id: number })[] = [
   {
     id: 5,
     name: 'Saibaman 5',
-    image: 'saibaman.png',
+    image: ENEMY_IMAGES.SAIBAMAN,
     power: 1200,
     hp: 12000,
     maxHp: 12000,
@@ -77,7 +77,7 @@ export const dbzEnemies: (Enemy & { id: number })[] = [
   {
     id: 6,
     name: 'Saibaman 6',
-    image: 'saibaman.png',
+    image: ENEMY_IMAGES.SAIBAMAN,
     power: 1200,
     hp: 12000,
     maxHp: 12000,
@@ -89,7 +89,7 @@ export const dbzEnemies: (Enemy & { id: number })[] = [
   {
     id: 7,
     name: 'Nappa',
-    image: 'nappa.png',
+    image: ENEMY_IMAGES.NAPPA,
     power: 4000,
     hp: 40000,
     maxHp: 40000,
@@ -101,7 +101,7 @@ export const dbzEnemies: (Enemy & { id: number })[] = [
   {
     id: 8,
     name: 'Vegeta',
-    image: 'vegeta.png',
+    image: ENEMY_IMAGES.VEGETA,
     power: 18000,
     hp: 180000,
     maxHp: 180000,
@@ -113,7 +113,7 @@ export const dbzEnemies: (Enemy & { id: number })[] = [
   {
     id: 9,
     name: 'Great Ape Vegeta',
-    image: 'vegeta-ozaru.png',
+    image: ENEMY_IMAGES.VEGETA_OZARU,
     power: 70000,
     hp: 700000,
     maxHp: 700000,
@@ -125,7 +125,7 @@ export const dbzEnemies: (Enemy & { id: number })[] = [
   {
     id: 10,
     name: 'Injured Vegeta',
-    image: 'vegeta-injured.png',
+    image: ENEMY_IMAGES.VEGETA_INJURED,
     power: 7000,
     hp: 70000,
     maxHp: 70000,
