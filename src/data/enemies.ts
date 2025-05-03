@@ -2,14 +2,15 @@
 import { Enemy } from '../types/game';
 
 const calculateEnemyStats = (basePower: number, playerPowerLevel: number = 1) => {
-  // Scale enemy stats based on player's power level, but maintain relative strength
-  const scaleFactor = Math.max(1, playerPowerLevel / 100);
+  // Scale enemy stats based on player's power level, but with a more balanced approach
+  // We'll use the same calculation logic as for player stats
+  // This ensures enemy stats grow at a similar rate to player stats
   
   return {
-    power: Math.floor(basePower * scaleFactor),
-    hp: Math.floor((basePower * 10) * scaleFactor),
-    maxHp: Math.floor((basePower * 10) * scaleFactor),
-    damage: Math.floor((basePower * 0.3) * scaleFactor)
+    power: basePower, // Keep base power intact to preserve progression difficulty
+    hp: Math.floor(basePower * 10), // Same formula as player: powerLevel * 10
+    maxHp: Math.floor(basePower * 10),
+    damage: Math.floor(basePower * 0.8) // Same formula as player: powerLevel * 0.8
   };
 };
 
