@@ -13,7 +13,7 @@ const EnemyDisplay = ({ enemy }: EnemyDisplayProps) => {
     <div className="flex flex-col items-center p-4">
       <div className="bg-gray-100 p-2 rounded-lg mb-4 w-28 h-28 flex items-center justify-center overflow-hidden">
         <img 
-          src={`/${enemy.image}`} 
+          src={enemy.image} 
           alt={enemy.name} 
           className="object-contain max-w-full max-h-full"
           onError={(e) => {

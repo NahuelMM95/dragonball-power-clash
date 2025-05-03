@@ -17,7 +17,7 @@ const calculateEnemyStats = (basePower: number, playerPowerLevel: number = 1) =>
 export const getForestEnemies = (playerPowerLevel: number = 1): Enemy[] => [
   {
     name: 'Wolf',
-    image: 'wolf-dbz.png',
+    image: '/wolf-dbz.png',
     ki: 0,
     maxKi: 0,
     zeniReward: 10,
@@ -25,7 +25,7 @@ export const getForestEnemies = (playerPowerLevel: number = 1): Enemy[] => [
   },
   {
     name: 'Bandit',
-    image: 'bandit.png',
+    image: '/bandit.png',
     ki: 10,
     maxKi: 10,
     zeniReward: 25,
@@ -33,7 +33,7 @@ export const getForestEnemies = (playerPowerLevel: number = 1): Enemy[] => [
   },
   {
     name: 'Bear',
-    image: 'bear-dbz.png',
+    image: '/bear-dbz.png',
     ki: 0,
     maxKi: 0,
     zeniReward: 50,
@@ -44,7 +44,7 @@ export const getForestEnemies = (playerPowerLevel: number = 1): Enemy[] => [
 export const getDesertEnemies = (playerPowerLevel: number = 1): Enemy[] => [
   {
     name: 'Yamcha',
-    image: 'yamcha.png',
+    image: '/yamcha.png',
     ki: 100,
     maxKi: 100,
     zeniReward: 200,
@@ -52,7 +52,7 @@ export const getDesertEnemies = (playerPowerLevel: number = 1): Enemy[] => [
   },
   {
     name: 'T-Rex',
-    image: 't-rex.png',
+    image: '/t-rex.png',
     ki: 0,
     maxKi: 0,
     zeniReward: 500,
@@ -60,7 +60,7 @@ export const getDesertEnemies = (playerPowerLevel: number = 1): Enemy[] => [
   },
   {
     name: 'Pterodactyl',
-    image: 'pterodactyl.png',
+    image: '/pterodactyl.png',
     ki: 0,
     maxKi: 0,
     zeniReward: 300,
@@ -71,7 +71,7 @@ export const getDesertEnemies = (playerPowerLevel: number = 1): Enemy[] => [
 export const getWastelandEnemies = (playerPowerLevel: number = 1): Enemy[] => [
   {
     name: 'Saibaman',
-    image: 'saibaman.png',
+    image: '/saibaman.png',
     ki: 500,
     maxKi: 500,
     zeniReward: 1000,

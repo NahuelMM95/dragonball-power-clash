@@ -14,7 +14,7 @@ const BattleResult = ({ enemy, won, onContinue }: BattleResultProps) => {
       <div className="bg-gray-100 p-4 rounded-full mb-4 w-24 h-24 flex items-center justify-center overflow-hidden">
         {enemy ? (
           <img 
-            src={`/${enemy.image}`} 
+            src={enemy.image} 
             alt={enemy.name} 
             className="object-contain max-w-full max-h-full"
             onError={(e) => {
