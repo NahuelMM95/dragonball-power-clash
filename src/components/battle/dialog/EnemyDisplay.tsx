@@ -3,6 +3,7 @@ import { Enemy } from '@/types/game';
 import { Progress } from "@/components/ui/progress";
 import { Image } from "lucide-react";
 import { useState } from 'react';
+import { PLACEHOLDER_IMAGE } from '@/data/assets';
 
 type EnemyDisplayProps = {
   enemy: Enemy;
@@ -20,9 +21,14 @@ const EnemyDisplay = ({ enemy }: EnemyDisplayProps) => {
             src={enemy.image} 
             alt={enemy.name} 
             className="object-contain max-w-full max-h-full"
-            onError={() => {
+            onError={(e) => {
               console.log(`Failed to load enemy image: ${enemy.image}`);
-              setImageError(true);
+              const target = e.target as HTMLImageElement;
+              target.onerror = null; // Prevent infinite loop
+              target.src = PLACEHOLDER_IMAGE;
+              if (target.src === PLACEHOLDER_IMAGE) {
+                setImageError(true);
+              }
             }}
           />
         ) : (
