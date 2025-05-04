@@ -1,7 +1,7 @@
 
 import { Enemy } from '@/types/game';
 import { Progress } from "@/components/ui/progress";
-import { ImageOff } from "lucide-react";
+import { Image } from "lucide-react";
 import { PLACEHOLDER_IMAGE } from "@/data/assets";
 import { useState } from 'react';
 
@@ -32,7 +32,7 @@ const EnemyDisplay = ({ enemy }: EnemyDisplayProps) => {
           />
         ) : (
           <div className="flex flex-col items-center justify-center text-gray-400">
-            <ImageOff size={32} />
+            <Image size={32} />
             <span className="text-xs mt-1">{enemy.name}</span>
           </div>
         )}

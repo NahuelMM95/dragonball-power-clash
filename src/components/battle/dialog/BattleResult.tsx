@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Enemy } from "@/types/game";
-import { ImageOff } from "lucide-react";
+import { Image } from "lucide-react";
 import { PLACEHOLDER_IMAGE } from "@/data/assets";
 import { useState } from "react";
 
@@ -33,7 +33,7 @@ const BattleResult = ({ enemy, won, onContinue }: BattleResultProps) => {
           />
         ) : enemy && imageError ? (
           <div className="flex flex-col items-center justify-center text-gray-400">
-            <ImageOff size={24} />
+            <Image size={24} />
           </div>
         ) : (
           <span className="text-3xl">❓</span>
