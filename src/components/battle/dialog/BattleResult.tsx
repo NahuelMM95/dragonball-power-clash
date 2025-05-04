@@ -2,7 +2,6 @@
 import { Button } from "@/components/ui/button";
 import { Enemy } from "@/types/game";
 import { Image } from "lucide-react";
-import { PLACEHOLDER_IMAGE } from "@/data/assets";
 import { useState } from "react";
 
 type BattleResultProps = {
@@ -22,12 +21,8 @@ const BattleResult = ({ enemy, won, onContinue }: BattleResultProps) => {
             src={enemy.image} 
             alt={enemy.name} 
             className="object-contain max-w-full max-h-full"
-            onError={(e) => {
-              // Fallback if image fails to load
-              const target = e.target as HTMLImageElement;
-              target.onerror = null; // Prevent infinite error loop
-              console.log(`Failed to load image: ${enemy.image}`);
-              target.src = PLACEHOLDER_IMAGE;
+            onError={() => {
+              console.log(`Failed to load enemy image in result: ${enemy.image}`);
               setImageError(true);
             }}
           />
