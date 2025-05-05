@@ -2,17 +2,17 @@
 // Central location for all game assets
 export const ENEMY_IMAGES = {
   // Forest enemies
-  WOLF: 'https://images.unsplash.com/photo-1493962853295-0fd70327578a?auto=format&fit=crop&w=200&h=200', // Wolf fallback
-  BANDIT: 'https://images.unsplash.com/photo-1493962853295-0fd70327578a?auto=format&fit=crop&w=200&h=200', // Bandit fallback
-  BEAR: 'https://images.unsplash.com/photo-1493962853295-0fd70327578a?auto=format&fit=crop&w=200&h=200', // Bear fallback
+  WOLF: '/wolf.png', // Wolf image
+  BANDIT: '/bandit.png', // Bandit image
+  BEAR: '/bear.png', // Bear image
   
   // Desert enemies
-  YAMCHA: 'https://images.unsplash.com/photo-1493962853295-0fd70327578a?auto=format&fit=crop&w=200&h=200', // Yamcha fallback
-  T_REX: 'https://images.unsplash.com/photo-1493962853295-0fd70327578a?auto=format&fit=crop&w=200&h=200', // T-Rex fallback
-  PTERODACTYL: 'https://images.unsplash.com/photo-1493962853295-0fd70327578a?auto=format&fit=crop&w=200&h=200', // Pterodactyl fallback
+  YAMCHA: '/yamcha.png', // Yamcha image
+  T_REX: '/t-rex.png', // T-Rex image
+  PTERODACTYL: '/pterodactyl.png', // Pterodactyl image
   
   // Wasteland enemies
-  SAIBAMAN: 'https://images.unsplash.com/photo-1493962853295-0fd70327578a?auto=format&fit=crop&w=200&h=200', // Saibaman fallback
+  SAIBAMAN: '/saibaman.png', // Saibaman image
   
   // Story enemies
   RADITZ: 'https://images.unsplash.com/photo-1493962853295-0fd70327578a?auto=format&fit=crop&w=200&h=200',
