@@ -30,6 +30,16 @@ const ZoneCard = ({
       bg: "bg-forestGreen", 
       hover: "hover:bg-forestGreen/80"
     },
+    dbRed: { 
+      border: "border-dragonOrange", 
+      bg: "bg-dragonOrange", 
+      hover: "hover:bg-dragonOrange/80" 
+    },
+    crystalBlue: { 
+      border: "border-blue-500", 
+      bg: "bg-blue-500", 
+      hover: "hover:bg-blue-600" 
+    },
     // Add other colors as needed
     desert: {
       border: "border-dragonOrange",

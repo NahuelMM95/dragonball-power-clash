@@ -31,7 +31,7 @@ export const BattleProvider: React.FC<BattleProviderProps> = ({
 }) => {
   // Use our custom hooks
   const { skills, purchaseSkill, setSkills } = useSkillManagement();
-  const { forest, desert, wasteland, getFightEnemy } = useBattleZones();
+  const { forest, desert, wasteland, crystalCave, getFightEnemy } = useBattleZones();
   const { 
     battleState, 
     setBattleState, 
@@ -119,6 +119,7 @@ export const BattleProvider: React.FC<BattleProviderProps> = ({
       useItemInBattle: handleUseItemInBattle,
       forest,
       desert,
+      crystalCave,
       wasteland,
       resetSkills
     }}>

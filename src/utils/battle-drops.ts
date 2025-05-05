@@ -1,4 +1,3 @@
-
 import { Enemy, Item } from '../types/game';
 import { toast } from "sonner";
 
@@ -229,6 +228,215 @@ export const handleEnemyDrops = (
       setTimeout(() => {
         toast.success(`You found a Stolen Pouch!`, {
           description: "You gained an additional 50 Zeni."
+        });
+      }, 1000);
+    }
+  }
+  
+  if (enemy.name === 'Snake') {
+    // 30% chance to drop Snake Venom
+    if (Math.random() < 0.3) {
+      const snakeVenom: Item = {
+        id: `snake-venom-${Date.now()}`,
+        name: "Snake Venom",
+        description: "Can be applied to weapons for extra damage.",
+        type: 'consumable',
+        quantity: 1,
+        effect: {
+          type: 'temp_damage_boost',
+          value: 0.2,
+          duration: 12
+        },
+        usableInBattle: true
+      };
+      
+      setInventory(prevInventory => {
+        const existingItemIndex = prevInventory.findIndex(
+          item => item.name === snakeVenom.name && item.type === snakeVenom.type
+        );
+        
+        if (existingItemIndex >= 0) {
+          const updatedInventory = [...prevInventory];
+          updatedInventory[existingItemIndex] = {
+            ...updatedInventory[existingItemIndex],
+            quantity: updatedInventory[existingItemIndex].quantity + 1
+          };
+          return updatedInventory;
+        } else {
+          return [...prevInventory, snakeVenom];
+        }
+      });
+      
+      setTimeout(() => {
+        toast.success(`You found Snake Venom!`, {
+          description: "Use it in battle to increase damage by 20% for 12 seconds."
+        });
+      }, 1000);
+    }
+  }
+  
+  if (enemy.name === 'Desert Bandit') {
+    // 40% chance to drop Desert Scarf
+    if (Math.random() < 0.4) {
+      const desertScarf: Item = {
+        id: `desert-scarf-${Date.now()}`,
+        name: "Desert Scarf",
+        description: "A protective scarf that reduces heat and damage.",
+        type: 'consumable',
+        quantity: 1,
+        effect: {
+          type: 'temp_defense_boost',
+          value: 0.15,
+          duration: 15
+        },
+        usableInBattle: true
+      };
+      
+      setInventory(prevInventory => {
+        const existingItemIndex = prevInventory.findIndex(
+          item => item.name === desertScarf.name && item.type === desertScarf.type
+        );
+        
+        if (existingItemIndex >= 0) {
+          const updatedInventory = [...prevInventory];
+          updatedInventory[existingItemIndex] = {
+            ...updatedInventory[existingItemIndex],
+            quantity: updatedInventory[existingItemIndex].quantity + 1
+          };
+          return updatedInventory;
+        } else {
+          return [...prevInventory, desertScarf];
+        }
+      });
+      
+      setTimeout(() => {
+        toast.success(`You found a Desert Scarf!`, {
+          description: "Use it in battle to reduce incoming damage by 15% for 15 seconds."
+        });
+      }, 1000);
+    }
+  }
+  
+  if (enemy.name === 'Scorpion') {
+    // 35% chance to drop Scorpion Sting
+    if (Math.random() < 0.35) {
+      const scorpionSting: Item = {
+        id: `scorpion-sting-${Date.now()}`,
+        name: "Scorpion Sting",
+        description: "Can be used to poison enemies for extra damage over time.",
+        type: 'consumable',
+        quantity: 1,
+        effect: {
+          type: 'damage_over_time',
+          value: 5,
+          duration: 10
+        },
+        usableInBattle: true
+      };
+      
+      setInventory(prevInventory => {
+        const existingItemIndex = prevInventory.findIndex(
+          item => item.name === scorpionSting.name && item.type === scorpionSting.type
+        );
+        
+        if (existingItemIndex >= 0) {
+          const updatedInventory = [...prevInventory];
+          updatedInventory[existingItemIndex] = {
+            ...updatedInventory[existingItemIndex],
+            quantity: updatedInventory[existingItemIndex].quantity + 1
+          };
+          return updatedInventory;
+        } else {
+          return [...prevInventory, scorpionSting];
+        }
+      });
+      
+      setTimeout(() => {
+        toast.success(`You found a Scorpion Sting!`, {
+          description: "Use it in battle to deal 5 damage per second for 10 seconds."
+        });
+      }, 1000);
+    }
+  }
+  
+  if (enemy.name === 'Crystal Monster') {
+    // 25% chance to drop Crystal Shard
+    if (Math.random() < 0.25) {
+      const crystalShard: Item = {
+        id: `crystal-shard-${Date.now()}`,
+        name: "Crystal Shard",
+        description: "A powerful crystal fragment that temporarily boosts your power level.",
+        type: 'consumable',
+        quantity: 1,
+        effect: {
+          type: 'temp_power_boost',
+          value: 15,
+          duration: 20
+        },
+        usableInBattle: true
+      };
+      
+      setInventory(prevInventory => {
+        const existingItemIndex = prevInventory.findIndex(
+          item => item.name === crystalShard.name && item.type === crystalShard.type
+        );
+        
+        if (existingItemIndex >= 0) {
+          const updatedInventory = [...prevInventory];
+          updatedInventory[existingItemIndex] = {
+            ...updatedInventory[existingItemIndex],
+            quantity: updatedInventory[existingItemIndex].quantity + 1
+          };
+          return updatedInventory;
+        } else {
+          return [...prevInventory, crystalShard];
+        }
+      });
+      
+      setTimeout(() => {
+        toast.success(`You found a Crystal Shard!`, {
+          description: "Use it in battle to temporarily increase your power level by 15 for 20 seconds."
+        });
+      }, 1000);
+    }
+  }
+  
+  if (enemy.name === 'Malfunctioning Robot') {
+    // 15% chance to drop Robot Parts
+    if (Math.random() < 0.15) {
+      const robotParts: Item = {
+        id: `robot-parts-${Date.now()}`,
+        name: "Robot Parts",
+        description: "Advanced technology that can be used to craft powerful items.",
+        type: 'weapon',
+        slot: 'weapon',
+        quantity: 1,
+        effect: {
+          type: 'damage_multiplier',
+          value: 1.4
+        }
+      };
+      
+      setInventory(prevInventory => {
+        const existingItemIndex = prevInventory.findIndex(
+          item => item.name === robotParts.name && item.type === robotParts.type
+        );
+        
+        if (existingItemIndex >= 0) {
+          const updatedInventory = [...prevInventory];
+          updatedInventory[existingItemIndex] = {
+            ...updatedInventory[existingItemIndex],
+            quantity: updatedInventory[existingItemIndex].quantity + 1
+          };
+          return updatedInventory;
+        } else {
+          return [...prevInventory, robotParts];
+        }
+      });
+      
+      setTimeout(() => {
+        toast.success(`You found Robot Parts!`, {
+          description: "Can be equipped as a weapon, increasing damage by 40%."
         });
       }, 1000);
     }

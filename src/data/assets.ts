@@ -2,25 +2,32 @@
 // Central location for all game assets
 export const ENEMY_IMAGES = {
   // Forest enemies
-  WOLF: '/wolf.png', // Wolf image
-  BANDIT: '/bandit.png', // Bandit image
-  BEAR: '/bear.png', // Bear image
+  WOLF: 'wolf',
+  BANDIT: 'bandit',
+  BEAR: 'bear',
+  SNAKE: 'snake',
   
   // Desert enemies
-  YAMCHA: '/yamcha.png', // Yamcha image
-  T_REX: '/t-rex.png', // T-Rex image
-  PTERODACTYL: '/pterodactyl.png', // Pterodactyl image
+  YAMCHA: 'yamcha',
+  T_REX: 't-rex',
+  PTERODACTYL: 'pterodactyl',
+  DESERT_BANDIT: 'desert',
+  SCORPION: 'scorpion',
+  
+  // Crystal Cave enemies
+  CRYSTAL_MONSTER: 'crystal',
+  ROBOT: 'robot',
   
   // Wasteland enemies
-  SAIBAMAN: '/saibaman.png', // Saibaman image
+  SAIBAMAN: 'saibaman',
   
   // Story enemies
-  RADITZ: 'https://images.unsplash.com/photo-1493962853295-0fd70327578a?auto=format&fit=crop&w=200&h=200',
-  NAPPA: 'https://images.unsplash.com/photo-1493962853295-0fd70327578a?auto=format&fit=crop&w=200&h=200',
-  VEGETA: 'https://images.unsplash.com/photo-1493962853295-0fd70327578a?auto=format&fit=crop&w=200&h=200',
-  VEGETA_OZARU: 'https://images.unsplash.com/photo-1493962853295-0fd70327578a?auto=format&fit=crop&w=200&h=200',
-  VEGETA_INJURED: 'https://images.unsplash.com/photo-1493962853295-0fd70327578a?auto=format&fit=crop&w=200&h=200'
+  RADITZ: 'raditz',
+  NAPPA: 'nappa',
+  VEGETA: 'vegeta',
+  VEGETA_OZARU: 'vegeta-ozaru',
+  VEGETA_INJURED: 'vegeta-injured'
 };
 
-// Default placeholder using a generic silhouette image from Unsplash
-export const PLACEHOLDER_IMAGE = 'https://images.unsplash.com/photo-1493962853295-0fd70327578a?auto=format&fit=crop&w=200&h=200';
+// Default placeholder using a generic silhouette image
+export const PLACEHOLDER_IMAGE = 'monster';

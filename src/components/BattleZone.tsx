@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useGame } from '@/contexts/GameContext';
 import { useBattle } from '@/contexts/BattleContext';
@@ -7,6 +8,7 @@ import ForestZone from './battle/ForestZone';
 import DesertZone from './battle/DesertZone';
 import BattleDialogContent from './battle/BattleDialogContent';
 import WastelandZone from './battle/WastelandZone';
+import CrystalCaveZone from './battle/CrystalCaveZone';
 
 const BattleZone = () => {
   const { powerLevel } = useGame();
@@ -25,9 +27,10 @@ const BattleZone = () => {
       <h2 className="text-xl font-bold text-forestGreen mb-4">Battle Zone</h2>
       
       <Tabs value={activeZone} onValueChange={setActiveZone} className="w-full">
-        <TabsList className="grid grid-cols-3 mb-4">
+        <TabsList className="grid grid-cols-4 mb-4">
           <TabsTrigger value="forest">Forest</TabsTrigger>
           <TabsTrigger value="desert">Desert</TabsTrigger>
+          <TabsTrigger value="crystal-cave">Crystal Cave</TabsTrigger>
           <TabsTrigger value="wasteland">Wasteland</TabsTrigger>
         </TabsList>
         
@@ -37,6 +40,10 @@ const BattleZone = () => {
         
         <TabsContent value="desert">
           <DesertZone />
+        </TabsContent>
+        
+        <TabsContent value="crystal-cave">
+          <CrystalCaveZone />
         </TabsContent>
 
         <TabsContent value="wasteland">

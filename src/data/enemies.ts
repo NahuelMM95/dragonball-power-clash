@@ -1,3 +1,4 @@
+
 import { Enemy } from '../types/game';
 import { ENEMY_IMAGES } from './assets';
 
@@ -38,6 +39,14 @@ export const getForestEnemies = (playerPowerLevel: number = 1): Enemy[] => [
     maxKi: 0,
     zeniReward: 50,
     ...calculateEnemyStats(20, playerPowerLevel)
+  },
+  {
+    name: 'Snake',
+    image: ENEMY_IMAGES.SNAKE,
+    ki: 0,
+    maxKi: 0,
+    zeniReward: 5,
+    ...calculateEnemyStats(3, playerPowerLevel)
   }
 ];
 
@@ -65,6 +74,41 @@ export const getDesertEnemies = (playerPowerLevel: number = 1): Enemy[] => [
     maxKi: 0,
     zeniReward: 300,
     ...calculateEnemyStats(150, playerPowerLevel)
+  },
+  {
+    name: 'Desert Bandit',
+    image: ENEMY_IMAGES.DESERT_BANDIT,
+    ki: 20,
+    maxKi: 20,
+    zeniReward: 100,
+    ...calculateEnemyStats(15, playerPowerLevel)
+  },
+  {
+    name: 'Scorpion',
+    image: ENEMY_IMAGES.SCORPION,
+    ki: 0,
+    maxKi: 0,
+    zeniReward: 75,
+    ...calculateEnemyStats(10, playerPowerLevel)
+  }
+];
+
+export const getCrystalCaveEnemies = (playerPowerLevel: number = 1): Enemy[] => [
+  {
+    name: 'Crystal Monster',
+    image: ENEMY_IMAGES.CRYSTAL_MONSTER,
+    ki: 100,
+    maxKi: 100,
+    zeniReward: 800,
+    ...calculateEnemyStats(70, playerPowerLevel)
+  },
+  {
+    name: 'Malfunctioning Robot',
+    image: ENEMY_IMAGES.ROBOT,
+    ki: 200,
+    maxKi: 200,
+    zeniReward: 1200,
+    ...calculateEnemyStats(120, playerPowerLevel)
   }
 ];
 
@@ -82,4 +126,5 @@ export const getWastelandEnemies = (playerPowerLevel: number = 1): Enemy[] => [
 // Export static versions for reference
 export const forestEnemies = getForestEnemies();
 export const desertEnemies = getDesertEnemies();
+export const crystalCaveEnemies = getCrystalCaveEnemies();
 export const wastelandEnemies = getWastelandEnemies();
