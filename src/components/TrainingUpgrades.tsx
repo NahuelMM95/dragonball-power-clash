@@ -1,3 +1,4 @@
+
 import { useGame } from '@/contexts/GameContext';
 import { useUpgrades } from '@/contexts/UpgradeContext';
 import { useBattle } from '@/contexts/BattleContext';
@@ -19,7 +20,7 @@ const TrainingUpgrades = () => {
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold text-dbBlue">Shop</h2>
         <Badge variant="outline" className="text-amber-600 border-amber-600">
-          <span className="text-yellow-500 font-bold">₽</span> {zeni} Zeni
+          <span className="text-yellow-500 font-bold">₽</span> {zeni.toLocaleString('en')} Zeni
         </Badge>
       </div>
       
@@ -53,10 +54,16 @@ const TrainingUpgrades = () => {
                   {!upgrade.itemType ? (
                     <p className="text-sm"><span className="font-semibold text-dbBlue">+{upgrade.powerBonus}</span> Power Level gain</p>
                   ) : (
-                    <p className="text-sm"><span className="font-semibold text-dbBlue">+15%</span> Power Level gain when equipped</p>
+                    <p className="text-sm"><span className="font-semibold text-dbBlue">+15%</span> Power Level gain chance</p>
                   )}
                   {!upgrade.purchased && (
-                    <p className="text-sm">Cost: <span className="font-semibold text-dbRed">{upgrade.cost}</span> Power Levels</p>
+                    <p className="text-sm">Cost: {" "}
+                      {upgrade.costType === 'zeni' ? (
+                        <span className="font-semibold text-yellow-600">{upgrade.cost.toLocaleString('en')} Zeni</span>
+                      ) : (
+                        <span className="font-semibold text-dbRed">{upgrade.cost.toLocaleString('en')} Power Levels</span>
+                      )}
+                    </p>
                   )}
                 </CardContent>
                 <CardFooter className="pt-0">
@@ -64,7 +71,8 @@ const TrainingUpgrades = () => {
                     <Button 
                       variant="default" 
                       className="w-full bg-dbBlue hover:bg-dbBlue/80"
-                      disabled={powerLevel < upgrade.cost}
+                      disabled={(upgrade.costType === 'zeni' && zeni < upgrade.cost) || 
+                               (upgrade.costType !== 'zeni' && powerLevel < upgrade.cost)}
                       onClick={() => purchaseUpgrade(upgrade.id)}
                     >
                       Purchase
@@ -125,7 +133,7 @@ const TrainingUpgrades = () => {
                     <span>Ki Cost: <span className="font-semibold text-blue-600">{skill.kiCost}</span></span>
                   </div>
                   {!skill.purchased && (
-                    <p className="text-sm mt-2">Cost: <span className="font-semibold text-yellow-600">{skill.cost} Zeni</span></p>
+                    <p className="text-sm mt-2">Cost: <span className="font-semibold text-yellow-600">{(skill.cost || 0).toLocaleString('en')} Zeni</span></p>
                   )}
                 </CardContent>
                 <CardFooter className="pt-0">

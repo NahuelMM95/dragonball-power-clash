@@ -1,3 +1,4 @@
+
 export type Enemy = {
   name: string;
   power: number;
@@ -54,6 +55,10 @@ export type Skill = {
   description: string;
   purchased?: boolean;
   cost?: number;
+  specialEffect?: {
+    type: string;
+    value: number;
+  };
 };
 
 export type Upgrade = {
@@ -64,6 +69,7 @@ export type Upgrade = {
   cost: number;
   purchased: boolean;
   itemType?: string;
+  costType?: 'zeni' | 'power';
 };
 
 export type ActiveBuff = {

@@ -17,6 +17,8 @@ interface UpgradeProviderProps {
   setInventory: React.Dispatch<React.SetStateAction<any[]>>;
   clicks: number;
   originalIncreaseClicks: () => void;
+  zeni: number;
+  setZeni: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export const UpgradeProvider: React.FC<UpgradeProviderProps> = ({ 
@@ -25,7 +27,9 @@ export const UpgradeProvider: React.FC<UpgradeProviderProps> = ({
   setPowerLevel, 
   setInventory,
   clicks,
-  originalIncreaseClicks
+  originalIncreaseClicks,
+  zeni,
+  setZeni
 }) => {
   const [upgrades, setUpgrades] = useLocalStorage<Upgrade[]>('dbUpgrades', initialUpgrades);
   const [equippedUpgrade, setEquippedUpgrade] = useLocalStorage<string | null>('dbEquippedUpgrade', null);
@@ -33,9 +37,23 @@ export const UpgradeProvider: React.FC<UpgradeProviderProps> = ({
   // Apply power bonus when clicks are a multiple of 100, but with only a 20% chance
   useEffect(() => {
     if (clicks % 100 === 0 && clicks > 0) {
-      // 20% chance of getting a power level
+      // Base chance of 20%
+      let baseChance = 0.2;
+      
+      // Check if weighted clothes are equipped
+      const equippedItems = JSON.parse(localStorage.getItem('dbEquippedItems') || '[]');
+      const hasWeightedClothes = equippedItems.some(
+        (item: any) => item.effect?.type === 'power_gain_chance_increase'
+      );
+      
+      // Increase chance if weighted clothes are equipped
+      if (hasWeightedClothes) {
+        baseChance += 0.15; // Add 15% chance
+      }
+      
+      // Roll the dice
       const randomChance = Math.random();
-      if (randomChance <= 0.2) {
+      if (randomChance <= baseChance) {
         // Calculate bonus based on equipped upgrade
         let bonus = 1; // Base increase
         
@@ -48,8 +66,10 @@ export const UpgradeProvider: React.FC<UpgradeProviderProps> = ({
         }
         
         setPowerLevel(prev => prev + bonus);
-        toast.success(`You gained ${bonus} Power Level!`, {
-          description: "You got lucky with your training (20% chance)",
+        toast.success(`You gained ${bonus.toLocaleString('en')} Power Level!`, {
+          description: hasWeightedClothes 
+            ? "Your weighted clothes increased your chance (35% chance)"
+            : "You got lucky with your training (20% chance)",
         });
       }
     }
@@ -57,23 +77,27 @@ export const UpgradeProvider: React.FC<UpgradeProviderProps> = ({
 
   const purchaseUpgrade = (id: string) => {
     const upgrade = upgrades.find(u => u.id === id);
-    if (!upgrade || upgrade.purchased || powerLevel < upgrade.cost) return;
+    if (!upgrade || upgrade.purchased) return;
 
     if (upgrade.id === 'weights') {
+      if (zeni < upgrade.cost) return;
+
       const weights = {
         id: `weights-${Date.now()}`,
         name: "Training Weights",
-        description: "Increases power gain by 15% when equipped",
+        description: "Increases chance of power gain by 15% per 100 clicks",
         type: 'weight',
         slot: 'weight',
+        quantity: 1,
         effect: {
-          type: 'power_gain_percent',
+          type: 'power_gain_chance_increase',
           value: 0.15
         }
       };
       
-      setPowerLevel(powerLevel - upgrade.cost);
+      setZeni(zeni - upgrade.cost);
       setInventory(prev => [...prev, weights]);
+      setUpgrades(upgrades.map(u => (u.id === id ? { ...u, purchased: true } : u)));
       
       toast(`You've purchased ${upgrade.name}!`, {
         description: "Check your inventory to equip it.",
@@ -82,6 +106,8 @@ export const UpgradeProvider: React.FC<UpgradeProviderProps> = ({
       return;
     }
 
+    // Handle power level cost for other upgrades
+    if (powerLevel < upgrade.cost) return;
     setPowerLevel(powerLevel - upgrade.cost);
     setUpgrades(upgrades.map(u => (u.id === id ? { ...u, purchased: true } : u)));
     

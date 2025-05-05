@@ -21,7 +21,7 @@ export const enemyAttack = (
     setBattleState(prev => ({
       ...prev,
       playerStats: newPlayerStats,
-      log: [...prev.log, `${prev.enemy?.name} attacks for ${damage} damage!`, 'You were defeated!'],
+      log: [...prev.log, `${prev.enemy?.name} attacks for ${damage.toLocaleString('en')} damage!`, 'You were defeated!'],
       inProgress: false
     }));
     
@@ -32,7 +32,7 @@ export const enemyAttack = (
   setBattleState(prev => ({
     ...prev,
     playerStats: newPlayerStats,
-    log: [...prev.log, `${prev.enemy?.name} attacks for ${damage} damage!`],
+    log: [...prev.log, `${prev.enemy?.name} attacks for ${damage.toLocaleString('en')} damage!`],
     playerTurn: true
   }));
 };
@@ -60,7 +60,7 @@ export const handlePlayerPowerLoss = (
     const powerLoss = Math.ceil((percentage / 100) * powerLevel);
     setPowerLevel(prev => Math.max(0, prev - powerLoss));
     
-    toast.error(`Lost ${powerLoss} Power Levels!`, {
+    toast.error(`Lost ${powerLoss.toLocaleString('en')} Power Levels!`, {
       description: `You lost ${percentage.toFixed(1)}% of your power from the defeat.`,
       duration: 3000
     });
@@ -81,7 +81,7 @@ export const handleEnemyPowerDrop = (
     
     setPowerLevel(prev => prev + powerGain);
     
-    toast.success(`Absorbed ${powerGain} Power Levels!`, {
+    toast.success(`Absorbed ${powerGain.toLocaleString('en')} Power Levels!`, {
       description: `You absorbed ${percentage.toFixed(1)}% of ${enemy.name}'s power.`,
       duration: 3000
     });

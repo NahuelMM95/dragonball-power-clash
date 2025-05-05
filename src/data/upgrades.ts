@@ -1,3 +1,4 @@
+
 import { Upgrade } from '../types/game';
 
 export const initialUpgrades: Upgrade[] = [
@@ -28,10 +29,11 @@ export const initialUpgrades: Upgrade[] = [
   { 
     id: 'weights', 
     name: '5Kg Weighted Clothes', 
-    description: 'Train with weighted clothing to increase power gain by 15%.', 
+    description: 'Increases chance of power gain every 100 clicks by 15%.', 
     powerBonus: 0, 
-    cost: 75, 
+    cost: 2000, // Now costs Zeni instead of Power Levels
     purchased: false,
-    itemType: 'weight'
+    itemType: 'weight',
+    costType: 'zeni'
   },
 ];

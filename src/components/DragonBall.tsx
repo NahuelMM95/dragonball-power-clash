@@ -25,7 +25,7 @@ const DragonBall = () => {
           </div>
         </div>
       </div>
-      <p className="text-lg font-semibold">Clicks: {clicks}</p>
+      <p className="text-lg font-semibold">Clicks: {clicks.toLocaleString('en')}</p>
       <p className="text-sm text-gray-600">Every 100 clicks = 20% chance of +1 Power Level</p>
     </div>
   );

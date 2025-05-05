@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { BattleProvider, useBattle } from './BattleContext';
@@ -87,10 +86,6 @@ export const GameContextWrapper: React.FC<{ children: React.ReactNode }> = ({ ch
     zeni,
     increaseClicks: () => {
       originalIncreaseClicks();
-      
-      // Calculate power gain based on equipped upgrade from UpgradeContext
-      // We'll handle this from the UpgradeProvider since it has access to the
-      // equipped upgrade and upgrade details
     },
     resetProgress: () => {
       // Keep the original implementation
@@ -110,6 +105,8 @@ export const GameContextWrapper: React.FC<{ children: React.ReactNode }> = ({ ch
         setInventory={setInventory}
         clicks={clicks}
         originalIncreaseClicks={originalIncreaseClicks}
+        zeni={zeni}
+        setZeni={setZeni}
       >
         <BattleProvider
           powerLevel={powerLevel}

@@ -19,7 +19,25 @@ export const useSkillInBattle = (
     return;
   }
   
-  const damage = Math.floor(battleState.playerStats.damage * skill.damageMultiplier);
+  let damage = Math.floor(battleState.playerStats.damage * skill.damageMultiplier);
+  
+  // Apply special effects like Kaioken's HP drain
+  let newPlayerStats = {
+    ...battleState.playerStats,
+    ki: battleState.playerStats.ki - skill.kiCost
+  };
+  
+  // Handle Kaioken HP drain
+  if (skill.name === "Kaioken x2" && skill.specialEffect) {
+    const hpDrain = Math.ceil(battleState.playerStats.maxHp * skill.specialEffect.value);
+    newPlayerStats.hp = Math.max(1, newPlayerStats.hp - hpDrain); // Ensure player doesn't die from drain
+    
+    // Add HP drain to battle log
+    setBattleState(prev => ({
+      ...prev,
+      log: [...prev.log, `Kaioken drains ${hpDrain.toLocaleString('en')} HP!`]
+    }));
+  }
   
   const newEnemyHp = Math.max(0, battleState.enemy.hp - damage);
   const newEnemy = {
@@ -27,17 +45,12 @@ export const useSkillInBattle = (
     hp: newEnemyHp
   };
   
-  const newPlayerStats = {
-    ...battleState.playerStats,
-    ki: battleState.playerStats.ki - skill.kiCost
-  };
-  
   if (newEnemyHp <= 0) {
     setBattleState(prev => ({
       ...prev,
       enemy: newEnemy,
       playerStats: newPlayerStats,
-      log: [...prev.log, `You use ${skill.name} for ${damage} damage!`, `${prev.enemy?.name} was defeated!`],
+      log: [...prev.log, `You use ${skill.name} for ${damage.toLocaleString('en')} damage!`, `${prev.enemy?.name} was defeated!`],
       inProgress: false
     }));
     
@@ -49,7 +62,7 @@ export const useSkillInBattle = (
     ...prev,
     enemy: newEnemy,
     playerStats: newPlayerStats,
-    log: [...prev.log, `You use ${skill.name} for ${damage} damage!`],
+    log: [...prev.log, `You use ${skill.name} for ${damage.toLocaleString('en')} damage!`],
     playerTurn: false
   }));
   
