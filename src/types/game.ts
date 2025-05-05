@@ -121,4 +121,5 @@ export type GameContextType = {
   resetProgress: () => void;
   setPowerLevel: React.Dispatch<React.SetStateAction<number>>;
   setZeni: React.Dispatch<React.SetStateAction<number>>;
+  gameOver?: boolean;
 };

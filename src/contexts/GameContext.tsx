@@ -1,15 +1,17 @@
+
 import React, { createContext, useContext } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { BattleProvider, useBattle } from './BattleContext';
 import { ItemProvider, useItems } from './ItemContext'; 
 import { UpgradeProvider, useUpgrades } from './UpgradeContext';
 import { GameContextType } from '@/types/game';
+import { toast } from 'sonner';
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
 
 const initialState = {
   clicks: 0,
-  powerLevel: 1,
+  powerLevel: 5, // Changed starting power level from 1 to 5
   zeni: 0
 };
 
@@ -19,6 +21,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [zeni, setZeni] = useLocalStorage('dbZeni', initialState.zeni);
   const [inventory, setInventory] = useLocalStorage('dbInventory', []);
   const [equippedItems, setEquippedItems] = useLocalStorage('dbEquippedItems', []);
+  const [gameOver, setGameOver] = useLocalStorage('dbGameOver', false);
 
   const increaseClicks = () => {
     const newClicks = clicks + 1;
@@ -32,6 +35,29 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setClicks(initialState.clicks);
     setPowerLevel(initialState.powerLevel);
     setZeni(initialState.zeni);
+    setGameOver(false); // Reset game over state
+  };
+
+  // Check for game over condition when powerLevel is updated
+  const handleSetPowerLevel = (newPowerLevelOrFunction: number | ((prev: number) => number)) => {
+    setPowerLevel((prevPower) => {
+      // Handle both direct value and function updates
+      const newPowerLevel = typeof newPowerLevelOrFunction === 'function' 
+        ? newPowerLevelOrFunction(prevPower) 
+        : newPowerLevelOrFunction;
+      
+      // Check for game over
+      if (newPowerLevel <= 0 && !gameOver) {
+        setGameOver(true);
+        toast.error("GAME OVER! Your power level dropped to zero!", {
+          description: "Reset your game to start again",
+          duration: 10000
+        });
+        return 0; // Don't go below zero
+      }
+      
+      return newPowerLevel;
+    });
   };
   
   return (
@@ -41,8 +67,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       zeni,
       increaseClicks,
       resetProgress,
-      setPowerLevel,
-      setZeni
+      setPowerLevel: handleSetPowerLevel,
+      setZeni,
+      gameOver
     }}>
       {children}
     </GameContext.Provider>
@@ -50,7 +77,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 };
 
 export const GameContextWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { powerLevel, setPowerLevel, zeni, setZeni, clicks, increaseClicks: originalIncreaseClicks } = useGame();
+  const { powerLevel, setPowerLevel, zeni, setZeni, clicks, increaseClicks: originalIncreaseClicks, gameOver } = useGame();
   const [inventory, setInventory] = useLocalStorage('dbInventory', []);
   const [equippedItems, setEquippedItems] = useLocalStorage('dbEquippedItems', []);
   
@@ -71,7 +98,8 @@ export const GameContextWrapper: React.FC<{ children: React.ReactNode }> = ({ ch
       context.resetProgress();
     },
     setPowerLevel,
-    setZeni
+    setZeni,
+    gameOver
   };
   
   return (

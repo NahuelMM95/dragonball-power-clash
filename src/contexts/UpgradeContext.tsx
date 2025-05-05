@@ -30,21 +30,28 @@ export const UpgradeProvider: React.FC<UpgradeProviderProps> = ({
   const [upgrades, setUpgrades] = useLocalStorage<Upgrade[]>('dbUpgrades', initialUpgrades);
   const [equippedUpgrade, setEquippedUpgrade] = useLocalStorage<string | null>('dbEquippedUpgrade', null);
 
-  // Apply power bonus when clicks are a multiple of 100
+  // Apply power bonus when clicks are a multiple of 100, but with only a 20% chance
   useEffect(() => {
     if (clicks % 100 === 0 && clicks > 0) {
-      // Calculate bonus based on equipped upgrade
-      let bonus = 1; // Base increase
-      
-      if (equippedUpgrade) {
-        const upgrade = upgrades.find(u => u.id === equippedUpgrade);
-        if (upgrade) {
-          // Only apply the bonus, not 1 + bonus, as the base 1 is already included
-          bonus = upgrade.powerBonus;
+      // 20% chance of getting a power level
+      const randomChance = Math.random();
+      if (randomChance <= 0.2) {
+        // Calculate bonus based on equipped upgrade
+        let bonus = 1; // Base increase
+        
+        if (equippedUpgrade) {
+          const upgrade = upgrades.find(u => u.id === equippedUpgrade);
+          if (upgrade) {
+            // Only apply the bonus, not 1 + bonus, as the base 1 is already included
+            bonus = upgrade.powerBonus;
+          }
         }
+        
+        setPowerLevel(prev => prev + bonus);
+        toast.success(`You gained ${bonus} Power Level!`, {
+          description: "You got lucky with your training (20% chance)",
+        });
       }
-      
-      setPowerLevel(prev => prev + bonus);
     }
   }, [clicks, equippedUpgrade, upgrades, setPowerLevel]);
 
