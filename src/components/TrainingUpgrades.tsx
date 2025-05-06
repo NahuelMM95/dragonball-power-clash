@@ -133,7 +133,13 @@ const TrainingUpgrades = () => {
                     <span>Ki Cost: <span className="font-semibold text-blue-600">{skill.kiCost}</span></span>
                   </div>
                   {!skill.purchased && (
-                    <p className="text-sm mt-2">Cost: <span className="font-semibold text-yellow-600">{(skill.cost || 0).toLocaleString('en')} Zeni</span></p>
+                    <div className="mt-2">
+                      {skill.powerRequirement ? (
+                        <p className="text-sm">Requires: <span className="font-semibold text-dbRed">{skill.powerRequirement.toLocaleString('en')} Power Level</span></p>
+                      ) : (
+                        <p className="text-sm">Cost: <span className="font-semibold text-yellow-600">{(skill.cost || 0).toLocaleString('en')} Zeni</span></p>
+                      )}
+                    </div>
                   )}
                 </CardContent>
                 <CardFooter className="pt-0">
@@ -141,7 +147,10 @@ const TrainingUpgrades = () => {
                     <Button 
                       variant="default" 
                       className="w-full bg-purple-600 hover:bg-purple-700"
-                      disabled={zeni < (skill.cost || 0)}
+                      disabled={
+                        (skill.powerRequirement && powerLevel < skill.powerRequirement) ||
+                        (!skill.powerRequirement && skill.cost && zeni < (skill.cost || 0))
+                      }
                       onClick={() => purchaseSkill(skill.name)}
                     >
                       Learn Skill

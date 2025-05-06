@@ -22,15 +22,17 @@ export const playerSkills: Skill[] = [
   },
   {
     name: "Kaioken x2",
-    type: "ultimate",
+    type: "form",
     damageMultiplier: 2,
     kiCost: 50,
-    description: "Multiplies your damage by 2 but drains 2% HP per turn",
+    description: "A technique that doubles your power but drains 2% HP per turn",
     purchased: false,
-    cost: 4000,
+    cost: 9000,
+    powerRequirement: 9000,
     specialEffect: {
       type: "hp_drain_percent",
-      value: 0.02
+      value: 0.02,
+      multiplier: 2
     }
   }
 ];

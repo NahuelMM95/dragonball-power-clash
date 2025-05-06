@@ -31,7 +31,7 @@ export const initialUpgrades: Upgrade[] = [
     name: '5Kg Weighted Clothes', 
     description: 'Increases chance of power gain every 100 clicks by 15%.', 
     powerBonus: 0, 
-    cost: 2000, // Now costs Zeni instead of Power Levels
+    cost: 2000,
     purchased: false,
     itemType: 'weight',
     costType: 'zeni'

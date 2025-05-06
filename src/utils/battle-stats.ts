@@ -11,6 +11,8 @@ export const calculatePlayerStats = (powerLevel: number, equippedItems: Item[]):
     ki: powerLevel * 5,
     maxKi: powerLevel * 5,
     damageMultiplier: 1, // Default multiplier
+    basePowerLevel: powerLevel,
+    powerLevel: powerLevel
   };
   
   // Apply equipment bonuses

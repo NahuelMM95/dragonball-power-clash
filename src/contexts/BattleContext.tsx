@@ -9,6 +9,7 @@ import { fleeFromBattle } from '@/utils/battleFleeActions';
 import { useItemInBattle, processBattleEnd } from '@/utils/battleItemActions';
 import { enemyAttack } from '@/utils/battle';
 import { dbzEnemies } from '@/data/storyEnemies';
+import { toast } from "sonner";
 
 const BattleContext = createContext<BattleContextType | undefined>(undefined);
 
@@ -95,6 +96,36 @@ export const BattleProvider: React.FC<BattleProviderProps> = ({
     useItemInBattle(itemId, inventory, setInventoryCallback, battleState, setBattleState, endBattle);
   };
   
+  // Function to purchase a skill
+  const handlePurchaseSkill = (skillName: string) => {
+    const skill = skills.find(s => s.name === skillName);
+    
+    if (!skill || skill.purchased) return;
+    
+    // Check if this is a power level requirement skill
+    if (skill.powerRequirement) {
+      if (powerLevel >= skill.powerRequirement) {
+        purchaseSkill(skillName);
+        toast.success(`You've mastered ${skillName}!`, {
+          description: `Your power level of ${powerLevel.toLocaleString('en')} is sufficient to use this technique.`
+        });
+      } else {
+        toast.error(`Not enough power to learn ${skillName}!`, {
+          description: `You need ${skill.powerRequirement.toLocaleString('en')} Power Level (you have ${powerLevel.toLocaleString('en')}).`
+        });
+      }
+      return;
+    }
+    
+    // Regular zeni cost skill
+    if (skill.cost && setZeni) {
+      const cost = purchaseSkill(skillName);
+      if (cost) {
+        setZeni(prev => prev - cost);
+      }
+    }
+  };
+  
   // Function to reset skills to their initial state
   const resetSkills = () => {
     // Reset skills to their initial state from the playerSkills in data/skills
@@ -111,7 +142,7 @@ export const BattleProvider: React.FC<BattleProviderProps> = ({
       battleState,
       setBattleState,
       skills,
-      purchaseSkill,
+      purchaseSkill: handlePurchaseSkill,
       startBattle: initBattle,
       useSkill,
       fleeFromBattle: handleFleeFromBattle,

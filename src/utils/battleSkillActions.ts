@@ -21,15 +21,43 @@ export const useSkillInBattle = (
   
   let damage = Math.floor(battleState.playerStats.damage * skill.damageMultiplier);
   
-  // Apply special effects like Kaioken's HP drain
+  // Apply special effects like Kaioken's HP drain and stat multipliers
   let newPlayerStats = {
     ...battleState.playerStats,
     ki: battleState.playerStats.ki - skill.kiCost
   };
   
-  // Handle Kaioken HP drain
+  // Handle form transformations like Kaioken
+  if (skill.type === "form" && skill.specialEffect?.multiplier) {
+    const multiplier = skill.specialEffect.multiplier;
+    
+    // Apply the multiplier to all stats
+    newPlayerStats = {
+      ...newPlayerStats,
+      hp: Math.floor(newPlayerStats.hp * multiplier),
+      maxHp: Math.floor(newPlayerStats.maxHp * multiplier),
+      damage: Math.floor(newPlayerStats.damage * multiplier),
+      ki: Math.floor(newPlayerStats.ki * multiplier),
+      maxKi: Math.floor(newPlayerStats.maxKi * multiplier),
+      activeForm: skill.name,
+      formMultiplier: multiplier,
+      basePowerLevel: battleState.playerStats.basePowerLevel || 0,
+      powerLevel: Math.floor((battleState.playerStats.basePowerLevel || 0) * multiplier)
+    };
+    
+    // Recalculate damage with the new multiplier
+    damage = Math.floor(newPlayerStats.damage * skill.damageMultiplier);
+    
+    // Add transformation to battle log
+    setBattleState(prev => ({
+      ...prev,
+      log: [...prev.log, `You transform using ${skill.name}! Your power level is now ${newPlayerStats.powerLevel.toLocaleString('en')}!`]
+    }));
+  }
+  
+  // Handle HP drain for Kaioken
   if (skill.name === "Kaioken x2" && skill.specialEffect) {
-    const hpDrain = Math.ceil(battleState.playerStats.maxHp * skill.specialEffect.value);
+    const hpDrain = Math.ceil(newPlayerStats.maxHp * skill.specialEffect.value);
     newPlayerStats.hp = Math.max(1, newPlayerStats.hp - hpDrain); // Ensure player doesn't die from drain
     
     // Add HP drain to battle log

@@ -12,7 +12,9 @@ const initialBattleState: BattleState = {
     damage: 0,
     ki: 0,
     maxKi: 0,
-    damageMultiplier: 1
+    damageMultiplier: 1,
+    basePowerLevel: 0,
+    powerLevel: 0
   },
   enemy: null,
   log: [],

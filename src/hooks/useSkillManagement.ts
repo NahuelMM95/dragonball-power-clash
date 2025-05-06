@@ -9,7 +9,7 @@ export const useSkillManagement = () => {
   
   const purchaseSkill = (skillName: string) => {
     const skill = skills.find(s => s.name === skillName);
-    if (!skill || skill.purchased || !skill.cost) return;
+    if (!skill || skill.purchased) return;
 
     setSkills(skills.map(s => (s.name === skillName ? { ...s, purchased: true } : s)));
     
@@ -18,7 +18,7 @@ export const useSkillManagement = () => {
       duration: 3000,
     });
     
-    return skill.cost;
+    return skill.cost || 0;
   };
   
   return {

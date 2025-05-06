@@ -43,9 +43,13 @@ export type CombatStats = {
   ki: number;
   maxKi: number;
   damageMultiplier?: number;
+  basePowerLevel?: number;
+  powerLevel?: number;
+  activeForm?: string;
+  formMultiplier?: number;
 };
 
-export type SkillType = 'basic' | 'special' | 'ultimate';
+export type SkillType = 'basic' | 'special' | 'ultimate' | 'form';
 
 export type Skill = {
   name: string;
@@ -55,9 +59,11 @@ export type Skill = {
   description: string;
   purchased?: boolean;
   cost?: number;
+  powerRequirement?: number;
   specialEffect?: {
     type: string;
     value: number;
+    multiplier?: number;
   };
 };
 
