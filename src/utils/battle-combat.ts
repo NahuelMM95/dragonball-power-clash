@@ -1,3 +1,4 @@
+
 import { BattleState, Enemy } from '../types/game';
 import { toast } from "sonner";
 
@@ -56,7 +57,8 @@ export const enemyAttack = (
 // Function to toggle Kaioken form on/off
 export const toggleKaiokenForm = (
   battleState: BattleState,
-  setBattleState: React.Dispatch<React.SetStateAction<BattleState>>
+  setBattleState: React.Dispatch<React.SetStateAction<BattleState>>,
+  endBattleCallback?: (victory: boolean) => void
 ) => {
   if (!battleState.playerStats.activeForm) {
     // Activate Kaioken
@@ -93,11 +95,13 @@ export const toggleKaiokenForm = (
     
     // Trigger enemy's turn
     setTimeout(() => {
-      enemyAttack(
-        { ...battleState, playerStats: newPlayerStats }, 
-        setBattleState, 
-        battleState.endBattle || (() => {})
-      );
+      if (endBattleCallback) {
+        enemyAttack(
+          { ...battleState, playerStats: newPlayerStats }, 
+          setBattleState, 
+          endBattleCallback
+        );
+      }
     }, 1000);
   } else {
     // Deactivate Kaioken
@@ -130,11 +134,13 @@ export const toggleKaiokenForm = (
     
     // Trigger enemy's turn
     setTimeout(() => {
-      enemyAttack(
-        { ...battleState, playerStats: newPlayerStats }, 
-        setBattleState, 
-        battleState.endBattle || (() => {})
-      );
+      if (endBattleCallback) {
+        enemyAttack(
+          { ...battleState, playerStats: newPlayerStats }, 
+          setBattleState, 
+          endBattleCallback
+        );
+      }
     }, 1000);
   }
 };

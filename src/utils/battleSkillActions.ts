@@ -16,7 +16,7 @@ export const useSkillInBattle = (
     // Check if the player already has Kaioken active
     if (battleState.playerStats.activeForm === "Kaioken x2") {
       // Toggle Kaioken off
-      toggleKaiokenForm(battleState, setBattleState);
+      toggleKaiokenForm(battleState, setBattleState, endBattle);
       return;
     } else {
       // Toggle Kaioken on
@@ -42,7 +42,8 @@ export const useSkillInBattle = (
       // Toggle Kaioken on with the updated ki
       toggleKaiokenForm(
         { ...battleState, playerStats: newPlayerStats },
-        setBattleState
+        setBattleState,
+        endBattle
       );
       
       return;
