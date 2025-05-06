@@ -8,9 +8,10 @@ const ForestZone = () => {
   const { fightEnemy } = useBattle();
 
   const forestEnemiesInfo = [
-    { name: "Wolf", power: 5, reward: "10 Zeni reward" },
-    { name: "Bandit", power: 10, reward: "25 Zeni reward" },
-    { name: "Bear", power: 20, reward: "50 Zeni reward" }
+    { name: "Wolf", power: 5, reward: "10 Zeni" },
+    { name: "Bandit", power: 10, reward: "25 Zeni" },
+    { name: "Bear", power: 20, reward: "50 Zeni" },
+    { name: "Snake", power: 3, reward: "5 Zeni" }
   ];
 
   return (

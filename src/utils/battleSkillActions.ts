@@ -51,20 +51,43 @@ export const useSkillInBattle = (
     // Add transformation to battle log
     setBattleState(prev => ({
       ...prev,
-      log: [...prev.log, `You transform using ${skill.name}! Your power level is now ${newPlayerStats.powerLevel.toLocaleString('en')}!`]
+      log: [...prev.log, `You transform using ${skill.name}! Your power level is now ${newPlayerStats.powerLevel.toLocaleString('en')}!`],
+      playerStats: newPlayerStats,
+      playerTurn: true
     }));
+    
+    // Apply HP drain for Kaioken immediately
+    if (skill.name === "Kaioken x2" && skill.specialEffect) {
+      const hpDrain = Math.ceil(newPlayerStats.maxHp * skill.specialEffect.value);
+      newPlayerStats.hp = Math.max(1, newPlayerStats.hp - hpDrain); // Ensure player doesn't die from drain
+      
+      // Add HP drain to battle log
+      setBattleState(prev => ({
+        ...prev,
+        log: [...prev.log, `Kaioken drains ${hpDrain.toLocaleString('en')} HP!`],
+        playerStats: newPlayerStats
+      }));
+    }
+    
+    return;
   }
   
-  // Handle HP drain for Kaioken
-  if (skill.name === "Kaioken x2" && skill.specialEffect) {
-    const hpDrain = Math.ceil(newPlayerStats.maxHp * skill.specialEffect.value);
-    newPlayerStats.hp = Math.max(1, newPlayerStats.hp - hpDrain); // Ensure player doesn't die from drain
+  // Apply Kaioken drain if active
+  if (newPlayerStats.activeForm === "Kaioken x2") {
+    const kaiokenSkill = skill.type === "form" ? skill : 
+      battleState.playerStats.activeForm === "Kaioken x2" ? 
+        { specialEffect: { value: 0.02, type: "hp_drain_percent" }} : null;
     
-    // Add HP drain to battle log
-    setBattleState(prev => ({
-      ...prev,
-      log: [...prev.log, `Kaioken drains ${hpDrain.toLocaleString('en')} HP!`]
-    }));
+    if (kaiokenSkill && kaiokenSkill.specialEffect) {
+      const hpDrain = Math.ceil(newPlayerStats.maxHp * kaiokenSkill.specialEffect.value);
+      newPlayerStats.hp = Math.max(1, newPlayerStats.hp - hpDrain); // Ensure player doesn't die from drain
+      
+      // Add HP drain to battle log
+      setBattleState(prev => ({
+        ...prev,
+        log: [...prev.log, `Kaioken drains ${hpDrain.toLocaleString('en')} HP!`]
+      }));
+    }
   }
   
   const newEnemyHp = Math.max(0, battleState.enemy.hp - damage);

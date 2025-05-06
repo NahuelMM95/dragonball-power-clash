@@ -24,20 +24,34 @@ const BattleDialogContent = ({ battleState, fightResult, handleCloseDialog }: Ba
   const { inventory, setInventory } = useItems();
   const [showSkills, setShowSkills] = useState(false);
   const [showItems, setShowItems] = useState(false);
+  const [showForms, setShowForms] = useState(false);
 
   const handleAttackClick = () => {
     setShowSkills(true);
     setShowItems(false);
+    setShowForms(false);
   };
 
   const handleItemsClick = () => {
     setShowItems(true);
+    setShowSkills(false);
+    setShowForms(false);
+  };
+
+  const handleFormsClick = () => {
+    setShowForms(true);
+    setShowItems(false);
     setShowSkills(false);
   };
 
   const handleSkillClick = (skill: Skill) => {
     useSkill(skill);
     setShowSkills(false);
+  };
+
+  const handleFormClick = (form: Skill) => {
+    useSkill(form);
+    setShowForms(false);
   };
 
   const handleItemClick = (itemId: string) => {
@@ -50,7 +64,8 @@ const BattleDialogContent = ({ battleState, fightResult, handleCloseDialog }: Ba
   };
 
   const usableItems = inventory.filter(item => item.usableInBattle);
-  const availableSkills = skills.filter(skill => skill.purchased);
+  const availableSkills = skills.filter(skill => skill.purchased && skill.type !== 'form');
+  const formSkills = skills.filter(skill => skill.purchased && skill.type === 'form');
 
   return (
     <DialogContent className="sm:max-w-md">
@@ -86,14 +101,23 @@ const BattleDialogContent = ({ battleState, fightResult, handleCloseDialog }: Ba
                 onBack={() => setShowItems(false)} 
                 onSelectItem={handleItemClick} 
               />
+            ) : showForms ? (
+              <SkillsList 
+                skills={formSkills} 
+                onBack={() => setShowForms(false)} 
+                onSelectSkill={handleFormClick}
+                currentKi={battleState.playerStats.ki}
+              />
             ) : (
               <BattleActions 
                 onAttack={handleAttackClick}
                 onItems={handleItemsClick}
+                onForms={handleFormsClick}
                 onFlee={handleFleeClick}
                 playerTurn={battleState.playerTurn}
                 enemyName={battleState.enemy.name}
                 usableItems={usableItems}
+                hasFormSkills={formSkills.length > 0}
               />
             )
           ) : (

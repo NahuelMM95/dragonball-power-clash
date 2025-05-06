@@ -17,11 +17,29 @@ export const enemyAttack = (
     hp: Math.max(0, battleState.playerStats.hp - damage)
   };
   
+  // Apply Kaioken HP drain if active
+  if (newPlayerStats.activeForm === "Kaioken x2") {
+    const hpDrain = Math.ceil(newPlayerStats.maxHp * 0.02); // 2% HP drain
+    newPlayerStats.hp = Math.max(1, newPlayerStats.hp - hpDrain); // Ensure player doesn't die from drain
+    
+    // Add drain to combat log after enemy attack
+    setBattleState(prev => ({
+      ...prev,
+      log: [...prev.log, `${prev.enemy?.name} attacks for ${damage.toLocaleString('en')} damage!`, `Kaioken drains ${hpDrain.toLocaleString('en')} HP!`]
+    }));
+  } else {
+    // Regular enemy attack without Kaioken drain
+    setBattleState(prev => ({
+      ...prev,
+      log: [...prev.log, `${prev.enemy?.name} attacks for ${damage.toLocaleString('en')} damage!`]
+    }));
+  }
+  
   if (newPlayerStats.hp <= 0) {
     setBattleState(prev => ({
       ...prev,
       playerStats: newPlayerStats,
-      log: [...prev.log, `${prev.enemy?.name} attacks for ${damage.toLocaleString('en')} damage!`, 'You were defeated!'],
+      log: [...prev.log, 'You were defeated!'],
       inProgress: false
     }));
     
@@ -32,7 +50,6 @@ export const enemyAttack = (
   setBattleState(prev => ({
     ...prev,
     playerStats: newPlayerStats,
-    log: [...prev.log, `${prev.enemy?.name} attacks for ${damage.toLocaleString('en')} damage!`],
     playerTurn: true
   }));
 };

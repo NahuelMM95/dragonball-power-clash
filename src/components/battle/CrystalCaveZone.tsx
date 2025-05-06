@@ -8,8 +8,8 @@ const CrystalCaveZone = () => {
   const { fightEnemy } = useBattle();
 
   const crystalCaveEnemiesInfo = [
-    { name: "Crystal Monster", power: 70, reward: "800 Zeni, 25% chance to drop Crystal Shard" },
-    { name: "Malfunctioning Robot", power: 120, reward: "1200 Zeni, 15% chance to drop Robot Parts" }
+    { name: "Crystal Monster", power: 70, reward: "800 Zeni" },
+    { name: "Malfunctioning Robot", power: 120, reward: "1200 Zeni" }
   ];
 
   return (
