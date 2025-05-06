@@ -83,8 +83,13 @@ const DragonBallZStory = () => {
                   {isCompleted && <span className="ml-2 text-green-500">✓</span>}
                 </h3>
                 <p className={`text-sm ${isLocked ? "text-gray-400" : "text-gray-600"}`}>
-                  Power Level: {enemy.power}
+                  Power Level: {enemy.power.toLocaleString('en')}
                 </p>
+                {enemy.isGroup && (
+                  <p className={`text-xs ${isLocked ? "text-gray-400" : "text-gray-600"}`}>
+                    Group of {enemy.enemyCount} enemies
+                  </p>
+                )}
               </div>
               <Button 
                 variant={isCompleted ? "outline" : isCurrent ? "default" : "ghost"}

@@ -42,12 +42,17 @@ const BattleResult = ({ enemy, won, onContinue }: BattleResultProps) => {
       </div>
       <div className="text-center mb-4">
         <p className="font-bold text-lg">{enemy?.name}</p>
-        <p>Power Level: {enemy?.power}</p>
+        <p>Power Level: {enemy?.power?.toLocaleString('en') || 0}</p>
+        {enemy?.isGroup && (
+          <p className="text-xs text-amber-600">
+            Group of {enemy.enemyCount} enemies
+          </p>
+        )}
       </div>
       {won !== null && (
         <div className={`text-center p-2 rounded-md ${won ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'} w-full`}>
           {won 
-            ? `Victory! You defeated the ${enemy?.name}!` 
+            ? `Victory! You defeated ${enemy?.isGroup ? 'the group of ' + enemy?.enemyCount + ' ' + enemy?.name : 'the ' + enemy?.name}!` 
             : `Defeat! The ${enemy?.name} was too strong!`
           }
         </div>

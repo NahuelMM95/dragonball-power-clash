@@ -1,3 +1,4 @@
+
 import { Enemy } from '@/types/game';
 import { ENEMY_IMAGES } from './assets';
 
@@ -16,75 +17,19 @@ export const dbzEnemies: (Enemy & { id: number })[] = [
   },
   {
     id: 1,
-    name: 'Saibaman 1',
+    name: 'Saibamen Squad',
     image: ENEMY_IMAGES.SAIBAMAN,
-    power: 1200,
-    hp: 12000,
-    maxHp: 12000,
+    power: 1500,
+    hp: 72000, // 6 Saibamen with 12000 HP each
+    maxHp: 72000,
     damage: 360,
     ki: 800,
     maxKi: 800,
-    zeniReward: 1000
-  },
-  {
-    id: 2,
-    name: 'Saibaman 2',
-    image: ENEMY_IMAGES.SAIBAMAN,
-    power: 1200,
-    hp: 12000,
-    maxHp: 12000,
-    damage: 360,
-    ki: 800,
-    maxKi: 800,
-    zeniReward: 1000
-  },
-  {
-    id: 3,
-    name: 'Saibaman 3',
-    image: ENEMY_IMAGES.SAIBAMAN,
-    power: 1200,
-    hp: 12000,
-    maxHp: 12000,
-    damage: 360,
-    ki: 800,
-    maxKi: 800,
-    zeniReward: 1000
-  },
-  {
-    id: 4,
-    name: 'Saibaman 4',
-    image: ENEMY_IMAGES.SAIBAMAN,
-    power: 1200,
-    hp: 12000,
-    maxHp: 12000,
-    damage: 360,
-    ki: 800,
-    maxKi: 800,
-    zeniReward: 1000
-  },
-  {
-    id: 5,
-    name: 'Saibaman 5',
-    image: ENEMY_IMAGES.SAIBAMAN,
-    power: 1200,
-    hp: 12000,
-    maxHp: 12000,
-    damage: 360,
-    ki: 800,
-    maxKi: 800,
-    zeniReward: 1000
-  },
-  {
-    id: 6,
-    name: 'Saibaman 6',
-    image: ENEMY_IMAGES.SAIBAMAN,
-    power: 1200,
-    hp: 12000,
-    maxHp: 12000,
-    damage: 360,
-    ki: 800,
-    maxKi: 800,
-    zeniReward: 1000
+    zeniReward: 6000, // 6 × 1000
+    isGroup: true,
+    enemyCount: 6,
+    individualHp: 12000,
+    individualMaxHp: 12000
   },
   {
     id: 7,

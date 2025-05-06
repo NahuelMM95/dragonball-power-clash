@@ -1,4 +1,3 @@
-
 export type Enemy = {
   name: string;
   power: number;
@@ -9,6 +8,10 @@ export type Enemy = {
   ki: number;
   maxKi: number;
   zeniReward?: number;
+  isGroup?: boolean;
+  enemyCount?: number;
+  individualHp?: number;
+  individualMaxHp?: number;
 };
 
 export type ItemType = 'weapon' | 'weight' | 'consumable';

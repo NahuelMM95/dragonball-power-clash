@@ -42,7 +42,7 @@ const StoryContent = () => {
       </div>
       
       <div className="text-center mt-8">
-        <p className="text-sm text-gray-600">Your current power level: {powerLevel}</p>
+        <p className="text-sm text-gray-600">Your current power level: {powerLevel.toLocaleString('en')}</p>
       </div>
     </div>
   );

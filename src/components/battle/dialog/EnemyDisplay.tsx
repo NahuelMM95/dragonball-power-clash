@@ -13,6 +13,18 @@ const EnemyDisplay = ({ enemy }: EnemyDisplayProps) => {
   const healthPercentage = (enemy.hp / enemy.maxHp) * 100;
   const [imageError, setImageError] = useState(false);
   
+  // Calculate remaining enemies in a group
+  const getRemainingEnemies = () => {
+    if (enemy.isGroup && enemy.individualHp && enemy.enemyCount) {
+      // Calculate how many full enemies are still alive
+      const fullEnemies = Math.ceil(enemy.hp / enemy.individualHp);
+      return fullEnemies;
+    }
+    return 1;
+  };
+  
+  const remainingEnemies = getRemainingEnemies();
+  
   return (
     <div className="flex flex-col items-center p-4">
       <div className="bg-gray-100 p-2 rounded-lg mb-4 w-28 h-28 flex items-center justify-center overflow-hidden">
@@ -40,10 +52,15 @@ const EnemyDisplay = ({ enemy }: EnemyDisplayProps) => {
       </div>
       <div className="text-center w-full mb-4">
         <p className="font-bold">{enemy.name}</p>
-        <p className="text-xs text-gray-600">Power Level: {enemy.power}</p>
+        {enemy.isGroup && (
+          <p className="text-xs text-amber-600 font-semibold">
+            {remainingEnemies} of {enemy.enemyCount} remaining
+          </p>
+        )}
+        <p className="text-xs text-gray-600">Power Level: {enemy.power.toLocaleString('en')}</p>
         <div className="flex justify-between text-xs text-gray-600 mt-1">
           <span>HP:</span>
-          <span>{enemy.hp}/{enemy.maxHp}</span>
+          <span>{enemy.hp.toLocaleString('en')}/{enemy.maxHp.toLocaleString('en')}</span>
         </div>
         <Progress value={healthPercentage} className="h-2 mt-1" />
       </div>
