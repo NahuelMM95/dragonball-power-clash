@@ -3,7 +3,35 @@ import { getCrystalCaveEnemies, getForestEnemies, getDesertEnemies, getWasteland
 import { Enemy } from '@/types/game';
 
 export const useBattleZones = () => {
-  const getFightEnemy = (zone: string, playerPowerLevel: number = 1): Enemy => {
+  const getFightEnemy = (zone: string, playerPowerLevel: number = 1): Enemy | Enemy[] => {
+    // Check if this should be a multiple fight (5% chance)
+    const isMultipleFight = Math.random() < 0.05;
+    
+    if (isMultipleFight && zone !== 'story') {
+      // For multiple fights, create an array of 2-6 enemies
+      const enemyCount = Math.floor(Math.random() * 5) + 2; // Random number between 2 and 6
+      const enemies: Enemy[] = [];
+      
+      for (let i = 0; i < enemyCount; i++) {
+        // Get a single enemy and add it to the array
+        const singleEnemy = getSingleEnemy(zone, playerPowerLevel);
+        enemies.push({ ...singleEnemy, isPartOfSequence: true });
+      }
+      
+      // Set the sequence info
+      return enemies.map((enemy, index) => ({
+        ...enemy,
+        sequencePosition: index + 1,
+        sequenceTotal: enemies.length
+      }));
+    }
+    
+    // Regular single enemy fight
+    return getSingleEnemy(zone, playerPowerLevel);
+  };
+  
+  // Helper function to get a single enemy based on zone
+  const getSingleEnemy = (zone: string, playerPowerLevel: number): Enemy => {
     let selectedEnemy: Enemy;
     const forestEnemies = getForestEnemies(playerPowerLevel);
     const desertEnemies = getDesertEnemies(playerPowerLevel);

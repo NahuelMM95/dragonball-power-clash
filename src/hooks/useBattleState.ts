@@ -29,15 +29,23 @@ export const useBattleState = (powerLevel: number, equippedItems: any[]) => {
     setFightResult(null);
   };
 
-  const startBattle = (enemy: Enemy): BattleState => {
-    const playerStats = calculatePlayerStats(powerLevel, equippedItems);
+  const startBattle = (enemy: Enemy, continueWithStats?: any): BattleState => {
+    // Use continued stats if provided, otherwise calculate new stats
+    const playerStats = continueWithStats || calculatePlayerStats(powerLevel, equippedItems);
     const playerFirst = powerLevel >= enemy.power;
+    
+    let battleMessage = `Battle started against ${enemy.name}!`;
+    
+    // Add sequence info to battle log if present
+    if (enemy.sequencePosition && enemy.sequenceTotal) {
+      battleMessage += ` (${enemy.sequencePosition} of ${enemy.sequenceTotal})`;
+    }
     
     const newBattleState = {
       inProgress: true,
       playerStats,
       enemy: { ...enemy },
-      log: [`Battle started against ${enemy.name}!`, 
+      log: [battleMessage, 
             `${playerFirst ? 'You attack first!' : `${enemy.name} attacks first!`}`],
       playerTurn: playerFirst
     };

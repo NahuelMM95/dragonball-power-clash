@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import { handleEnemyDrops, handleEnemyPowerDrop, handlePlayerPowerLoss } from "./battle";
+import { handleEnemyPowerDrop, handlePlayerPowerLoss } from "./battle";
 
 // Function to use items in battle
 export const useItemInBattle = (
@@ -24,6 +24,71 @@ export const useItemInBattle = (
   
   // Handle item effects
   if (item.effect) {
+    // Fix Senzu Bean healing (restore full HP and Ki)
+    if (item.name === "Senzu Bean" && item.effect.type === 'heal') {
+      const newPlayerStats = {
+        ...battleState.playerStats,
+        hp: battleState.playerStats.maxHp,  // Restore to max HP
+        ki: battleState.playerStats.maxKi   // Restore to max Ki
+      };
+      
+      setBattleState(prev => ({
+        ...prev,
+        playerStats: newPlayerStats,
+        log: [...prev.log, `You used a Senzu Bean!`, `Your HP and Ki have been completely restored!`],
+        playerTurn: false // End player's turn after using item
+      }));
+      
+      // Remove Senzu Bean from inventory
+      setInventory(prev => {
+        const updatedInventory = [...prev];
+        const itemIndex = updatedInventory.findIndex(i => i.id === itemId);
+        
+        if (updatedInventory[itemIndex].quantity > 1) {
+          updatedInventory[itemIndex] = {
+            ...updatedInventory[itemIndex],
+            quantity: updatedInventory[itemIndex].quantity - 1
+          };
+        } else {
+          updatedInventory.splice(itemIndex, 1);
+        }
+        
+        return updatedInventory;
+      });
+      
+      // Trigger enemy's turn
+      setTimeout(() => {
+        // Make enemy attack
+        const damage = battleState.enemy.damage;
+        
+        const playerStats = {
+          ...newPlayerStats,
+          hp: Math.max(0, newPlayerStats.hp - damage)
+        };
+        
+        if (playerStats.hp <= 0) {
+          setBattleState(prev => ({
+            ...prev,
+            playerStats,
+            log: [...prev.log, `${prev.enemy?.name} attacks for ${damage.toLocaleString('en')} damage!`, "You were defeated!"],
+            inProgress: false
+          }));
+          
+          setTimeout(() => endBattle(false), 1500);
+          return;
+        }
+        
+        setBattleState(prev => ({
+          ...prev,
+          playerStats,
+          log: [...prev.log, `${prev.enemy?.name} attacks for ${damage.toLocaleString('en')} damage!`],
+          playerTurn: true
+        }));
+      }, 1000);
+      
+      return;
+    }
+  
     if (item.effect.type === 'temp_damage_boost') {
       // Handle temp damage boost
       const newPlayerStats = {
@@ -77,7 +142,7 @@ export const useItemInBattle = (
           setBattleState(prev => ({
             ...prev,
             playerStats,
-            log: [...prev.log, `${prev.enemy?.name} attacks for ${damage} damage!`, "You were defeated!"],
+            log: [...prev.log, `${prev.enemy?.name} attacks for ${damage.toLocaleString('en')} damage!`, "You were defeated!"],
             inProgress: false
           }));
           
@@ -88,7 +153,7 @@ export const useItemInBattle = (
         setBattleState(prev => ({
           ...prev,
           playerStats,
-          log: [...prev.log, `${prev.enemy?.name} attacks for ${damage} damage!`],
+          log: [...prev.log, `${prev.enemy?.name} attacks for ${damage.toLocaleString('en')} damage!`],
           playerTurn: true
         }));
       }, 1000);
@@ -274,8 +339,14 @@ export const processBattleEnd = (
   resetBattleState();
   
   if (victory && enemy) {
-    // Process enemy drops (items, zeni)
-    handleEnemyDrops(enemy, setInventory, setZeni);
+    // Process zeni reward
+    if (enemy.zeniReward) {
+      setZeni(prev => prev + enemy.zeniReward);
+      toast.success(`Earned ${enemy.zeniReward.toLocaleString('en')} Zeni!`, {
+        description: `Reward from defeating ${enemy.name}`,
+        duration: 3000
+      });
+    }
     
     // Handle power drop from enemy (20% chance)
     handleEnemyPowerDrop(enemy, powerLevel, setPowerLevel);

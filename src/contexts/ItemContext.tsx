@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect } from 'react';
 import { toast } from "sonner";
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -125,9 +126,12 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children, zeni, setZ
 
   const purchaseItem = (itemType: string) => {
     if (itemType === 'senzu') {
-      if (zeni < 100) {
+      // Updated Senzu Bean price to 50,000 zeni
+      const senzuPrice = 50000;
+      
+      if (zeni < senzuPrice) {
         toast.error("Not enough Zeni!", {
-          description: "You need 100 Zeni to buy a Senzu Bean.",
+          description: `You need ${senzuPrice.toLocaleString('en')} Zeni to buy a Senzu Bean.`,
           duration: 3000,
         });
         return;
@@ -136,17 +140,17 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children, zeni, setZ
       const senzuBean: Item = {
         id: `senzu-${Date.now()}`,
         name: "Senzu Bean",
-        description: "Completely restore HP during battle",
+        description: "Completely restore HP and Ki during battle",
         type: 'consumable',
         quantity: 1,
         effect: {
           type: 'heal',
           value: 1
         },
-        usableInBattle: true  // Make sure this is set to true
+        usableInBattle: true
       };
       
-      setZeni(zeni - 100);
+      setZeni(zeni - senzuPrice);
       
       addItemToInventory(senzuBean);
       

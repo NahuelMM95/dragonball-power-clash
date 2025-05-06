@@ -75,7 +75,7 @@ const BattleDialogContent = ({ battleState, fightResult, handleCloseDialog }: Ba
         </DialogTitle>
         <DialogDescription>
           {battleState.inProgress ? 
-            `Fighting against ${battleState.enemy?.name}!` : 
+            `Fighting against ${battleState.enemy?.name}!${battleState.enemy?.sequencePosition ? ` (${battleState.enemy.sequencePosition} of ${battleState.enemy.sequenceTotal})` : ''}` : 
             fightResult?.enemy ? `You encountered a ${fightResult.enemy.name}!` : ''}
         </DialogDescription>
       </DialogHeader>

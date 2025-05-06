@@ -12,6 +12,9 @@ export type Enemy = {
   enemyCount?: number;
   individualHp?: number;
   individualMaxHp?: number;
+  isPartOfSequence?: boolean;
+  sequencePosition?: number;
+  sequenceTotal?: number;
 };
 
 export type ItemType = 'weapon' | 'weight' | 'consumable';
@@ -99,12 +102,15 @@ export interface BattleContextType {
   setBattleState: React.Dispatch<React.SetStateAction<BattleState>>;
   skills: Skill[];
   purchaseSkill: (skillName: string) => number | void;
-  startBattle: (enemy: Enemy) => BattleState;
+  startBattle: (enemy: Enemy, continueWithStats?: CombatStats) => BattleState;
   useSkill: (skill: Skill) => void;
   fleeFromBattle: () => void;
   endBattle: (victory: boolean) => void;
   useItemInBattle: (itemId: string, inventory: Item[], setInventory: React.Dispatch<React.SetStateAction<Item[]>>) => void;
   resetSkills: () => void;
+  // New fields for sequential battles
+  enemySequence: Enemy[];
+  currentSequenceIndex: number;
 }
 
 export interface ItemContextType {

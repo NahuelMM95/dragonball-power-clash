@@ -38,11 +38,11 @@ const PowerLevel = () => {
         <>
           <div className="flex items-center mb-2">
             <div className="h-4 w-4 bg-dbRed rounded-full mr-2"></div>
-            <p className="text-lg font-semibold">Power Level: {powerLevel}</p>
+            <p className="text-lg font-semibold">Power Level: {powerLevel.toLocaleString('en')}</p>
           </div>
           <div className="flex items-center">
             <div className="h-4 w-4 bg-dbBlue rounded-full mr-2"></div>
-            <p className="text-lg font-semibold">Power Gain: +{powerGain} (20% chance)</p>
+            <p className="text-lg font-semibold">Power Gain: +{powerGain.toLocaleString('en')} (20% chance)</p>
           </div>
           
           {equippedUpgrade && (

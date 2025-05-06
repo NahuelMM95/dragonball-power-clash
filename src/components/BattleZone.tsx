@@ -51,7 +51,7 @@ const BattleZone = () => {
         </TabsContent>
       </Tabs>
       
-      <p className="text-sm text-center text-gray-600">Your current power level: {powerLevel}</p>
+      <p className="text-sm text-center text-gray-600">Your current power level: {powerLevel.toLocaleString('en')}</p>
 
       <Dialog 
         open={dialogOpen || battleState.inProgress} 

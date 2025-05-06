@@ -1,6 +1,6 @@
 
 import { BattleState, Skill } from '@/types/game';
-import { enemyAttack } from './battle';
+import { enemyAttack, toggleKaiokenForm } from './battle';
 
 // Helper function for using skills in battle
 export const useSkillInBattle = (
@@ -10,6 +10,44 @@ export const useSkillInBattle = (
   endBattle: (victory: boolean) => void
 ) => {
   if (!battleState.inProgress || !battleState.playerTurn || !battleState.enemy || !skill.purchased) return;
+  
+  // Handle Kaioken form toggling
+  if (skill.name === "Kaioken x2" && skill.type === "form") {
+    // Check if the player already has Kaioken active
+    if (battleState.playerStats.activeForm === "Kaioken x2") {
+      // Toggle Kaioken off
+      toggleKaiokenForm(battleState, setBattleState);
+      return;
+    } else {
+      // Toggle Kaioken on
+      if (battleState.playerStats.ki < skill.kiCost) {
+        setBattleState(prev => ({
+          ...prev,
+          log: [...prev.log, `Not enough Ki to use ${skill.name}!`]
+        }));
+        return;
+      }
+      
+      // Deduct ki cost
+      const newPlayerStats = {
+        ...battleState.playerStats,
+        ki: battleState.playerStats.ki - skill.kiCost
+      };
+      
+      setBattleState(prev => ({
+        ...prev,
+        playerStats: newPlayerStats
+      }));
+      
+      // Toggle Kaioken on with the updated ki
+      toggleKaiokenForm(
+        { ...battleState, playerStats: newPlayerStats },
+        setBattleState
+      );
+      
+      return;
+    }
+  }
   
   if (battleState.playerStats.ki < skill.kiCost) {
     setBattleState(prev => ({
@@ -26,51 +64,6 @@ export const useSkillInBattle = (
     ...battleState.playerStats,
     ki: battleState.playerStats.ki - skill.kiCost
   };
-  
-  // Handle form transformations like Kaioken
-  if (skill.type === "form" && skill.specialEffect?.multiplier) {
-    const multiplier = skill.specialEffect.multiplier;
-    
-    // Apply the multiplier to all stats
-    newPlayerStats = {
-      ...newPlayerStats,
-      hp: Math.floor(newPlayerStats.hp * multiplier),
-      maxHp: Math.floor(newPlayerStats.maxHp * multiplier),
-      damage: Math.floor(newPlayerStats.damage * multiplier),
-      ki: Math.floor(newPlayerStats.ki * multiplier),
-      maxKi: Math.floor(newPlayerStats.maxKi * multiplier),
-      activeForm: skill.name,
-      formMultiplier: multiplier,
-      basePowerLevel: battleState.playerStats.basePowerLevel || 0,
-      powerLevel: Math.floor((battleState.playerStats.basePowerLevel || 0) * multiplier)
-    };
-    
-    // Recalculate damage with the new multiplier
-    damage = Math.floor(newPlayerStats.damage * skill.damageMultiplier);
-    
-    // Add transformation to battle log
-    setBattleState(prev => ({
-      ...prev,
-      log: [...prev.log, `You transform using ${skill.name}! Your power level is now ${newPlayerStats.powerLevel.toLocaleString('en')}!`],
-      playerStats: newPlayerStats,
-      playerTurn: true
-    }));
-    
-    // Apply HP drain for Kaioken immediately
-    if (skill.name === "Kaioken x2" && skill.specialEffect) {
-      const hpDrain = Math.ceil(newPlayerStats.maxHp * skill.specialEffect.value);
-      newPlayerStats.hp = Math.max(1, newPlayerStats.hp - hpDrain); // Ensure player doesn't die from drain
-      
-      // Add HP drain to battle log
-      setBattleState(prev => ({
-        ...prev,
-        log: [...prev.log, `Kaioken drains ${hpDrain.toLocaleString('en')} HP!`],
-        playerStats: newPlayerStats
-      }));
-    }
-    
-    return;
-  }
   
   // Apply Kaioken drain if active
   if (newPlayerStats.activeForm === "Kaioken x2") {
