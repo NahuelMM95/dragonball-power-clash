@@ -8,7 +8,7 @@ const WastelandZone = () => {
   const { fightEnemy } = useBattle();
 
   const wastelandEnemiesInfo = [
-    { name: "Saibaman", power: "1,500", reward: "1,000 Zeni" }
+    { name: "Saibaman", power: 1500, reward: "1,000 Zeni" }
   ];
 
   return (

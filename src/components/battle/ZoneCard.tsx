@@ -45,6 +45,11 @@ const ZoneCard = ({
       border: "border-dragonOrange",
       bg: "bg-dragonOrange",
       hover: "hover:bg-dragonOrange/80"
+    },
+    wasteland: {
+      border: "border-green-700",
+      bg: "bg-green-700",
+      hover: "hover:bg-green-800"
     }
   };
   
@@ -75,7 +80,7 @@ const ZoneCard = ({
             <ul className="list-disc pl-5">
               {enemies.map((enemy) => (
                 <li key={enemy.name}>
-                  {enemy.name} (Power Level: {enemy.power})
+                  {enemy.name} (Power Level: {enemy.power.toLocaleString('en')})
                   {enemy.reward && ` - ${enemy.reward}`}
                 </li>
               ))}
