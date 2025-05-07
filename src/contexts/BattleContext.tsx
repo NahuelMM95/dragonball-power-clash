@@ -1,14 +1,9 @@
-import React, { createContext, useContext, useState } from 'react';
-import { BattleContextType, Enemy, Item } from '@/types/game';
-import { useBattleState } from '@/hooks/useBattleState';
-import { useBattleZones } from '@/hooks/useBattleZones';
+import React, { createContext, useContext } from 'react';
+import { BattleContextType, Item } from '@/types/game';
 import { useSkillManagement } from '@/hooks/useSkillManagement';
-import { useSkillInBattle } from '@/utils/battleSkillActions';
-import { fleeFromBattle } from '@/utils/battleFleeActions';
-import { useItemInBattle, processBattleEnd } from '@/utils/battleItemActions';
-import { enemyAttack } from '@/utils/battle';
-import { dbzEnemies } from '@/data/storyEnemies';
-import { toast } from "sonner";
+import { useBattleInitiation } from '@/hooks/useBattleInitiation';
+import { useEnemySequence } from '@/hooks/useEnemySequence';
+import { useBattleActions } from '@/hooks/useBattleActions';
 
 const BattleContext = createContext<BattleContextType | undefined>(undefined);
 
@@ -31,127 +26,70 @@ export const BattleProvider: React.FC<BattleProviderProps> = ({
 }) => {
   // Use our custom hooks
   const { skills, purchaseSkill, setSkills } = useSkillManagement();
-  const { forest, desert, wasteland, crystalCave, getFightEnemy } = useBattleZones();
-  const { 
-    battleState, 
-    setBattleState, 
-    fightResult, 
-    setFightResult, 
-    clearFightResult, 
-    startBattle: initBattle, 
-    resetBattleState
-  } = useBattleState(powerLevel, equippedItems);
   
-  // State for storing enemies in a sequence
-  const [enemySequence, setEnemySequence] = useState<Enemy[]>([]);
-  const [currentSequenceIndex, setCurrentSequenceIndex] = useState<number>(0);
+  // Enemy sequence management
+  const {
+    enemySequence,
+    currentSequenceIndex,
+    handleEnemySequence,
+    advanceEnemySequence,
+    clearEnemySequence
+  } = useEnemySequence();
+  
+  // Battle state and initiation
+  const {
+    battleState,
+    setBattleState,
+    fightResult,
+    setFightResult,
+    clearFightResult,
+    startBattle,
+    resetBattleState,
+    fightEnemy: initiateFight,
+    forest,
+    desert,
+    wasteland,
+    crystalCave
+  } = useBattleInitiation(powerLevel, equippedItems);
+  
+  // Battle actions
+  const {
+    useSkill,
+    fleeFromBattle,
+    endBattle,
+    useItemInBattle
+  } = useBattleActions(
+    powerLevel,
+    setPowerLevel,
+    setInventory,
+    setZeni,
+    battleState,
+    setBattleState,
+    resetBattleState,
+    setFightResult,
+    clearFightResult,
+    advanceEnemySequence,
+    clearEnemySequence
+  );
 
-  // Function to start a fight with an enemy from a specific zone
+  // Wrapper for initiating a fight with a zone
   const fightEnemy = (zone: string) => {
-    let selectedEnemy: Enemy | Enemy[];
+    const newBattleState = initiateFight(zone, handleEnemySequence);
     
-    if (zone === 'story') {
-      // Get the current progress from localStorage
-      const dbzProgress = parseInt(localStorage.getItem("dbzStoryProgress") || "0");
-      selectedEnemy = { ...dbzEnemies[dbzProgress] };
-    } else {
-      selectedEnemy = getFightEnemy(zone, powerLevel);
-    }
-    
-    // Handle multiple enemy sequence
-    if (Array.isArray(selectedEnemy)) {
-      setEnemySequence(selectedEnemy);
-      setCurrentSequenceIndex(0);
-      selectedEnemy = selectedEnemy[0]; // Start with the first enemy
-      
-      toast.info(`Multiple enemies encountered!`, {
-        description: `You will fight ${selectedEnemy.sequenceTotal} enemies in sequence.`
-      });
-    } else {
-      // Clear any existing sequence
-      setEnemySequence([]);
-      setCurrentSequenceIndex(0);
-    }
-    
-    setFightResult({ enemy: Array.isArray(selectedEnemy) ? selectedEnemy[0] : selectedEnemy, won: null });
-    
-    const newBattleState = initBattle(Array.isArray(selectedEnemy) ? selectedEnemy[0] : selectedEnemy);
-    
-    // If enemy attacks first, trigger their attack
+    // Set the endBattle callback on the battle state
     if (!newBattleState.playerTurn) {
       setTimeout(() => {
+        // This ensures the endBattle from useBattleActions is used
+        const enemyAttack = (bs: any, setBs: any, endBattleCb: any) => {
+          // Import dynamically to avoid circular dependencies
+          import('@/utils/battle').then(({ enemyAttack }) => {
+            enemyAttack(bs, setBs, endBattle);
+          });
+        };
+        
         enemyAttack(newBattleState, setBattleState, endBattle);
       }, 1000);
     }
-  };
-
-  // Function to handle using a skill during battle
-  const useSkill = (skill: any) => {
-    useSkillInBattle(skill, battleState, setBattleState, endBattle);
-  };
-
-  // Function to handle fleeing from battle
-  const handleFleeFromBattle = () => {
-    fleeFromBattle(battleState, setBattleState, resetBattleState, clearFightResult);
-    
-    // Clear enemy sequence when fleeing
-    setEnemySequence([]);
-    setCurrentSequenceIndex(0);
-  };
-
-  // Function to handle ending the battle
-  const endBattle = (victory: boolean) => {
-    if (victory && enemySequence.length > 0 && currentSequenceIndex < enemySequence.length - 1) {
-      // Move to next enemy in the sequence
-      const nextIndex = currentSequenceIndex + 1;
-      setCurrentSequenceIndex(nextIndex);
-      
-      // Start battle with the next enemy but keep player's current stats
-      const nextEnemy = enemySequence[nextIndex];
-      
-      setTimeout(() => {
-        // Preserve player's stats from previous fight
-        const continuedBattleState = initBattle(nextEnemy, battleState.playerStats);
-        
-        setFightResult(prev => ({ 
-          ...prev, 
-          enemy: nextEnemy,
-          won: null 
-        }));
-        
-        toast.info(`Next enemy: ${nextEnemy.name}`, {
-          description: `Enemy ${nextIndex + 1} of ${enemySequence.length}`
-        });
-        
-        // If enemy attacks first in the new battle
-        if (!continuedBattleState.playerTurn) {
-          setTimeout(() => {
-            enemyAttack(continuedBattleState, setBattleState, endBattle);
-          }, 1000);
-        }
-      }, 1500);
-    } else {
-      // Process the battle end normally (last enemy in sequence or regular battle)
-      processBattleEnd(
-        victory, 
-        battleState.enemy, 
-        powerLevel, 
-        setPowerLevel, 
-        setInventory, 
-        setZeni, 
-        setFightResult, 
-        resetBattleState
-      );
-      
-      // Clear enemy sequence when all enemies are defeated or on defeat
-      setEnemySequence([]);
-      setCurrentSequenceIndex(0);
-    }
-  };
-
-  // Function to use item in battle
-  const handleUseItemInBattle = (itemId: string, inventory: Item[], setInventoryCallback: React.Dispatch<React.SetStateAction<Item[]>>) => {
-    useItemInBattle(itemId, inventory, setInventoryCallback, battleState, setBattleState, endBattle);
   };
   
   // Function to purchase a skill
@@ -201,11 +139,11 @@ export const BattleProvider: React.FC<BattleProviderProps> = ({
       setBattleState,
       skills,
       purchaseSkill: handlePurchaseSkill,
-      startBattle: initBattle,
+      startBattle,
       useSkill,
-      fleeFromBattle: handleFleeFromBattle,
+      fleeFromBattle,
       endBattle,
-      useItemInBattle: handleUseItemInBattle,
+      useItemInBattle,
       forest,
       desert,
       crystalCave,

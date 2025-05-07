@@ -1,4 +1,3 @@
-
 import { BattleState, Enemy } from '../types/game';
 import { toast } from "sonner";
 
@@ -56,9 +55,9 @@ export const enemyAttack = (
 
 // Function to toggle Kaioken form on/off
 export const toggleKaiokenForm = (
-  battleState: BattleState,
-  setBattleState: React.Dispatch<React.SetStateAction<BattleState>>,
-  endBattleCallback?: (victory: boolean) => void
+  battleState: any,
+  setBattleState: any,
+  endBattleCallback: (victory: boolean) => void
 ) => {
   if (!battleState.playerStats.activeForm) {
     // Activate Kaioken
