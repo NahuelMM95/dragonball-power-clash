@@ -20,7 +20,7 @@ export const handleDamageBoost = (
     damage: Math.floor(battleState.playerStats.damage * (1 + item.effect.value)),
     // Add temporary effect flag
     tempEffects: {
-      ...battleState.playerStats.tempEffects,
+      ...battleState.playerStats.tempEffects || {}, // Use empty object if tempEffects is undefined
       damageBoosted: {
         endTime: Date.now() + (item.effect.duration || 0) * 1000,
         multiplier: item.effect.value

@@ -18,7 +18,7 @@ export const handleDefenseBoost = (
   const newPlayerStats = {
     ...battleState.playerStats,
     tempEffects: {
-      ...battleState.playerStats.tempEffects,
+      ...battleState.playerStats.tempEffects || {}, // Use empty object if tempEffects is undefined
       defenseBoosted: {
         endTime: Date.now() + (item.effect.duration || 0) * 1000,
         reduction: item.effect.value

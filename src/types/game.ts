@@ -15,6 +15,7 @@ export type Enemy = {
   isPartOfSequence?: boolean;
   sequencePosition?: number;
   sequenceTotal?: number;
+  isStoryBoss?: boolean;  // Added this property
 };
 
 export type ItemType = 'weapon' | 'weight' | 'consumable';
@@ -42,6 +43,12 @@ export type BattleState = {
   playerTurn: boolean;
 };
 
+export type TempEffect = {
+  endTime: number;
+  multiplier?: number;
+  reduction?: number;
+};
+
 export type CombatStats = {
   hp: number;
   maxHp: number;
@@ -53,6 +60,11 @@ export type CombatStats = {
   powerLevel?: number;
   activeForm?: string;
   formMultiplier?: number;
+  tempEffects?: {    // Added this property
+    damageBoosted?: TempEffect;
+    defenseBoosted?: TempEffect;
+    [key: string]: TempEffect | undefined;
+  };
 };
 
 export type SkillType = 'basic' | 'special' | 'ultimate' | 'form';
