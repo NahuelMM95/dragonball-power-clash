@@ -15,6 +15,9 @@ const TrainingUpgrades = () => {
   const { skills, purchaseSkill } = useBattle();
   const { purchaseItem } = useItems();
 
+  // Filter upgrades to only show weighted items in the shop
+  const weightedGear = upgrades.filter(upgrade => upgrade.itemType === 'weight');
+
   return (
     <div className="bg-white/90 p-4 rounded-lg shadow-md backdrop-blur-sm border-2 border-dbBlue">
       <div className="flex justify-between items-center mb-4">
@@ -24,45 +27,37 @@ const TrainingUpgrades = () => {
         </Badge>
       </div>
       
-      <Tabs defaultValue="training">
+      <Tabs defaultValue="training-gear">
         <TabsList className="grid w-full grid-cols-3 mb-4">
-          <TabsTrigger value="training">Training</TabsTrigger>
+          <TabsTrigger value="training-gear">Training Gear</TabsTrigger>
           <TabsTrigger value="skills">Skills</TabsTrigger>
           <TabsTrigger value="items">Items</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="training" className="mt-1">
-          <h3 className="text-lg font-semibold text-dbBlue mb-3">Training Shop</h3>
+        <TabsContent value="training-gear" className="mt-1">
+          <h3 className="text-lg font-semibold text-dbBlue mb-3">Training Gear Shop</h3>
           <div className="grid grid-cols-2 gap-6 max-w-4xl mx-auto">
-            {upgrades.map((upgrade) => (
-              <Card key={upgrade.id} className={`border-2 ${equippedUpgrade === upgrade.id ? 'border-dragonOrange bg-amber-50' : 'border-gray-200'}`}>
+            {weightedGear.map((upgrade) => (
+              <Card key={upgrade.id} className="border-2 border-gray-200">
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-center">
                     <div className="flex items-center">
-                      {upgrade.id === 'weights' && <Weight className="mr-2 h-5 w-5 text-gray-600" />}
+                      <Weight className="mr-2 h-5 w-5 text-gray-600" />
                       <CardTitle className="text-lg">{upgrade.name}</CardTitle>
                     </div>
-                    {upgrade.purchased && !upgrade.itemType && (
-                      <Badge variant={equippedUpgrade === upgrade.id ? "default" : "outline"} className="ml-2">
-                        {equippedUpgrade === upgrade.id ? "Equipped" : "Purchased"}
+                    {upgrade.purchased && (
+                      <Badge variant="outline" className="ml-2">
+                        Purchased
                       </Badge>
                     )}
                   </div>
                   <CardDescription>{upgrade.description}</CardDescription>
                 </CardHeader>
                 <CardContent className="pb-2">
-                  {!upgrade.itemType ? (
-                    <p className="text-sm"><span className="font-semibold text-dbBlue">+{upgrade.powerBonus}</span> Power Level gain</p>
-                  ) : (
-                    <p className="text-sm"><span className="font-semibold text-dbBlue">+15%</span> Power Level gain chance</p>
-                  )}
+                  <p className="text-sm"><span className="font-semibold text-dbBlue">+5%</span> Power Level gain chance</p>
                   {!upgrade.purchased && (
                     <p className="text-sm">Cost: {" "}
-                      {upgrade.costType === 'zeni' ? (
-                        <span className="font-semibold text-yellow-600">{upgrade.cost.toLocaleString('en')} Zeni</span>
-                      ) : (
-                        <span className="font-semibold text-dbRed">{upgrade.cost.toLocaleString('en')} Power Levels</span>
-                      )}
+                      <span className="font-semibold text-yellow-600">{upgrade.cost.toLocaleString('en')} Zeni</span>
                     </p>
                   )}
                 </CardContent>
@@ -71,35 +66,18 @@ const TrainingUpgrades = () => {
                     <Button 
                       variant="default" 
                       className="w-full bg-dbBlue hover:bg-dbBlue/80"
-                      disabled={(upgrade.costType === 'zeni' && zeni < upgrade.cost) || 
-                               (upgrade.costType !== 'zeni' && powerLevel < upgrade.cost)}
+                      disabled={zeni < upgrade.cost}
                       onClick={() => purchaseUpgrade(upgrade.id)}
                     >
                       Purchase
                     </Button>
-                  ) : !upgrade.itemType && equippedUpgrade !== upgrade.id ? (
+                  ) : (
                     <Button 
                       variant="default" 
                       className="w-full bg-dragonOrange hover:bg-dragonOrange/80"
                       onClick={() => equipUpgrade(upgrade.id)}
                     >
                       Equip
-                    </Button>
-                  ) : !upgrade.itemType ? (
-                    <Button 
-                      variant="outline" 
-                      className="w-full"
-                      disabled
-                    >
-                      Currently Equipped
-                    </Button>
-                  ) : (
-                    <Button 
-                      variant="outline" 
-                      className="w-full"
-                      disabled
-                    >
-                      Available in Inventory
                     </Button>
                   )}
                 </CardFooter>
@@ -183,13 +161,13 @@ const TrainingUpgrades = () => {
               </CardHeader>
               <CardContent className="pb-2">
                 <p className="text-sm">Effect: <span className="font-semibold text-green-600">Full HP Recovery</span></p>
-                <p className="text-sm mt-1">Cost: <span className="font-semibold text-yellow-600">100 Zeni</span></p>
+                <p className="text-sm mt-1">Cost: <span className="font-semibold text-yellow-600">50,000 Zeni</span></p>
               </CardContent>
               <CardFooter className="pt-0">
                 <Button 
                   variant="default" 
                   className="w-full bg-green-600 hover:bg-green-700"
-                  disabled={zeni < 100}
+                  disabled={zeni < 50000}
                   onClick={() => purchaseItem('senzu')}
                 >
                   Purchase

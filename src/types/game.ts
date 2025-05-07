@@ -1,3 +1,4 @@
+
 export type Enemy = {
   name: string;
   power: number;
@@ -94,6 +95,7 @@ export type Upgrade = {
   purchased: boolean;
   itemType?: string;
   costType?: 'zeni' | 'power';
+  powerRequirement?: number; // Added this field
 };
 
 export type ActiveBuff = {

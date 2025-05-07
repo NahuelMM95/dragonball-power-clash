@@ -32,7 +32,7 @@ export const UpgradeProvider: React.FC<UpgradeProviderProps> = ({
   setZeni
 }) => {
   const [upgrades, setUpgrades] = useLocalStorage<Upgrade[]>('dbUpgrades', initialUpgrades);
-  const [equippedUpgrade, setEquippedUpgrade] = useLocalStorage<string | null>('dbEquippedUpgrade', null);
+  const [equippedUpgrade, setEquippedUpgrade] = useLocalStorage<string | null>('dbEquippedUpgrade', 'pushups'); // Default to pushups
 
   // Apply power bonus when clicks are a multiple of 100, but with only a 20% chance
   useEffect(() => {
@@ -46,9 +46,9 @@ export const UpgradeProvider: React.FC<UpgradeProviderProps> = ({
         (item: any) => item.effect?.type === 'power_gain_chance_increase'
       );
       
-      // Increase chance if weighted clothes are equipped
+      // Increase chance if weighted clothes are equipped (now 5% instead of 15%)
       if (hasWeightedClothes) {
-        baseChance += 0.15; // Add 15% chance
+        baseChance += 0.05; // Add 5% chance
       }
       
       // Roll the dice
@@ -68,7 +68,7 @@ export const UpgradeProvider: React.FC<UpgradeProviderProps> = ({
         setPowerLevel(prev => prev + bonus);
         toast.success(`You gained ${bonus.toLocaleString('en')} Power Level!`, {
           description: hasWeightedClothes 
-            ? "Your weighted clothes increased your chance (35% chance)"
+            ? "Your weighted clothes increased your chance (25% chance)"
             : "You got lucky with your training (20% chance)",
         });
       }
@@ -85,13 +85,13 @@ export const UpgradeProvider: React.FC<UpgradeProviderProps> = ({
       const weights = {
         id: `weights-${Date.now()}`,
         name: "Training Weights",
-        description: "Increases chance of power gain by 15% per 100 clicks",
+        description: "Increases chance of power gain by 5% per 100 clicks",
         type: 'weight',
         slot: 'weight',
         quantity: 1,
         effect: {
           type: 'power_gain_chance_increase',
-          value: 0.15
+          value: 0.05
         }
       };
       
@@ -100,30 +100,45 @@ export const UpgradeProvider: React.FC<UpgradeProviderProps> = ({
       setUpgrades(upgrades.map(u => (u.id === id ? { ...u, purchased: true } : u)));
       
       toast(`You've purchased ${upgrade.name}!`, {
-        description: "Check your inventory to equip it.",
+        description: "You can equip it right away for extra power gains.",
         duration: 3000,
       });
       return;
     }
 
-    // Handle power level cost for other upgrades
-    if (powerLevel < upgrade.cost) return;
-    setPowerLevel(powerLevel - upgrade.cost);
+    // Handle power level requirement for training exercises
+    const powerRequirement = upgrade.powerRequirement || upgrade.cost;
+    if (powerLevel < powerRequirement) {
+      toast.error(`Not enough Power Level!`, {
+        description: `You need ${powerRequirement.toLocaleString('en')} Power Level for this training.`,
+        duration: 3000,
+      });
+      return;
+    }
+    
+    // No longer deduct power level for training upgrades
     setUpgrades(upgrades.map(u => (u.id === id ? { ...u, purchased: true } : u)));
     
-    toast(`You've purchased ${upgrade.name}!`, {
-      description: "Equip it to boost your power gains.",
+    toast(`You've unlocked ${upgrade.name}!`, {
+      description: "Select it as your training to boost your power gains.",
       duration: 3000,
     });
   };
 
   const equipUpgrade = (id: string) => {
     const upgrade = upgrades.find(u => u.id === id);
-    if (!upgrade || !upgrade.purchased) return;
+    if (!upgrade || !upgrade.purchased) {
+      if (upgrade && !upgrade.purchased) {
+        // Try to purchase the upgrade first if not purchased
+        purchaseUpgrade(id);
+        return;
+      }
+      return;
+    }
 
     setEquippedUpgrade(id);
     
-    toast(`You've equipped ${upgrade.name}!`, {
+    toast(`You're now training with ${upgrade.name}!`, {
       description: `Power gain +${upgrade.powerBonus}`,
       duration: 3000,
     });
@@ -132,7 +147,7 @@ export const UpgradeProvider: React.FC<UpgradeProviderProps> = ({
   // Function to reset upgrades to their initial state
   const resetUpgrades = () => {
     setUpgrades(initialUpgrades);
-    setEquippedUpgrade(null);
+    setEquippedUpgrade('pushups'); // Reset to pushups
   };
   
   return (
