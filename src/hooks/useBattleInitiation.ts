@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Enemy } from '@/types/game';
+import { Enemy, BattleState } from '@/types/game';
 import { useBattleState } from './useBattleState';
 import { useBattleZones } from './useBattleZones';
 import { dbzEnemies } from '@/data/storyEnemies';
@@ -25,7 +25,7 @@ export const useBattleInitiation = (
   const fightEnemy = (
     zone: string, 
     handleEnemySequence: (selectedEnemy: Enemy | Enemy[]) => Enemy
-  ) => {
+  ): BattleState => {
     let selectedEnemy: Enemy | Enemy[];
     
     if (zone === 'story') {

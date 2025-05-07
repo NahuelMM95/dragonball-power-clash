@@ -11,8 +11,8 @@ export const processBattleEnd = (
   setPowerLevel: React.Dispatch<React.SetStateAction<number>>,
   setInventory: React.Dispatch<React.SetStateAction<any[]>>,
   setZeni: React.Dispatch<React.SetStateAction<number>>,
-  setFightResult: any,
-  resetBattleState: any
+  setFightResult: React.Dispatch<React.SetStateAction<{ enemy: Enemy | null; won: boolean | null } | null>>,
+  resetBattleState: () => void
 ) => {
   // Update the fight result
   setFightResult(prev => ({ ...prev, won: victory }));

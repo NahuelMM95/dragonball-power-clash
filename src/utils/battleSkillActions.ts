@@ -73,7 +73,7 @@ export const useSkillInBattle = (
         { specialEffect: { value: 0.02, type: "hp_drain_percent" }} : null;
     
     if (kaiokenSkill && kaiokenSkill.specialEffect) {
-      const hpDrain = Math.ceil(newPlayerStats.maxHp * kaiokenSkill.specialEffect.value);
+      const hpDrain = Math.ceil(newPlayerStats.maxHp * (kaiokenSkill.specialEffect.value || 0));
       newPlayerStats.hp = Math.max(1, newPlayerStats.hp - hpDrain); // Ensure player doesn't die from drain
       
       // Add HP drain to battle log

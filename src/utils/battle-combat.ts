@@ -1,10 +1,10 @@
-import { BattleState, Enemy } from '../types/game';
+import { BattleState, Enemy, CombatStats } from '../types/game';
 import { toast } from "sonner";
 
 // Helper function to make enemy attack
 export const enemyAttack = (
-  battleState: any,
-  setBattleState: any,
+  battleState: BattleState,
+  setBattleState: React.Dispatch<React.SetStateAction<BattleState>>,
   endBattle: (victory: boolean) => void
 ) => {
   if (!battleState.enemy) return;
@@ -55,8 +55,8 @@ export const enemyAttack = (
 
 // Function to toggle Kaioken form on/off
 export const toggleKaiokenForm = (
-  battleState: any,
-  setBattleState: any,
+  battleState: BattleState,
+  setBattleState: React.Dispatch<React.SetStateAction<BattleState>>,
   endBattleCallback: (victory: boolean) => void
 ) => {
   if (!battleState.playerStats.activeForm) {
@@ -67,7 +67,7 @@ export const toggleKaiokenForm = (
     const baseStats = battleState.playerStats;
     
     // Calculate new stats
-    const newPlayerStats = {
+    const newPlayerStats: CombatStats = {
       ...baseStats,
       hp: Math.floor(baseStats.hp * multiplier),
       maxHp: Math.floor(baseStats.maxHp * multiplier),
@@ -114,7 +114,7 @@ export const toggleKaiokenForm = (
     const currentHpPercentage = baseStats.hp / baseStats.maxHp;
     
     // Revert to base stats but keep relative HP percentage
-    const newPlayerStats = {
+    const newPlayerStats: CombatStats = {
       ...baseStats,
       hp: Math.floor((baseStats.basePowerLevel || 0) * 10 * currentHpPercentage), // Base HP * current percentage
       maxHp: Math.floor((baseStats.basePowerLevel || 0) * 10),

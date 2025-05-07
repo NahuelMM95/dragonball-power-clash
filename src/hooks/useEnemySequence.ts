@@ -9,7 +9,7 @@ export const useEnemySequence = () => {
   const [currentSequenceIndex, setCurrentSequenceIndex] = useState<number>(0);
 
   // Function to handle enemy sequences
-  const handleEnemySequence = (selectedEnemy: Enemy | Enemy[]) => {
+  const handleEnemySequence = (selectedEnemy: Enemy | Enemy[]): Enemy => {
     // Handle multiple enemy sequence
     if (Array.isArray(selectedEnemy)) {
       setEnemySequence(selectedEnemy);
@@ -29,7 +29,7 @@ export const useEnemySequence = () => {
   };
 
   // Function to advance to the next enemy in the sequence
-  const advanceEnemySequence = () => {
+  const advanceEnemySequence = (): Enemy | null => {
     if (enemySequence.length > 0 && currentSequenceIndex < enemySequence.length - 1) {
       const nextIndex = currentSequenceIndex + 1;
       setCurrentSequenceIndex(nextIndex);

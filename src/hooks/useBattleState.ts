@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { BattleState, Enemy } from '@/types/game';
+import { BattleState, Enemy, CombatStats } from '@/types/game';
 import { calculatePlayerStats } from '@/utils/battle';
 
 // Initial state for the battle
@@ -29,7 +29,7 @@ export const useBattleState = (powerLevel: number, equippedItems: any[]) => {
     setFightResult(null);
   };
 
-  const startBattle = (enemy: Enemy, continueWithStats?: any): BattleState => {
+  const startBattle = (enemy: Enemy, continueWithStats?: CombatStats): BattleState => {
     // Use continued stats if provided, otherwise calculate new stats
     const playerStats = continueWithStats || calculatePlayerStats(powerLevel, equippedItems);
     const playerFirst = powerLevel >= enemy.power;
