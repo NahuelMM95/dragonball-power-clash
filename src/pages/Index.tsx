@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { GameProvider, GameContextWrapper, useGame } from "@/contexts/GameContext";
@@ -100,7 +99,6 @@ const GameContent = () => {
               <ActiveBuffsIndicator />
               <div className="mt-6 w-full max-w-md mx-auto">
                 <PowerLevel />
-                <CheatButtons visible={cheatsVisible} />
               </div>
             </div>
           </TabsContent>

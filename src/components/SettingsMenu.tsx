@@ -16,7 +16,7 @@ interface SettingsMenuProps {
 }
 
 const SettingsMenu = ({ onCheatsUnlocked }: SettingsMenuProps) => {
-  const { resetProgress } = useGame();
+  const { resetProgress, setPowerLevel, setZeni, powerLevel, zeni } = useGame();
   const { setInventory, setEquippedItems, setActiveBuffs } = useItems();
   const { resetSkills } = useBattle();
   const { resetUpgrades } = useUpgrades();
@@ -24,6 +24,8 @@ const SettingsMenu = ({ onCheatsUnlocked }: SettingsMenuProps) => {
   const [cheatText, setCheatText] = useState('');
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [cheatsUnlocked, setCheatsUnlocked] = useState(false);
+  const [powerLevelInput, setPowerLevelInput] = useState('');
+  const [zeniInput, setZeniInput] = useState('');
 
   const handleReset = () => {
     if (deleteText === 'DELETE') {
@@ -61,13 +63,45 @@ const SettingsMenu = ({ onCheatsUnlocked }: SettingsMenuProps) => {
       }
       setCheatText('');
       toast.success("Cheats unlocked!", {
-        description: "Power boost buttons are now available on the main screen."
+        description: "Power level and zeni setters are now available in the settings menu."
       });
     } else {
       toast.error("Incorrect password", {
         description: "The cheat code was incorrect."
       });
     }
+  };
+
+  const handleSetPowerLevel = () => {
+    const newPowerLevel = parseInt(powerLevelInput);
+    if (isNaN(newPowerLevel) || newPowerLevel < 0) {
+      toast.error("Invalid power level", {
+        description: "Please enter a valid positive number."
+      });
+      return;
+    }
+    
+    setPowerLevel(newPowerLevel);
+    setPowerLevelInput('');
+    toast.success(`Power level set to ${newPowerLevel.toLocaleString('en')}`, {
+      description: "Your power level has been updated."
+    });
+  };
+
+  const handleSetZeni = () => {
+    const newZeni = parseInt(zeniInput);
+    if (isNaN(newZeni) || newZeni < 0) {
+      toast.error("Invalid zeni amount", {
+        description: "Please enter a valid positive number."
+      });
+      return;
+    }
+    
+    setZeni(newZeni);
+    setZeniInput('');
+    toast.success(`Zeni set to ${newZeni.toLocaleString('en')}`, {
+      description: "Your zeni has been updated."
+    });
   };
 
   return (
@@ -87,6 +121,42 @@ const SettingsMenu = ({ onCheatsUnlocked }: SettingsMenuProps) => {
         </SheetHeader>
         
         <div className="mt-6 space-y-6">
+          {cheatsUnlocked && (
+            <div className="space-y-4 border-2 border-amber-300 p-4 rounded-lg bg-amber-50">
+              <h3 className="text-lg font-medium text-amber-700">Cheats Enabled</h3>
+              
+              <div className="space-y-2">
+                <Label htmlFor="power-level-input">Set Power Level:</Label>
+                <div className="flex space-x-2">
+                  <Input 
+                    id="power-level-input"
+                    value={powerLevelInput}
+                    onChange={(e) => setPowerLevelInput(e.target.value)}
+                    placeholder={powerLevel.toString()}
+                    type="number"
+                    min="0"
+                  />
+                  <Button onClick={handleSetPowerLevel}>Set</Button>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="zeni-input">Set Zeni:</Label>
+                <div className="flex space-x-2">
+                  <Input 
+                    id="zeni-input"
+                    value={zeniInput}
+                    onChange={(e) => setZeniInput(e.target.value)}
+                    placeholder={zeni.toString()}
+                    type="number"
+                    min="0"
+                  />
+                  <Button onClick={handleSetZeni}>Set</Button>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="space-y-4">
             <h3 className="text-lg font-medium">Reset Progress</h3>
             <p className="text-sm text-muted-foreground">

@@ -48,9 +48,9 @@ const DragonBall = () => {
         </DialogTrigger>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-dbBlue text-xl font-bold">Select Training Method</DialogTitle>
+            <DialogTitle className="text-dbBlue text-xl font-bold mb-2">Select Training Method</DialogTitle>
           </DialogHeader>
-          <div className="grid grid-cols-1 gap-4 mt-2">
+          <div className="grid grid-cols-1 gap-6 mt-4">
             {trainingExercises.map((exercise) => (
               <Card 
                 key={exercise.id} 
@@ -60,19 +60,19 @@ const DragonBall = () => {
                   setIsTrainingDialogOpen(false);
                 }}
               >
-                <CardHeader className="py-3">
+                <CardHeader className="py-4">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-lg">{exercise.name}</CardTitle>
                     {equippedUpgrade === exercise.id && (
                       <div className="text-sm font-bold text-dragonOrange">Selected</div>
                     )}
                   </div>
-                  <CardDescription>{exercise.description}</CardDescription>
+                  <CardDescription className="mt-1">{exercise.description}</CardDescription>
                 </CardHeader>
-                <CardContent className="py-0">
+                <CardContent className="py-2">
                   <p className="text-sm"><span className="font-semibold text-dbBlue">+{exercise.powerBonus}</span> Power Level gain</p>
                   {!exercise.purchased ? (
-                    <p className="text-sm text-dbRed">
+                    <p className="text-sm text-dbRed mt-2">
                       Requires: {exercise.powerRequirement || exercise.cost} Power Level
                     </p>
                   ) : null}

@@ -30,6 +30,15 @@ export const initialUpgrades: Upgrade[] = [
     purchased: false 
   },
   { 
+    id: 'onehandpull', 
+    name: 'One-Handed Pull Ups', 
+    description: 'Increases your power gain by +5 per click.', 
+    powerBonus: 5, 
+    cost: 75,
+    powerRequirement: 100,
+    purchased: false 
+  },
+  { 
     id: 'weights', 
     name: '5Kg Weighted Clothes', 
     description: 'Increases chance of power gain every 100 clicks by 5%.', 
