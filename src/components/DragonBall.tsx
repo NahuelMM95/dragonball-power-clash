@@ -41,6 +41,10 @@ const DragonBall = () => {
     setTimeout(() => setIsClicking(false), 100);
   };
 
+  console.log('DragonBall - settings.numberAbbreviation:', settings.numberAbbreviation);
+  console.log('DragonBall - clicks:', clicks);
+  console.log('DragonBall - formatted clicks:', abbreviateNumber(clicks, settings.numberAbbreviation));
+
   return (
     <div className="flex flex-col items-center">
       <div 

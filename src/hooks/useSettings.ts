@@ -29,34 +29,27 @@ export const useSettings = () => {
   useEffect(() => {
     localStorage.setItem('gameSettings', JSON.stringify(settings));
     
-    // Apply dark mode to document with no transitions to prevent fading
+    // Apply dark mode to document immediately and persistently
     const root = document.documentElement;
     
-    // Completely disable transitions during theme change
-    const style = document.createElement('style');
-    style.innerHTML = `
-      *, *::before, *::after {
-        transition-duration: 0s !important;
-        transition-delay: 0s !important;
-        animation-duration: 0s !important;
-        animation-delay: 0s !important;
-      }
-    `;
-    document.head.appendChild(style);
+    // Force remove any existing dark class first
+    root.classList.remove('dark');
     
+    // Add dark class if enabled
     if (settings.darkMode) {
       root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
     }
     
-    // Re-enable transitions after theme change is complete
-    setTimeout(() => {
-      document.head.removeChild(style);
-    }, 100);
+    // Force a style recalculation to ensure the change takes effect
+    root.offsetHeight;
+    
+    console.log('Settings updated:', settings);
+    console.log('Dark mode applied:', settings.darkMode);
+    console.log('Document has dark class:', root.classList.contains('dark'));
   }, [settings]);
 
   const updateSetting = <K extends keyof GameSettings>(key: K, value: GameSettings[K]) => {
+    console.log(`Updating setting ${key} to:`, value);
     setSettings(prev => ({ ...prev, [key]: value }));
   };
 

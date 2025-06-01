@@ -26,6 +26,10 @@ const PowerLevel = () => {
     }
   };
 
+  console.log('PowerLevel - settings.numberAbbreviation:', settings.numberAbbreviation);
+  console.log('PowerLevel - powerLevel:', powerLevel);
+  console.log('PowerLevel - formatted powerLevel:', abbreviateNumber(powerLevel, settings.numberAbbreviation));
+
   return (
     <div className="bg-white/90 dark:bg-gray-800/90 p-4 rounded-lg shadow-md backdrop-blur-sm border-2 border-dragonOrange dark:border-dragonOrange/70">
       <h2 className="text-xl font-bold text-dbRed dark:text-dbRed mb-2">Power Status</h2>
