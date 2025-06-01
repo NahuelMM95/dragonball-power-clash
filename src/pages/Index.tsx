@@ -1,5 +1,5 @@
+
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { GameProvider, GameContextWrapper, useGame } from "@/contexts/GameContext";
 import { useItems } from "@/contexts/ItemContext";
 import { useBattle } from "@/contexts/BattleContext";
@@ -7,14 +7,12 @@ import { useUpgrades } from "@/contexts/UpgradeContext";
 import DragonBall from "@/components/DragonBall";
 import PowerLevel from "@/components/PowerLevel";
 import TrainingUpgrades from "@/components/TrainingUpgrades";
-import BattleZone from "@/components/BattleZone";
+import FightMenu from "@/components/FightMenu";
 import Inventory from "@/components/Inventory";
 import SettingsMenu from "@/components/SettingsMenu";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import CheatButtons from "@/components/CheatButtons";
-import { Button } from "@/components/ui/button";
-import { Sword } from "lucide-react";
 
 const ActiveBuffsIndicator = () => {
   const { inventory, activeBuffs } = useItems();
@@ -73,15 +71,6 @@ const GameContent = () => {
           DRAGON BALL POWER CLASH
         </h1>
         <p className="text-lg mt-2">Click to power up and become the strongest warrior!</p>
-        
-        <div className="mt-4">
-          <Link to="/story">
-            <Button variant="outline" className="gap-2 bg-orange-100 border-orange-300 hover:bg-orange-200 text-orange-800">
-              <Sword className="h-4 w-4" />
-              Story Mode
-            </Button>
-          </Link>
-        </div>
       </header>
       
       <div className="max-w-6xl mx-auto">
@@ -89,7 +78,7 @@ const GameContent = () => {
           <TabsList className="grid grid-cols-4 mb-8 mx-auto max-w-md">
             <TabsTrigger value="main" className="text-lg">Main</TabsTrigger>
             <TabsTrigger value="training" className="text-lg">Shop</TabsTrigger>
-            <TabsTrigger value="battle" className="text-lg">Battle Zone</TabsTrigger>
+            <TabsTrigger value="fight" className="text-lg">Fight</TabsTrigger>
             <TabsTrigger value="inventory" className="text-lg">Inventory</TabsTrigger>
           </TabsList>
           
@@ -109,9 +98,9 @@ const GameContent = () => {
             </div>
           </TabsContent>
           
-          <TabsContent value="battle" className="mt-6">
+          <TabsContent value="fight" className="mt-6">
             <div className="max-w-md mx-auto">
-              <BattleZone />
+              <FightMenu />
             </div>
           </TabsContent>
           
