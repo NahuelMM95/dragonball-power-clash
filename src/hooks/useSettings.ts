@@ -29,12 +29,22 @@ export const useSettings = () => {
   useEffect(() => {
     localStorage.setItem('gameSettings', JSON.stringify(settings));
     
-    // Apply dark mode to document
+    // Apply dark mode to document with immediate effect (no transitions)
+    const root = document.documentElement;
+    
+    // Temporarily disable transitions
+    root.style.setProperty('--transition-duration', '0s');
+    
     if (settings.darkMode) {
-      document.documentElement.classList.add('dark');
+      root.classList.add('dark');
     } else {
-      document.documentElement.classList.remove('dark');
+      root.classList.remove('dark');
     }
+    
+    // Re-enable transitions after a short delay
+    setTimeout(() => {
+      root.style.removeProperty('--transition-duration');
+    }, 50);
   }, [settings]);
 
   const updateSetting = <K extends keyof GameSettings>(key: K, value: GameSettings[K]) => {

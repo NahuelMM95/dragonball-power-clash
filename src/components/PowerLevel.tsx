@@ -1,6 +1,7 @@
 
 import { useGame } from '@/contexts/GameContext';
 import { useUpgrades } from '@/contexts/UpgradeContext';
+import { useItems } from '@/contexts/ItemContext';
 import { useSettings } from '@/hooks/useSettings';
 import { abbreviateNumber } from '@/utils/numberAbbreviation';
 import { Button } from '@/components/ui/button';
@@ -9,6 +10,7 @@ import { AlertCircle } from 'lucide-react';
 const PowerLevel = () => {
   const { powerLevel, gameOver, resetProgress } = useGame();
   const { equippedUpgrade, upgrades } = useUpgrades();
+  const { equippedItems } = useItems();
   const { settings } = useSettings();
   
   // Calculate power gain based on equipped upgrade
@@ -51,6 +53,12 @@ const PowerLevel = () => {
           {equippedUpgrade && (
             <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
               Training: {upgrades.find(u => u.id === equippedUpgrade)?.name}
+            </div>
+          )}
+          
+          {equippedItems.some(item => item.effect?.type === 'power_gain_chance_increase') && (
+            <div className="mt-2 text-sm text-green-600 dark:text-green-400">
+              Weighted Training: +5% power gain chance
             </div>
           )}
         </>

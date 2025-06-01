@@ -79,10 +79,10 @@ const GameContent = () => {
       <div className="max-w-6xl mx-auto">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid grid-cols-4 mb-8 mx-auto max-w-md dark:bg-gray-800">
-            <TabsTrigger value="main" className="text-lg dark:data-[state=active]:bg-gray-700">Main</TabsTrigger>
-            <TabsTrigger value="training" className="text-lg dark:data-[state=active]:bg-gray-700">Shop</TabsTrigger>
-            <TabsTrigger value="fight" className="text-lg dark:data-[state=active]:bg-gray-700">Fight</TabsTrigger>
-            <TabsTrigger value="inventory" className="text-lg dark:data-[state=active]:bg-gray-700">Inventory</TabsTrigger>
+            <TabsTrigger value="main" className="text-lg dark:data-[state=active]:bg-gray-700 dark:text-gray-300">Main</TabsTrigger>
+            <TabsTrigger value="training" className="text-lg dark:data-[state=active]:bg-gray-700 dark:text-gray-300">Shop</TabsTrigger>
+            <TabsTrigger value="fight" className="text-lg dark:data-[state=active]:bg-gray-700 dark:text-gray-300">Fight</TabsTrigger>
+            <TabsTrigger value="inventory" className="text-lg dark:data-[state=active]:bg-gray-700 dark:text-gray-300">Inventory</TabsTrigger>
           </TabsList>
           
           <TabsContent value="main" className="mt-6">
