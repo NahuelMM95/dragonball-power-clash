@@ -36,22 +36,24 @@ export const useBattleActions = (
       const nextEnemy = advanceEnemySequence();
       
       if (nextEnemy) {
-        // Continue with next enemy in sequence
+        // Continue with next enemy in sequence - DON'T CLOSE THE BATTLE DIALOG
         setTimeout(() => {
           // Start battle with the next enemy but keep player's current stats
           const continuedBattleState = {
             ...battleState,
             enemy: nextEnemy,
-            log: [...battleState.log, `Next enemy: ${nextEnemy.name}`],
-            playerTurn: powerLevel >= nextEnemy.power
+            log: [...battleState.log, `Next enemy: ${nextEnemy.name}`, "The battle continues!"],
+            playerTurn: powerLevel >= nextEnemy.power,
+            inProgress: true // Ensure battle stays active
           };
           
           setBattleState(continuedBattleState);
           
+          // DON'T set fight result to null - keep the battle dialog open
+          // Just update the enemy
           setFightResult(prev => ({ 
-            ...prev, 
             enemy: nextEnemy,
-            won: null 
+            won: null // Reset win state for new enemy
           }));
           
           // If enemy attacks first in the new battle
@@ -61,6 +63,9 @@ export const useBattleActions = (
             }, 1000);
           }
         }, 1500);
+        
+        // Return early to prevent normal battle end processing
+        return;
       } else {
         // Process the battle end normally (last enemy in sequence or regular battle)
         processBattleEnd(

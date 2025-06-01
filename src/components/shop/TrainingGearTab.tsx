@@ -30,7 +30,8 @@ const TrainingGearTab = () => {
     // Purchase the upgrade (this will add the item to inventory)
     purchaseUpgrade(upgradeId);
     
-    // The item will be automatically available in inventory for manual equipping
+    // Automatically equip the weighted item
+    equipItem(`weight-${upgradeId}`, 'weight');
   };
 
   return (
@@ -74,12 +75,17 @@ const TrainingGearTab = () => {
                   disabled={zeni < upgrade.cost}
                   onClick={() => handlePurchaseAndEquip(upgrade.id)}
                 >
-                  Purchase
+                  Purchase & Equip
                 </Button>
               ) : (
-                <div className="w-full text-center text-sm text-green-600 dark:text-green-400">
-                  Available in Inventory - Equip from Inventory tab
-                </div>
+                <Button 
+                  variant="default" 
+                  className="w-full bg-green-600 hover:bg-green-700"
+                  onClick={() => equipItem(`weight-${upgrade.id}`, 'weight')}
+                  disabled={isWeightedClothesEquipped}
+                >
+                  {isWeightedClothesEquipped ? 'Equipped' : 'Equip'}
+                </Button>
               )}
             </CardFooter>
           </Card>

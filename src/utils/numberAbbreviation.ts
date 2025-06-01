@@ -1,7 +1,7 @@
 
 export const abbreviateNumber = (num: number, useAbbreviation: boolean = true): string => {
   if (!useAbbreviation) {
-    return num.toLocaleString('en');
+    return num.toLocaleString('en-US');
   }
 
   const absNum = Math.abs(num);
