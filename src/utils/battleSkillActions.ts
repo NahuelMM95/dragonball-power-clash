@@ -11,6 +11,9 @@ export const useSkillInBattle = (
 ) => {
   if (!battleState.inProgress || !battleState.playerTurn || !battleState.enemy || !skill.purchased) return;
   
+  // Calculate ki cost as percentage of max ki
+  const kiCostAmount = Math.floor((skill.kiCost / 100) * battleState.playerStats.maxKi);
+  
   // Handle Kaioken form toggling
   if (skill.name === "Kaioken x2" && skill.type === "form") {
     // Check if the player already has Kaioken active
@@ -20,10 +23,10 @@ export const useSkillInBattle = (
       return;
     } else {
       // Toggle Kaioken on
-      if (battleState.playerStats.ki < skill.kiCost) {
+      if (battleState.playerStats.ki < kiCostAmount) {
         setBattleState(prev => ({
           ...prev,
-          log: [...prev.log, `Not enough Ki to use ${skill.name}!`]
+          log: [...prev.log, `Not enough Ki to use ${skill.name}! (Need ${kiCostAmount}, have ${battleState.playerStats.ki})`]
         }));
         return;
       }
@@ -31,7 +34,7 @@ export const useSkillInBattle = (
       // Deduct ki cost
       const newPlayerStats = {
         ...battleState.playerStats,
-        ki: battleState.playerStats.ki - skill.kiCost
+        ki: battleState.playerStats.ki - kiCostAmount
       };
       
       setBattleState(prev => ({
@@ -50,10 +53,10 @@ export const useSkillInBattle = (
     }
   }
   
-  if (battleState.playerStats.ki < skill.kiCost) {
+  if (battleState.playerStats.ki < kiCostAmount) {
     setBattleState(prev => ({
       ...prev,
-      log: [...prev.log, `Not enough Ki to use ${skill.name}!`]
+      log: [...prev.log, `Not enough Ki to use ${skill.name}! (Need ${kiCostAmount}, have ${battleState.playerStats.ki})`]
     }));
     return;
   }
@@ -63,7 +66,7 @@ export const useSkillInBattle = (
   // Apply special effects like Kaioken's HP drain and stat multipliers
   let newPlayerStats = {
     ...battleState.playerStats,
-    ki: battleState.playerStats.ki - skill.kiCost
+    ki: battleState.playerStats.ki - kiCostAmount
   };
   
   // Apply Kaioken drain if active

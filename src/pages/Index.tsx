@@ -4,6 +4,8 @@ import { GameProvider, GameContextWrapper, useGame } from "@/contexts/GameContex
 import { useItems } from "@/contexts/ItemContext";
 import { useBattle } from "@/contexts/BattleContext";
 import { useUpgrades } from "@/contexts/UpgradeContext";
+import { useSettings } from "@/hooks/useSettings";
+import { abbreviateNumber } from "@/utils/numberAbbreviation";
 import DragonBall from "@/components/DragonBall";
 import PowerLevel from "@/components/PowerLevel";
 import TrainingUpgrades from "@/components/TrainingUpgrades";
@@ -16,6 +18,7 @@ import CheatButtons from "@/components/CheatButtons";
 
 const ActiveBuffsIndicator = () => {
   const { inventory, activeBuffs } = useItems();
+  const { settings } = useSettings();
   
   if (!activeBuffs || activeBuffs.length === 0) return null;
   
@@ -63,23 +66,23 @@ const GameContent = () => {
   const [cheatsVisible, setCheatsVisible] = useState(false);
   
   return (
-    <div className="min-h-screen py-8 px-4 sm:px-6 md:py-12">
+    <div className="min-h-screen py-8 px-4 sm:px-6 md:py-12 dark:bg-gray-900 transition-colors duration-200">
       <SettingsMenu onCheatsUnlocked={() => setCheatsVisible(true)} />
       
       <header className="text-center mb-8">
-        <h1 className="text-4xl font-extrabold text-dragonOrange drop-shadow-md">
+        <h1 className="text-4xl font-extrabold text-dragonOrange drop-shadow-md dark:text-dragonOrange">
           DRAGON BALL POWER CLASH
         </h1>
-        <p className="text-lg mt-2">Click to power up and become the strongest warrior!</p>
+        <p className="text-lg mt-2 dark:text-gray-300">Click to power up and become the strongest warrior!</p>
       </header>
       
       <div className="max-w-6xl mx-auto">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-4 mb-8 mx-auto max-w-md">
-            <TabsTrigger value="main" className="text-lg">Main</TabsTrigger>
-            <TabsTrigger value="training" className="text-lg">Shop</TabsTrigger>
-            <TabsTrigger value="fight" className="text-lg">Fight</TabsTrigger>
-            <TabsTrigger value="inventory" className="text-lg">Inventory</TabsTrigger>
+          <TabsList className="grid grid-cols-4 mb-8 mx-auto max-w-md dark:bg-gray-800">
+            <TabsTrigger value="main" className="text-lg dark:data-[state=active]:bg-gray-700">Main</TabsTrigger>
+            <TabsTrigger value="training" className="text-lg dark:data-[state=active]:bg-gray-700">Shop</TabsTrigger>
+            <TabsTrigger value="fight" className="text-lg dark:data-[state=active]:bg-gray-700">Fight</TabsTrigger>
+            <TabsTrigger value="inventory" className="text-lg dark:data-[state=active]:bg-gray-700">Inventory</TabsTrigger>
           </TabsList>
           
           <TabsContent value="main" className="mt-6">
@@ -112,7 +115,7 @@ const GameContent = () => {
         </Tabs>
       </div>
       
-      <footer className="text-center mt-12 text-sm text-gray-600">
+      <footer className="text-center mt-12 text-sm text-gray-600 dark:text-gray-400">
         <p>Click the Dumbbell to increase your power level!</p>
       </footer>
     </div>

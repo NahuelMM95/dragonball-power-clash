@@ -8,13 +8,15 @@ const WastelandZone = () => {
   const { fightEnemy } = useBattle();
 
   const wastelandEnemiesInfo = [
-    { name: "Saibaman", power: 1500, reward: "1,000 Zeni" }
+    { name: "Saibaman", power: 1500, reward: "1,000 Zeni" },
+    { name: "T-Rex", power: 250, reward: "500 Zeni" },
+    { name: "Pterodactyl", power: 150, reward: "300 Zeni" }
   ];
 
   return (
     <ZoneCard
       zoneName="Wasteland"
-      description="Face off against powerful plant-based warriors in this desolate area."
+      description="Face off against powerful plant-based warriors and prehistoric beasts in this desolate area."
       enemies={wastelandEnemiesInfo}
       showEnemies={showEnemies}
       onToggleEnemies={() => setShowEnemies(!showEnemies)}

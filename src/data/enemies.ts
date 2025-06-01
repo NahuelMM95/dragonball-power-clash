@@ -60,22 +60,6 @@ export const getDesertEnemies = (playerPowerLevel: number = 1): Enemy[] => [
     ...calculateEnemyStats(50, playerPowerLevel)
   },
   {
-    name: 'T-Rex',
-    image: ENEMY_IMAGES.T_REX,
-    ki: 0,
-    maxKi: 0,
-    zeniReward: 500,
-    ...calculateEnemyStats(250, playerPowerLevel)
-  },
-  {
-    name: 'Pterodactyl',
-    image: ENEMY_IMAGES.PTERODACTYL,
-    ki: 0,
-    maxKi: 0,
-    zeniReward: 300,
-    ...calculateEnemyStats(150, playerPowerLevel)
-  },
-  {
     name: 'Desert Bandit',
     image: ENEMY_IMAGES.DESERT_BANDIT,
     ki: 20,
@@ -120,6 +104,22 @@ export const getWastelandEnemies = (playerPowerLevel: number = 1): Enemy[] => [
     maxKi: 500,
     zeniReward: 1000,
     ...calculateEnemyStats(1500, playerPowerLevel)
+  },
+  {
+    name: 'T-Rex',
+    image: ENEMY_IMAGES.T_REX,
+    ki: 0,
+    maxKi: 0,
+    zeniReward: 500,
+    ...calculateEnemyStats(250, playerPowerLevel)
+  },
+  {
+    name: 'Pterodactyl',
+    image: ENEMY_IMAGES.PTERODACTYL,
+    ki: 0,
+    maxKi: 0,
+    zeniReward: 300,
+    ...calculateEnemyStats(150, playerPowerLevel)
   }
 ];
 

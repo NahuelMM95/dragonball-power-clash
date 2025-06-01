@@ -51,16 +51,12 @@ export const useBattleZones = () => {
       }
     } else if (zone === 'desert') {
       const rand = Math.random();
-      if (rand < 0.2) {
+      if (rand < 0.4) {
         selectedEnemy = { ...desertEnemies[0] }; // Yamcha
-      } else if (rand < 0.4) {
-        selectedEnemy = { ...desertEnemies[1] }; // T-Rex
-      } else if (rand < 0.6) {
-        selectedEnemy = { ...desertEnemies[2] }; // Pterodactyl
-      } else if (rand < 0.8) {
-        selectedEnemy = { ...desertEnemies[3] }; // Desert Bandit
+      } else if (rand < 0.7) {
+        selectedEnemy = { ...desertEnemies[1] }; // Desert Bandit
       } else {
-        selectedEnemy = { ...desertEnemies[4] }; // Scorpion
+        selectedEnemy = { ...desertEnemies[2] }; // Scorpion
       }
     } else if (zone === 'crystal-cave') {
       const rand = Math.random();
@@ -70,7 +66,14 @@ export const useBattleZones = () => {
         selectedEnemy = { ...crystalCaveEnemies[1] }; // Malfunctioning Robot
       }
     } else {
-      selectedEnemy = { ...wastelandEnemies[0] };
+      const rand = Math.random();
+      if (rand < 0.4) {
+        selectedEnemy = { ...wastelandEnemies[0] }; // Saibaman
+      } else if (rand < 0.7) {
+        selectedEnemy = { ...wastelandEnemies[1] }; // T-Rex
+      } else {
+        selectedEnemy = { ...wastelandEnemies[2] }; // Pterodactyl
+      }
     }
     
     return selectedEnemy;
