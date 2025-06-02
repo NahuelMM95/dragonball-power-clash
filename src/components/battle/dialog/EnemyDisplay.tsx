@@ -62,7 +62,7 @@ const EnemyDisplay = ({ enemy }: EnemyDisplayProps) => {
           <span>HP:</span>
           <span>{enemy.hp.toLocaleString('en')}/{enemy.maxHp.toLocaleString('en')}</span>
         </div>
-        <Progress value={healthPercentage} className="h-2 mt-1" />
+        <Progress value={healthPercentage} color="red" className="h-2 mt-1" />
       </div>
     </div>
   );

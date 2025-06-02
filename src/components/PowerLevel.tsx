@@ -27,14 +27,14 @@ const PowerLevel = () => {
 
   return (
     <div className="bg-white/90 p-4 rounded-lg shadow-lg border-2 border-dragonOrange">
-      <h2 className="text-sm font-bold text-dbRed mb-3 text-center">POWER STATUS</h2>
+      <h2 className="text-xs font-bold text-dbRed mb-3 text-center">POWER STATUS</h2>
       
       {gameOver ? (
         <div className="flex flex-col items-center py-3">
-          <AlertCircle className="text-red-500 h-8 w-8 mb-2" />
-          <p className="text-sm font-bold text-red-500 mb-2">GAME OVER</p>
+          <AlertCircle className="text-red-500 h-6 w-6 mb-2" />
+          <p className="text-xs font-bold text-red-500 mb-2">GAME OVER</p>
           <p className="text-xs text-gray-700 mb-3 text-center">Your power level has dropped to zero!</p>
-          <Button onClick={handleReset} variant="destructive" size="sm" className="text-xs">
+          <Button onClick={handleReset} variant="destructive" size="sm" className="text-xs h-6">
             Reset Game
           </Button>
         </div>
@@ -42,32 +42,32 @@ const PowerLevel = () => {
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <div className="h-3 w-3 bg-dbRed rounded-full mr-2"></div>
+              <div className="h-2 w-2 bg-dbRed rounded-full mr-2"></div>
               <span className="text-xs font-bold">Power Level:</span>
             </div>
-            <span className="text-sm font-bold text-dbRed">
+            <span className="text-xs font-bold text-dbRed">
               {abbreviateNumber(powerLevel, settings.numberAbbreviation)}
             </span>
           </div>
           
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <div className="h-3 w-3 bg-dbBlue rounded-full mr-2"></div>
+              <div className="h-2 w-2 bg-dbBlue rounded-full mr-2"></div>
               <span className="text-xs font-bold">Power Gain:</span>
             </div>
-            <span className="text-sm font-bold text-dbBlue">
+            <span className="text-xs font-bold text-dbBlue">
               +{abbreviateNumber(powerGain, settings.numberAbbreviation)}
             </span>
           </div>
           
           {equippedUpgrade && (
-            <div className="text-xs text-gray-600 text-center bg-gray-100 rounded p-2">
+            <div className="text-xs text-gray-600 text-center bg-gray-100 rounded p-1">
               Training: {upgrades.find(u => u.id === equippedUpgrade)?.name}
             </div>
           )}
           
           {equippedItems.some(item => item.effect?.type === 'power_gain_chance_increase') && (
-            <div className="text-xs text-green-600 text-center bg-green-100 rounded p-2">
+            <div className="text-xs text-green-600 text-center bg-green-100 rounded p-1">
               Weighted Training: +5% power gain chance
             </div>
           )}

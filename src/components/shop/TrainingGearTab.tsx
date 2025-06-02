@@ -34,35 +34,41 @@ const TrainingGearTab = () => {
     equipItem(`weight-${upgradeId}`, 'weight');
   };
 
+  const handleEquip = (upgradeId: string) => {
+    equipItem(`weight-${upgradeId}`, 'weight');
+  };
+
   return (
     <>
-      <h3 className="text-lg font-semibold text-dbBlue mb-3">Training Gear Shop</h3>
-      <div className="grid grid-cols-2 gap-6 max-w-4xl mx-auto">
+      <h3 className="text-sm font-semibold text-dbBlue mb-3">Training Gear Shop</h3>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 max-w-6xl mx-auto">
         {weightedGear.map((upgrade) => (
           <Card key={upgrade.id} className="border-2 border-gray-200 dark:border-gray-700">
             <CardHeader className="pb-2">
-              <div className="flex justify-between items-center">
-                <div className="flex items-center">
-                  <Weight className="mr-2 h-5 w-5 text-gray-600 dark:text-gray-400" />
-                  <CardTitle className="text-lg dark:text-gray-200">{upgrade.name}</CardTitle>
+              <div className="flex justify-between items-start">
+                <div className="flex items-center flex-1">
+                  <Weight className="mr-2 h-4 w-4 text-gray-600 dark:text-gray-400" />
+                  <CardTitle className="text-sm dark:text-gray-200">{upgrade.name}</CardTitle>
                 </div>
-                {upgrade.purchased && (
-                  <Badge variant="outline" className="ml-2">
-                    Purchased
-                  </Badge>
-                )}
-                {upgrade.purchased && isWeightedClothesEquipped && (
-                  <Badge variant="default" className="ml-2 bg-green-600">
-                    Equipped
-                  </Badge>
-                )}
+                <div className="flex flex-col gap-1">
+                  {upgrade.purchased && (
+                    <Badge variant="outline" className="text-xs px-1 py-0">
+                      Purchased
+                    </Badge>
+                  )}
+                  {upgrade.purchased && isWeightedClothesEquipped && (
+                    <Badge variant="default" className="text-xs px-1 py-0 bg-green-600">
+                      Equipped
+                    </Badge>
+                  )}
+                </div>
               </div>
-              <CardDescription className="dark:text-gray-400">{upgrade.description}</CardDescription>
+              <CardDescription className="dark:text-gray-400 text-xs leading-relaxed">{upgrade.description}</CardDescription>
             </CardHeader>
             <CardContent className="pb-2">
-              <p className="text-sm dark:text-gray-300"><span className="font-semibold text-dbBlue">+5%</span> Power Level gain chance</p>
+              <p className="text-xs dark:text-gray-300"><span className="font-semibold text-dbBlue">+5%</span> Power Level gain chance</p>
               {!upgrade.purchased && (
-                <p className="text-sm dark:text-gray-300">Cost: {" "}
+                <p className="text-xs dark:text-gray-300">Cost: {" "}
                   <span className="font-semibold text-yellow-600">{abbreviateNumber(upgrade.cost, settings.numberAbbreviation)} Zeni</span>
                 </p>
               )}
@@ -71,7 +77,7 @@ const TrainingGearTab = () => {
               {!upgrade.purchased ? (
                 <Button 
                   variant="default" 
-                  className="w-full bg-dbBlue hover:bg-dbBlue/80"
+                  className="w-full bg-dbBlue hover:bg-dbBlue/80 text-xs h-8"
                   disabled={zeni < upgrade.cost}
                   onClick={() => handlePurchaseAndEquip(upgrade.id)}
                 >
@@ -80,8 +86,8 @@ const TrainingGearTab = () => {
               ) : (
                 <Button 
                   variant="default" 
-                  className="w-full bg-green-600 hover:bg-green-700"
-                  onClick={() => equipItem(`weight-${upgrade.id}`, 'weight')}
+                  className="w-full bg-green-600 hover:bg-green-700 text-xs h-8"
+                  onClick={() => handleEquip(upgrade.id)}
                   disabled={isWeightedClothesEquipped}
                 >
                   {isWeightedClothesEquipped ? 'Equipped' : 'Equip'}
