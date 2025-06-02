@@ -68,21 +68,20 @@ const BattleDialogContent = ({ battleState, fightResult, handleCloseDialog }: Ba
   const formSkills = skills.filter(skill => skill.purchased && skill.type === 'form');
 
   return (
-    <DialogContent className="sm:max-w-md">
+    <DialogContent className="sm:max-w-md bg-gray-50">
       <DialogHeader>
-        <DialogTitle>
+        <DialogTitle className="text-sm font-bold">
           {!battleState.inProgress ? (fightResult?.won === true ? 'Victory!' : fightResult?.won === false ? 'Defeat!' : 'Battle') : 'Battle'}
         </DialogTitle>
-        <DialogDescription>
+        <DialogDescription className="text-xs">
           {battleState.inProgress ? 
             `Fighting against ${battleState.enemy?.name}!${battleState.enemy?.sequencePosition ? ` (${battleState.enemy.sequencePosition} of ${battleState.enemy.sequenceTotal})` : ''}` : 
             fightResult?.enemy ? `You encountered a ${fightResult.enemy.name}!` : ''}
         </DialogDescription>
       </DialogHeader>
       
-      {/* Battle Interface */}
       {battleState.inProgress && battleState.enemy ? (
-        <div className="flex flex-col space-y-4">
+        <div className="flex flex-col space-y-3">
           <EnemyDisplay enemy={battleState.enemy} />
           <BattleLog log={battleState.log} />
           <PlayerStats stats={battleState.playerStats} />

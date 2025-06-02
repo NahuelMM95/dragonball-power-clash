@@ -18,22 +18,19 @@ const DragonBall = () => {
   const [isClicking, setIsClicking] = useState(false);
   const [isTrainingDialogOpen, setIsTrainingDialogOpen] = useState(false);
 
-  // Filter training exercises (non-weighted items)
   const trainingExercises = upgrades.filter(upgrade => !upgrade.itemType);
 
-  // Calculate current power gain and chance
   const powerGain = (() => {
     if (!equippedUpgrade) return 1;
     const upgrade = upgrades.find(u => u.id === equippedUpgrade);
     return upgrade ? upgrade.powerBonus : 1;
   })();
 
-  // Calculate chance based on equipped items
-  const baseChance = 20; // Base 20% chance
+  const baseChance = 20;
   const hasWeightedClothes = equippedItems.some(
     item => item.effect?.type === 'power_gain_chance_increase'
   );
-  const totalChance = hasWeightedClothes ? baseChance + 5 : baseChance; // +5% from weighted clothes
+  const totalChance = hasWeightedClothes ? baseChance + 5 : baseChance;
 
   const handleClick = () => {
     increaseClicks();
@@ -41,63 +38,66 @@ const DragonBall = () => {
     setTimeout(() => setIsClicking(false), 100);
   };
 
-  console.log('DragonBall - settings.numberAbbreviation:', settings.numberAbbreviation);
-  console.log('DragonBall - clicks:', clicks);
-  console.log('DragonBall - formatted clicks:', abbreviateNumber(clicks, settings.numberAbbreviation));
-
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center space-y-4">
       <div 
-        className={`cursor-pointer mb-4 ${isClicking ? 'animate-shake' : 'animate-float'}`} 
+        className={`cursor-pointer ${isClicking ? 'animate-shake' : 'animate-float'}`} 
         onClick={handleClick}
       >
         <div className="relative">
-          <div className="dumbbell-item w-40 h-40 rounded-full bg-dbBlue animate-pulse-glow flex items-center justify-center">
-            <Dumbbell className="text-white w-24 h-24 pointer-events-none" />
+          <div className="dumbbell-item w-32 h-32 rounded-full bg-dbBlue animate-pulse-glow flex items-center justify-center shadow-lg">
+            <Dumbbell className="text-white w-20 h-20 pointer-events-none" />
           </div>
         </div>
       </div>
-      <p className="text-lg font-semibold">Clicks: {abbreviateNumber(clicks, settings.numberAbbreviation)}</p>
-      <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-        Every 100 clicks = {totalChance}% chance of +{abbreviateNumber(powerGain, settings.numberAbbreviation)} Power Level
-      </p>
+      
+      <div className="text-center space-y-2">
+        <p className="text-sm font-bold">
+          Clicks: {abbreviateNumber(clicks, settings.numberAbbreviation)}
+        </p>
+        <p className="text-xs text-gray-600 max-w-xs text-center">
+          Every 100 clicks = {totalChance}% chance of +{abbreviateNumber(powerGain, settings.numberAbbreviation)} Power Level
+        </p>
+      </div>
       
       <Dialog open={isTrainingDialogOpen} onOpenChange={setIsTrainingDialogOpen}>
         <DialogTrigger asChild>
           <Button 
             variant="outline" 
-            className="bg-orange-100 border-orange-300 hover:bg-orange-200 text-orange-800 dark:bg-orange-900/20 dark:border-orange-600 dark:hover:bg-orange-900/40 dark:text-orange-300"
+            className="bg-orange-100 border-orange-300 hover:bg-orange-200 text-orange-800 text-xs"
           >
             Select Training
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-dbBlue dark:text-dbBlue text-xl font-bold mb-2">Select Training Method</DialogTitle>
+            <DialogTitle className="text-dbBlue text-sm font-bold mb-2">Select Training Method</DialogTitle>
           </DialogHeader>
-          <div className="grid grid-cols-1 gap-6 mt-4">
+          <div className="grid grid-cols-1 gap-4 mt-4">
             {trainingExercises.map((exercise) => (
               <Card 
                 key={exercise.id} 
-                className={`border-2 cursor-pointer hover:bg-orange-50 dark:hover:bg-orange-900/20 ${equippedUpgrade === exercise.id ? 'border-dragonOrange bg-amber-50 dark:bg-amber-900/20' : 'border-gray-200 dark:border-gray-700'}`}
+                className={`border-2 cursor-pointer hover:bg-orange-50 text-xs ${equippedUpgrade === exercise.id ? 'border-dragonOrange bg-amber-50' : 'border-gray-200'}`}
                 onClick={() => {
                   equipUpgrade(exercise.id);
                   setIsTrainingDialogOpen(false);
                 }}
               >
-                <CardHeader className="py-4">
+                <CardHeader className="py-3">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg dark:text-gray-200">{exercise.name}</CardTitle>
+                    <CardTitle className="text-sm">{exercise.name}</CardTitle>
                     {equippedUpgrade === exercise.id && (
-                      <div className="text-sm font-bold text-dragonOrange">Selected</div>
+                      <div className="text-xs font-bold text-dragonOrange">Selected</div>
                     )}
                   </div>
-                  <CardDescription className="mt-1 dark:text-gray-400">{exercise.description}</CardDescription>
+                  <CardDescription className="mt-1 text-xs">{exercise.description}</CardDescription>
                 </CardHeader>
                 <CardContent className="py-2">
-                  <p className="text-sm dark:text-gray-300"><span className="font-semibold text-dbBlue">+{exercise.powerBonus}</span> Power Level gain</p>
+                  <p className="text-xs">
+                    <span className="font-bold text-dbBlue">+{exercise.powerBonus}</span> Power Level gain
+                  </p>
                   {!exercise.purchased ? (
-                    <p className="text-sm text-dbRed mt-2">
+                    <p className="text-xs text-dbRed mt-1">
                       Requires: {exercise.powerRequirement || exercise.cost} Power Level
                     </p>
                   ) : null}

@@ -15,7 +15,8 @@ export const playerSkills: Skill[] = [
     name: "Ki Blast",
     type: "special",
     damageMultiplier: 1.5,
-    kiCost: 15, // 15% of max ki
+    kiCost: 20, // Fixed 20 Ki cost
+    kiCostPercent: 1, // Plus 1% of max Ki
     description: "Channel your ki into a powerful energy blast",
     purchased: false,
     cost: 500
@@ -24,7 +25,8 @@ export const playerSkills: Skill[] = [
     name: "Kaioken x2",
     type: "form",
     damageMultiplier: 2,
-    kiCost: 25, // 25% of max ki
+    kiCost: 1500, // Fixed 1500 Ki cost
+    kiCostPercent: 5, // Plus 5% of max Ki
     description: "A technique that doubles your power but drains 2% HP per turn",
     purchased: false,
     cost: 9000,

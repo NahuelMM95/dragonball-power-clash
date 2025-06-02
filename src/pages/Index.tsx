@@ -10,7 +10,6 @@ import DragonBall from "@/components/DragonBall";
 import PowerLevel from "@/components/PowerLevel";
 import TrainingUpgrades from "@/components/TrainingUpgrades";
 import FightMenu from "@/components/FightMenu";
-import Inventory from "@/components/Inventory";
 import SettingsMenu from "@/components/SettingsMenu";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -22,10 +21,7 @@ const ActiveBuffsIndicator = () => {
   
   if (!activeBuffs || activeBuffs.length === 0) return null;
   
-  // Get current timestamp
   const now = Date.now();
-  
-  // Filter active buffs
   const currentBuffs = activeBuffs.filter(buff => buff.endTime > now);
   
   if (currentBuffs.length === 0) return null;
@@ -35,7 +31,7 @@ const ActiveBuffsIndicator = () => {
       <div className="flex items-center gap-2">
         {currentBuffs.map(buff => {
           const item = inventory.find(i => i.id === buff.id);
-          const timeLeft = Math.ceil((buff.endTime - now) / 1000); // seconds
+          const timeLeft = Math.ceil((buff.endTime - now) / 1000);
           
           if (!item) return null;
           
@@ -66,56 +62,49 @@ const GameContent = () => {
   const [cheatsVisible, setCheatsVisible] = useState(false);
   
   return (
-    <div className="min-h-screen py-8 px-4 sm:px-6 md:py-12 dark:bg-gray-900 transition-colors duration-200">
+    <div className="min-h-screen py-4 px-4 sm:px-6 bg-gradient-to-b from-orange-100 to-yellow-100">
       <SettingsMenu onCheatsUnlocked={() => setCheatsVisible(true)} />
       
-      <header className="text-center mb-8">
-        <h1 className="text-4xl font-extrabold text-dragonOrange drop-shadow-md dark:text-dragonOrange">
+      <header className="text-center mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-dragonOrange drop-shadow-md">
           DRAGON BALL POWER CLASH
         </h1>
-        <p className="text-lg mt-2 dark:text-gray-300">Click to power up and become the strongest warrior!</p>
+        <p className="text-xs mt-2 text-gray-700">Click to power up and become the strongest warrior!</p>
       </header>
       
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-4 mb-8 mx-auto max-w-md dark:bg-gray-800">
-            <TabsTrigger value="main" className="text-lg dark:data-[state=active]:bg-gray-700 dark:text-gray-300">Main</TabsTrigger>
-            <TabsTrigger value="training" className="text-lg dark:data-[state=active]:bg-gray-700 dark:text-gray-300">Shop</TabsTrigger>
-            <TabsTrigger value="fight" className="text-lg dark:data-[state=active]:bg-gray-700 dark:text-gray-300">Fight</TabsTrigger>
-            <TabsTrigger value="inventory" className="text-lg dark:data-[state=active]:bg-gray-700 dark:text-gray-300">Inventory</TabsTrigger>
+          <TabsList className="grid grid-cols-3 mb-6 mx-auto max-w-md bg-white/80">
+            <TabsTrigger value="main" className="text-xs font-bold">Main</TabsTrigger>
+            <TabsTrigger value="training" className="text-xs font-bold">Shop</TabsTrigger>
+            <TabsTrigger value="fight" className="text-xs font-bold">Fight</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="main" className="mt-6">
-            <div className="flex flex-col items-center">
+          <TabsContent value="main" className="mt-4">
+            <div className="flex flex-col items-center space-y-4">
               <DragonBall />
               <ActiveBuffsIndicator />
-              <div className="mt-6 w-full max-w-md mx-auto">
+              <div className="w-full max-w-md mx-auto">
                 <PowerLevel />
               </div>
             </div>
           </TabsContent>
           
-          <TabsContent value="training" className="mt-6">
+          <TabsContent value="training" className="mt-4">
             <div className="max-w-md mx-auto">
               <TrainingUpgrades />
             </div>
           </TabsContent>
           
-          <TabsContent value="fight" className="mt-6">
+          <TabsContent value="fight" className="mt-4">
             <div className="max-w-md mx-auto">
               <FightMenu />
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="inventory" className="mt-6">
-            <div className="max-w-md mx-auto">
-              <Inventory />
             </div>
           </TabsContent>
         </Tabs>
       </div>
       
-      <footer className="text-center mt-12 text-sm text-gray-600 dark:text-gray-400">
+      <footer className="text-center mt-8 text-xs text-gray-600">
         <p>Click the Dumbbell to increase your power level!</p>
       </footer>
     </div>

@@ -95,15 +95,7 @@
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
-    font-family: 'Saiyan Sans', sans-serif;
-  }
-  
-  @font-face {
-    font-family: 'Saiyan Sans';
-    src: url('/saiyan-sans.woff2') format('woff2');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
+    font-family: 'Press Start 2P', monospace;
   }
   
   .dragon-ball {

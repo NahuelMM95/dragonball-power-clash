@@ -13,9 +13,8 @@ export const dbzEnemies: (Enemy & { id: number })[] = [
     damage: 450,
     ki: 1000,
     maxKi: 1000,
-    zeniReward: 2000
+    zeniReward: 1000
   },
-  // Create individual Saibamen for multiple fight sequence
   {
     id: 1,
     name: 'Saibaman 1',
@@ -26,7 +25,7 @@ export const dbzEnemies: (Enemy & { id: number })[] = [
     damage: 360,
     ki: 600,
     maxKi: 600,
-    zeniReward: 1000,
+    zeniReward: 500,
     isPartOfSequence: true,
     sequencePosition: 1,
     sequenceTotal: 6
@@ -41,7 +40,7 @@ export const dbzEnemies: (Enemy & { id: number })[] = [
     damage: 360,
     ki: 600,
     maxKi: 600,
-    zeniReward: 1000,
+    zeniReward: 500,
     isPartOfSequence: true,
     sequencePosition: 2,
     sequenceTotal: 6
@@ -56,7 +55,7 @@ export const dbzEnemies: (Enemy & { id: number })[] = [
     damage: 360,
     ki: 600,
     maxKi: 600,
-    zeniReward: 1000,
+    zeniReward: 500,
     isPartOfSequence: true,
     sequencePosition: 3,
     sequenceTotal: 6
@@ -71,7 +70,7 @@ export const dbzEnemies: (Enemy & { id: number })[] = [
     damage: 360,
     ki: 600,
     maxKi: 600,
-    zeniReward: 1000,
+    zeniReward: 500,
     isPartOfSequence: true,
     sequencePosition: 4,
     sequenceTotal: 6
@@ -86,7 +85,7 @@ export const dbzEnemies: (Enemy & { id: number })[] = [
     damage: 360,
     ki: 600,
     maxKi: 600,
-    zeniReward: 1000,
+    zeniReward: 500,
     isPartOfSequence: true,
     sequencePosition: 5,
     sequenceTotal: 6
@@ -101,7 +100,7 @@ export const dbzEnemies: (Enemy & { id: number })[] = [
     damage: 360,
     ki: 600,
     maxKi: 600,
-    zeniReward: 1000,
+    zeniReward: 500,
     isPartOfSequence: true,
     sequencePosition: 6,
     sequenceTotal: 6
@@ -116,7 +115,7 @@ export const dbzEnemies: (Enemy & { id: number })[] = [
     damage: 1200,
     ki: 2000,
     maxKi: 2000,
-    zeniReward: 5000
+    zeniReward: 2500
   },
   {
     id: 8,
@@ -128,7 +127,7 @@ export const dbzEnemies: (Enemy & { id: number })[] = [
     damage: 5400,
     ki: 10000,
     maxKi: 10000,
-    zeniReward: 10000
+    zeniReward: 5000
   },
   {
     id: 9,
@@ -140,7 +139,7 @@ export const dbzEnemies: (Enemy & { id: number })[] = [
     damage: 21000,
     ki: 30000,
     maxKi: 30000,
-    zeniReward: 25000
+    zeniReward: 15000
   },
   {
     id: 10,
@@ -152,6 +151,6 @@ export const dbzEnemies: (Enemy & { id: number })[] = [
     damage: 2100,
     ki: 5000,
     maxKi: 5000,
-    zeniReward: 15000
+    zeniReward: 3000
   }
 ];

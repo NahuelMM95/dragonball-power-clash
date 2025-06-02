@@ -2,6 +2,21 @@
 import { BattleState, Skill } from '@/types/game';
 import { enemyAttack, toggleKaiokenForm } from './battle';
 
+// Helper function for calculating critical hits
+const calculateCriticalDamage = (baseDamage: number): { damage: number; critType: string | null } => {
+  const critRoll = Math.random() * 100;
+  
+  if (critRoll < 0.25) {
+    // 0.25% chance for super critical (4x damage)
+    return { damage: baseDamage * 4, critType: 'SUPER CRITICAL HIT!' };
+  } else if (critRoll < 2.75) {
+    // 2.5% chance for critical (2x damage)
+    return { damage: baseDamage * 2, critType: 'CRITICAL HIT!' };
+  }
+  
+  return { damage: baseDamage, critType: null };
+};
+
 // Helper function for using skills in battle
 export const useSkillInBattle = (
   skill: Skill,
@@ -11,30 +26,28 @@ export const useSkillInBattle = (
 ) => {
   if (!battleState.inProgress || !battleState.playerTurn || !battleState.enemy || !skill.purchased) return;
   
-  // Calculate ki cost as percentage of max ki
-  const kiCostAmount = Math.floor((skill.kiCost / 100) * battleState.playerStats.maxKi);
+  // Calculate ki cost: base cost + percentage of max ki
+  const baseKiCost = skill.kiCost || 0;
+  const percentKiCost = skill.kiCostPercent ? Math.floor((skill.kiCostPercent / 100) * battleState.playerStats.maxKi) : 0;
+  const totalKiCost = baseKiCost + percentKiCost;
   
   // Handle Kaioken form toggling
   if (skill.name === "Kaioken x2" && skill.type === "form") {
-    // Check if the player already has Kaioken active
     if (battleState.playerStats.activeForm === "Kaioken x2") {
-      // Toggle Kaioken off
       toggleKaiokenForm(battleState, setBattleState, endBattle);
       return;
     } else {
-      // Toggle Kaioken on
-      if (battleState.playerStats.ki < kiCostAmount) {
+      if (battleState.playerStats.ki < totalKiCost) {
         setBattleState(prev => ({
           ...prev,
-          log: [...prev.log, `Not enough Ki to use ${skill.name}! (Need ${kiCostAmount}, have ${battleState.playerStats.ki})`]
+          log: [...prev.log, `Not enough Ki to use ${skill.name}! (Need ${totalKiCost}, have ${battleState.playerStats.ki})`]
         }));
         return;
       }
       
-      // Deduct ki cost
       const newPlayerStats = {
         ...battleState.playerStats,
-        ki: battleState.playerStats.ki - kiCostAmount
+        ki: battleState.playerStats.ki - totalKiCost
       };
       
       setBattleState(prev => ({
@@ -42,7 +55,6 @@ export const useSkillInBattle = (
         playerStats: newPlayerStats
       }));
       
-      // Toggle Kaioken on with the updated ki
       toggleKaiokenForm(
         { ...battleState, playerStats: newPlayerStats },
         setBattleState,
@@ -53,20 +65,22 @@ export const useSkillInBattle = (
     }
   }
   
-  if (battleState.playerStats.ki < kiCostAmount) {
+  if (battleState.playerStats.ki < totalKiCost) {
     setBattleState(prev => ({
       ...prev,
-      log: [...prev.log, `Not enough Ki to use ${skill.name}! (Need ${kiCostAmount}, have ${battleState.playerStats.ki})`]
+      log: [...prev.log, `Not enough Ki to use ${skill.name}! (Need ${totalKiCost}, have ${battleState.playerStats.ki})`]
     }));
     return;
   }
   
-  let damage = Math.floor(battleState.playerStats.damage * skill.damageMultiplier);
+  let baseDamage = Math.floor(battleState.playerStats.damage * skill.damageMultiplier);
   
-  // Apply special effects like Kaioken's HP drain and stat multipliers
+  // Calculate critical hit
+  const { damage, critType } = calculateCriticalDamage(baseDamage);
+  
   let newPlayerStats = {
     ...battleState.playerStats,
-    ki: battleState.playerStats.ki - kiCostAmount
+    ki: battleState.playerStats.ki - totalKiCost
   };
   
   // Apply Kaioken drain if active
@@ -77,9 +91,8 @@ export const useSkillInBattle = (
     
     if (kaiokenSkill && kaiokenSkill.specialEffect) {
       const hpDrain = Math.ceil(newPlayerStats.maxHp * (kaiokenSkill.specialEffect.value || 0));
-      newPlayerStats.hp = Math.max(1, newPlayerStats.hp - hpDrain); // Ensure player doesn't die from drain
+      newPlayerStats.hp = Math.max(1, newPlayerStats.hp - hpDrain);
       
-      // Add HP drain to battle log
       setBattleState(prev => ({
         ...prev,
         log: [...prev.log, `Kaioken drains ${hpDrain.toLocaleString('en')} HP!`]
@@ -93,12 +106,18 @@ export const useSkillInBattle = (
     hp: newEnemyHp
   };
   
+  // Create battle log messages
+  let attackMessage = `You use ${skill.name} for ${damage.toLocaleString('en')} damage!`;
+  if (critType) {
+    attackMessage = `${critType} You use ${skill.name} for ${damage.toLocaleString('en')} damage!`;
+  }
+  
   if (newEnemyHp <= 0) {
     setBattleState(prev => ({
       ...prev,
       enemy: newEnemy,
       playerStats: newPlayerStats,
-      log: [...prev.log, `You use ${skill.name} for ${damage.toLocaleString('en')} damage!`, `${prev.enemy?.name} was defeated!`],
+      log: [...prev.log, attackMessage, `${prev.enemy?.name} was defeated!`],
       inProgress: false
     }));
     
@@ -110,7 +129,7 @@ export const useSkillInBattle = (
     ...prev,
     enemy: newEnemy,
     playerStats: newPlayerStats,
-    log: [...prev.log, `You use ${skill.name} for ${damage.toLocaleString('en')} damage!`],
+    log: [...prev.log, attackMessage],
     playerTurn: false
   }));
   
