@@ -87,6 +87,7 @@ const GameContent = () => {
               <div className="w-full max-w-md mx-auto">
                 <PowerLevel />
               </div>
+              <CheatButtons visible={cheatsVisible} />
             </div>
           </TabsContent>
           

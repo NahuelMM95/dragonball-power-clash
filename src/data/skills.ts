@@ -19,7 +19,8 @@ export const playerSkills: Skill[] = [
     kiCostPercent: 1, // Plus 1% of max Ki
     description: "Channel your ki into a powerful energy blast",
     purchased: false,
-    cost: 500
+    cost: 0,
+    powerRequirement: 30
   },
   {
     name: "Kaioken x2",
@@ -35,6 +36,22 @@ export const playerSkills: Skill[] = [
       type: "hp_drain_percent",
       value: 0.02,
       multiplier: 2
+    }
+  },
+  {
+    name: "Super Saiyan",
+    type: "form",
+    damageMultiplier: 50,
+    kiCost: 5000, // Fixed 5000 Ki cost
+    kiCostPercent: 10, // Plus 10% of max Ki
+    description: "The legendary transformation that multiplies your power by 50 but drains 7.5% Ki per turn",
+    purchased: false,
+    cost: 50000,
+    powerRequirement: 50000,
+    specialEffect: {
+      type: "ki_drain_percent",
+      value: 0.075,
+      multiplier: 50
     }
   }
 ];

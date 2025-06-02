@@ -1,5 +1,7 @@
 
 import { Enemy } from '@/types/game';
+import { useSettings } from '@/hooks/useSettings';
+import { abbreviateNumber } from '@/utils/numberAbbreviation';
 import { Progress } from "@/components/ui/progress";
 import { Image } from "lucide-react";
 import { useState } from 'react';
@@ -10,6 +12,7 @@ type EnemyDisplayProps = {
 };
 
 const EnemyDisplay = ({ enemy }: EnemyDisplayProps) => {
+  const { settings } = useSettings();
   const healthPercentage = (enemy.hp / enemy.maxHp) * 100;
   const [imageError, setImageError] = useState(false);
   
@@ -57,10 +60,10 @@ const EnemyDisplay = ({ enemy }: EnemyDisplayProps) => {
             {remainingEnemies} of {enemy.enemyCount} remaining
           </p>
         )}
-        <p className="text-xs text-gray-600">Power Level: {enemy.power.toLocaleString('en')}</p>
+        <p className="text-xs text-gray-600">Power Level: {abbreviateNumber(enemy.power, settings.numberAbbreviation)}</p>
         <div className="flex justify-between text-xs text-gray-600 mt-1">
           <span>HP:</span>
-          <span>{enemy.hp.toLocaleString('en')}/{enemy.maxHp.toLocaleString('en')}</span>
+          <span>{abbreviateNumber(enemy.hp, settings.numberAbbreviation)}/{abbreviateNumber(enemy.maxHp, settings.numberAbbreviation)}</span>
         </div>
         <Progress value={healthPercentage} color="red" className="h-2 mt-1" />
       </div>

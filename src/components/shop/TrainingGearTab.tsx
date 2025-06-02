@@ -6,7 +6,6 @@ import { useSettings } from "@/hooks/useSettings";
 import { abbreviateNumber } from "@/utils/numberAbbreviation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Weight } from "lucide-react";
 
 const TrainingGearTab = () => {
@@ -45,23 +44,9 @@ const TrainingGearTab = () => {
         {weightedGear.map((upgrade) => (
           <Card key={upgrade.id} className="border-2 border-gray-200 dark:border-gray-700">
             <CardHeader className="pb-2">
-              <div className="flex justify-between items-start">
-                <div className="flex items-center flex-1">
-                  <Weight className="mr-2 h-4 w-4 text-gray-600 dark:text-gray-400" />
-                  <CardTitle className="text-sm dark:text-gray-200">{upgrade.name}</CardTitle>
-                </div>
-                <div className="flex flex-col gap-1">
-                  {upgrade.purchased && (
-                    <Badge variant="outline" className="text-xs px-1 py-0">
-                      Purchased
-                    </Badge>
-                  )}
-                  {upgrade.purchased && isWeightedClothesEquipped && (
-                    <Badge variant="default" className="text-xs px-1 py-0 bg-green-600">
-                      Equipped
-                    </Badge>
-                  )}
-                </div>
+              <div className="flex items-center">
+                <Weight className="mr-2 h-4 w-4 text-gray-600 dark:text-gray-400" />
+                <CardTitle className="text-sm dark:text-gray-200 leading-normal">{upgrade.name}</CardTitle>
               </div>
               <CardDescription className="dark:text-gray-400 text-xs leading-relaxed">{upgrade.description}</CardDescription>
             </CardHeader>

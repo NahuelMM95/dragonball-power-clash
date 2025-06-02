@@ -40,7 +40,7 @@ export const initialUpgrades: Upgrade[] = [
   },
   { 
     id: 'weights', 
-    name: '5Kg Weighted Clothes', 
+    name: '5 kg Weighted Clothes', 
     description: 'Increases chance of power gain every 100 clicks by 5%.', 
     powerBonus: 0, 
     cost: 2000,

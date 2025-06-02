@@ -13,8 +13,8 @@ const FightMenu = () => {
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid grid-cols-2 mb-4">
-          <TabsTrigger value="wilderness">Wilderness</TabsTrigger>
-          <TabsTrigger value="story">Story Mode</TabsTrigger>
+          <TabsTrigger value="wilderness" className="text-xs">Wilderness</TabsTrigger>
+          <TabsTrigger value="story" className="text-xs">Story Mode</TabsTrigger>
         </TabsList>
         
         <TabsContent value="wilderness">

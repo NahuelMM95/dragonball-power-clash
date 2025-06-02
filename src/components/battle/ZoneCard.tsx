@@ -61,8 +61,8 @@ const ZoneCard = ({
       <CardHeader className={`pb-2 ${style.bg}/20`}>
         <div className="flex justify-between items-center">
           <div>
-            <CardTitle className="text-lg">{zoneName}</CardTitle>
-            <CardDescription>{description}</CardDescription>
+            <CardTitle className="text-sm">{zoneName}</CardTitle>
+            <CardDescription className="text-xs">{description}</CardDescription>
           </div>
           <Button
             variant="ghost"
@@ -75,11 +75,11 @@ const ZoneCard = ({
       </CardHeader>
       <CardContent className="pb-2 pt-4">
         {showEnemies && (
-          <div className="text-sm">
+          <div className="text-xs">
             <p className="mb-1">Possible Enemies:</p>
             <ul className="list-disc pl-5">
               {enemies.map((enemy) => (
-                <li key={enemy.name}>
+                <li key={enemy.name} className="text-xs">
                   {enemy.name} (Power Level: {enemy.power.toLocaleString('en')})
                   {enemy.reward && ` - ${enemy.reward}`}
                 </li>
