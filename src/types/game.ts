@@ -75,6 +75,7 @@ export type Skill = {
   type: SkillType;
   damageMultiplier: number;
   kiCost: number;
+  kiCostPercent?: number; // Added this optional property
   description: string;
   purchased?: boolean;
   cost?: number;
